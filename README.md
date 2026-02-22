@@ -1,52 +1,49 @@
-# Oblamatik Home Assistant Custom Integration
+# Oblamatik
 
-## 🎯 Opis
+Home Assistant Custom Integration for Oblamatik.
 
-Integracja **Oblamatik** dla Home Assistant umożliwia sterowanie urządzeniami KWC (KWC Direct) za pomocą interfejsu API.
+## Installation
 
-## 🚀 Funkcjonalność
+### HACS (Recommended)
 
-### 🔄 Przełączniki (Switch)
-- **Water Flow** - włącz/wyłącz przepływ wody
-- **Heating** - włącz/wyłącz ogrzewanie
+1. Open HACS in your Home Assistant instance
+2. Click on "Integrations"
+3. Click the three dots in the top right corner
+4. Select "Custom repositories"
+5. Add this repository URL: `https://github.com/bobsilesia/oblamatik`
+6. Select category "Integration"
+7. Click "Add"
+8. Search for "Oblamatik" in HACS
+9. Click "Install"
+10. Restart Home Assistant
 
-### 🌡️ Klimatyzacja (Climate)
-- **Kontrola temperatury** - ustawianie temperatury wody
-- **Tryby HVAC** - grzanie, chłodzenie, automatyczne
+### Manual Installation
 
-### 📊 Sensory (Sensor)
-- **Temperatura** - aktualna temperatura wody
-- **Przepływ** - aktualny przepływ wody
-- **Status urządzenia** - stan połączenia
+1. Download the latest release from this repository
+2. Copy the `custom_components/oblamatik` directory to your Home Assistant `config/custom_components/` directory
+3. Restart Home Assistant
 
-### 🔢 Precyzyjna kontrola (Number)
-- **Temperatura** - precyzyjne ustawienie temperatury
-- **Przepływ** - precyzyjne ustawienie przepływu
+## Configuration
 
-## 📋 Wymagania
+After installation, add the integration through the Home Assistant UI:
 
-- Home Assistant >= 2023.1
-- aiohttp (dla zapytań HTTP)
-- Dostęp do sieci urządzenia KWC
+1. Go to Settings → Devices & Services
+2. Click "+ Add Integration"
+3. Search for "Oblamatik"
+4. Follow the configuration steps
 
-## 🎨 Ikona
+## Development
 
-Integracja używa oficjalnej ikony z repozytorium Home Assistant brands.
+This integration is in early development.
 
-## 📦 Instalacja
+### Contributing
 
-1. Skopiuj folder `oblamatik-hacs` do `custom_components/oblamatik/`
-2. Zrestartuj Home Assistant
-3. Dodaj integrację w Ustawienia > Integracje
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-## 📄 Wersja
+## License
 
-**v2.0.3** - najnowsza wersja z poprawkami:
-- Naprawiono błędy konfiguracji 500
-- Dodano wsparcie dla wielu urządzeń
-- Poprawiono obsługę flagi `changed`
-- Dodano oficjalną ikonę
+This project is licensed under the MIT License.
 
-## 👨‍💻 Autor
+## Support
 
-Robert Psiurski - rozwój i utrzymanie integracji Home Assistant
+For issues and feature requests, please use the [GitHub issue tracker](https://github.com/bobsilesia/oblamatik/issues).
