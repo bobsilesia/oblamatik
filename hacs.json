@@ -10,6 +10,7 @@
   "iot_class": false,
   "country": ["PL"],
   "issue_tracker": "https://github.com/robertpsiurski/oblamatik-hacs/issues",
+  "icon": "mdi:puzzle",
   "zip_exclude": [
     "tests",
     "__pycache__",
