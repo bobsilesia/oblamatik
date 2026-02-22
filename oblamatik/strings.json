@@ -1,0 +1,1 @@
+{"config": {"step": {"user": {"title": "Oblamatik", "description": "Configure your Oblamatik device.", "data": {"host": "Host/IP Address", "port": "Port (optional)"}}}, "error": {"cannot_connect": "Failed to connect to Oblamatik device"}}}

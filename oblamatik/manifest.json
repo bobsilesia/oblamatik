@@ -1,0 +1,1 @@
+{"domain": "oblamatik", "name": "Oblamatik", "version": "2.0.3", "documentation": "https://github.com/oblamatik/home-assistant-integration", "issue_tracker": "https://github.com/oblamatik/home-assistant-integration/issues", "dependencies": [], "codeowners": ["@oblamatik"], "requirements": ["aiohttp"], "config_flow": true}
