@@ -45,6 +45,11 @@ async def async_setup_entry(
             OblamatikTemperatureSensor(hass, device),
             OblamatikFlowSensor(hass, device),
             OblamatikStatusSensor(hass, device),
+            OblamatikWaterFlowSensor(hass, device),
+            OblamatikCurrentTemperatureSensor(hass, device),
+            OblamatikFlowRateLiterPerHourSensor(hass, device),
+            OblomatikBathFaucetSensor(hass, device),
+            OblomatikBathButtonSensor(hass, device),
         ])
     
     async_add_entities(sensors, True)
@@ -65,24 +70,30 @@ class OblamatikBaseSensor(SensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, self._host)},
             name=device.get("name", f"Oblamatik ({self._host})"),
-            manufacturer="KWC",
-            model="TLC15F",
+            manufacturer="KWC/Viega",
+            model="TLC15F/TLC30FTD",
         )
         self._attr_available = True
 
     async def _get_device_state(self) -> Dict[str, Any]:
-        """Get current state from KWC device."""
+        """Get current state from KWC/Viega device."""
         try:
             base_url = f"http://{self._host}:{self._port}"
+            # Try Viega API first
             async with aiohttp.ClientSession() as session:
-                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=5) as response:
+                async with session.get(f"{base_url}/api/tlc/1/", timeout=5) as response:
                     if response.status == 200:
                         return await response.json()
                     else:
-                        _LOGGER.warning(f"Failed to get KWC state: {response.status}")
-                        return {}
+                        # Fallback to KWC API
+                        async with session.get(f"{base_url}/api/tlc/1/state/", timeout=5) as response:
+                            if response.status == 200:
+                                return await response.json()
+                            else:
+                                _LOGGER.warning(f"Failed to get device state: {response.status}")
+                                return {}
         except Exception as e:
-            _LOGGER.error("Error getting KWC state: %s", e)
+            _LOGGER.error("Error getting device state: %s", e)
             return {}
 
 
@@ -153,4 +164,129 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         """Update sensor state."""
         state = await self._get_device_state()
         self._current_status = state.get("state", "unknown")
+        self.async_write_ha_state()
+
+
+class OblamatikWaterFlowSensor(OblamatikBaseSensor):
+    """Sensor for water flow state (open/closed)."""
+
+    def __init__(self, hass: HomeAssistant, device: Dict[str, Any]) -> None:
+        """Initialize water flow sensor."""
+        super().__init__(hass, device)
+        self._attr_name = f"Water Flow State ({self._host})"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_water_flow_state"
+        self._attr_icon = "mdi:water-pump"
+        self._attr_state_class = None
+        self._water_flow_state = "closed"
+
+    @property
+    def native_value(self) -> Optional[str]:
+        """Return the water flow state."""
+        return self._water_flow_state
+
+    async def async_update(self) -> None:
+        """Update sensor state."""
+        state = await self._get_device_state()
+        flow = state.get("flow", 0.0)
+        self._water_flow_state = "open" if flow > 0 else "closed"
+        self.async_write_ha_state()
+
+
+class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
+    """Sensor for current temperature (Viega compatible)."""
+
+    def __init__(self, hass: HomeAssistant, device: Dict[str, Any]) -> None:
+        """Initialize current temperature sensor."""
+        super().__init__(hass, device)
+        self._attr_name = f"Current Temperature ({self._host})"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_current_temperature"
+        self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+        self._attr_icon = "mdi:thermometer-water"
+        self._attr_state_class = "measurement"
+        self._current_temperature = 0.0
+
+    @property
+    def native_value(self) -> Optional[float]:
+        """Return the current temperature."""
+        return self._current_temperature
+
+    async def async_update(self) -> None:
+        """Update sensor state."""
+        state = await self._get_device_state()
+        self._current_temperature = state.get("temperature", 0.0)
+        self.async_write_ha_state()
+
+
+class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
+    """Sensor for flow rate in liters per hour."""
+
+    def __init__(self, hass: HomeAssistant, device: Dict[str, Any]) -> None:
+        """Initialize flow rate L/h sensor."""
+        super().__init__(hass, device)
+        self._attr_name = f"Flow Rate L/h ({self._host})"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_flow_rate_lh"
+        self._attr_native_unit_of_measurement = "L/h"
+        self._attr_icon = "mdi:water-speed"
+        self._attr_state_class = "measurement"
+        self._flow_rate_lh = 0.0
+
+    @property
+    def native_value(self) -> Optional[float]:
+        """Return the current flow rate in L/h."""
+        return self._flow_rate_lh
+
+    async def async_update(self) -> None:
+        """Update sensor state."""
+        state = await self._get_device_state()
+        flow_lpm = state.get("flow", 0.0)  # L/min from API
+        self._flow_rate_lh = flow_lpm * 60  # Convert to L/h
+        self.async_write_ha_state()
+
+
+class OblomatikBathFaucetSensor(OblamatikBaseSensor):
+    """Sensor for bath faucet state (Viega)."""
+
+    def __init__(self, hass: HomeAssistant, device: Dict[str, Any]) -> None:
+        """Initialize bath faucet sensor."""
+        super().__init__(hass, device)
+        self._attr_name = f"Bath Faucet ({self._host})"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_faucet"
+        self._attr_icon = "mdi:faucet"
+        self._bath_faucet_state = "closed"
+
+    @property
+    def native_value(self) -> Optional[str]:
+        """Return the bath faucet state."""
+        return self._bath_faucet_state
+
+    async def async_update(self) -> None:
+        """Update sensor state."""
+        state = await self._get_device_state()
+        device_state = state.get("state", "unknown")
+        # Viega state 'a' might mean active/open
+        self._bath_faucet_state = "open" if device_state == "a" else "closed"
+        self.async_write_ha_state()
+
+
+class OblomatikBathButtonSensor(OblamatikBaseSensor):
+    """Sensor for bath button state (Viega)."""
+
+    def __init__(self, hass: HomeAssistant, device: Dict[str, Any]) -> None:
+        """Initialize bath button sensor."""
+        super().__init__(hass, device)
+        self._attr_name = f"Bath Button ({self._host})"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_button"
+        self._attr_icon = "mdi:button-pointer"
+        self._bath_button_state = False
+
+    @property
+    def native_value(self) -> Optional[bool]:
+        """Return the bath button state."""
+        return self._bath_button_state
+
+    async def async_update(self) -> None:
+        """Update sensor state."""
+        state = await self._get_device_state()
+        popup = state.get("popup", False)
+        self._bath_button_state = bool(popup)
         self.async_write_ha_state()
