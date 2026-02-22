@@ -56,3 +56,4 @@ async def async_unload_entry(hass: HomeAssistant, entry) -> bool:
     return await hass.config_entries.async_forward_entry_unload(entry, [
         Platform.SWITCH, Platform.CLIMATE, Platform.SENSOR, Platform.NUMBER
     ])
+from .websocket import OblamatikWebSocket, OblamatikRealTimeUpdater
