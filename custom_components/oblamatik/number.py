@@ -109,14 +109,47 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
         self._attr_native_step = 1.0
         self._attr_native_value = 38.0
 
+    async def _get_current_flow(self) -> Optional[float]:
+        """Get current flow from device."""
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{base_url}/api/state/", 
+                    timeout=5
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        # Try to get flow from response
+                        if "flow" in data:
+                            return float(data["flow"])
+                        elif "flow_rate" in data:
+                            return float(data["flow_rate"])
+                        else:
+                            _LOGGER.warning(f"Flow not found in response: {data}")
+                            return None
+                    else:
+                        _LOGGER.warning(f"Failed to get state: {response.status}")
+                        return None
+        except Exception as e:
+            _LOGGER.error("Error getting current flow: %s", e)
+            return None
+
     async def async_set_native_value(self, value: float) -> None:
         """Set new temperature value."""
         _LOGGER.info(f"Setting temperature to {value}°C")
         self._attr_native_value = value
         
-        # Send temperature command
-        if await self._post_tlc(value, 0.0, True):
-            _LOGGER.info(f"Temperature set successfully to {value}°C")
+        # Get current flow to send with temperature command
+        current_flow = await self._get_current_flow()
+        if current_flow is None:
+            current_flow = 0.0  # Fallback to default flow
+            _LOGGER.warning(f"Could not get current flow, using fallback: {current_flow} L/min")
+        
+        # Send temperature command with current flow
+        if await self._post_tlc(value, current_flow, True):
+            _LOGGER.info(f"Temperature set successfully to {value}°C with flow {current_flow} L/min")
             self.async_write_ha_state()
         else:
             _LOGGER.error("Failed to set temperature")
@@ -137,14 +170,47 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
         self._attr_native_step = 0.1
         self._attr_native_value = 0.0
 
+    async def _get_current_temperature(self) -> Optional[float]:
+        """Get current temperature from device."""
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            
+            async with aiohttp.ClientSession() as session:
+                async with session.get(
+                    f"{base_url}/api/state/", 
+                    timeout=5
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        # Try to get temperature from response
+                        if "temperature" in data:
+                            return float(data["temperature"])
+                        elif "temp" in data:
+                            return float(data["temp"])
+                        else:
+                            _LOGGER.warning(f"Temperature not found in response: {data}")
+                            return None
+                    else:
+                        _LOGGER.warning(f"Failed to get state: {response.status}")
+                        return None
+        except Exception as e:
+            _LOGGER.error("Error getting current temperature: %s", e)
+            return None
+
     async def async_set_native_value(self, value: float) -> None:
         """Set new flow value."""
         _LOGGER.info(f"Setting flow rate to {value} L/min")
         self._attr_native_value = value
         
-        # Send flow command
-        if await self._post_tlc(38.0, value, True):
-            _LOGGER.info(f"Flow rate set successfully to {value} L/min")
+        # Get current temperature to send with flow command
+        current_temp = await self._get_current_temperature()
+        if current_temp is None:
+            current_temp = 38.0  # Fallback to default temperature
+            _LOGGER.warning(f"Could not get current temperature, using fallback: {current_temp}°C")
+        
+        # Send flow command with current temperature
+        if await self._post_tlc(current_temp, value, True):
+            _LOGGER.info(f"Flow rate set successfully to {value} L/min with temperature {current_temp}°C")
             self.async_write_ha_state()
         else:
             _LOGGER.error("Failed to set flow rate")
