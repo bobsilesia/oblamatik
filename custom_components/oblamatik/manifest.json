@@ -1,1 +1,12 @@
-{"domain": "oblamatik", "name": "Oblamatik", "version": "2.0.3", "documentation": "https://github.com/oblamatik/home-assistant-integration", "issue_tracker": "https://github.com/oblamatik/home-assistant-integration/issues", "dependencies": [], "codeowners": ["@oblamatik"], "requirements": ["aiohttp"], "config_flow": true}
+{
+  "domain": "oblamatik",
+  "name": "Oblamatik",
+  "version": "2.0.4",
+  "documentation": "https://github.com/bobsilesia/oblamatik",
+  "issue_tracker": "https://github.com/bobsilesia/oblamatik/issues",
+  "dependencies": [],
+  "codeowners": ["@bobsilesia"],
+  "requirements": ["aiohttp"],
+  "config_flow": true,
+  "iot_class": "local_polling"
+}
