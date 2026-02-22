@@ -105,9 +105,11 @@ class OblamatikTemperatureSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Temperature ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_temperature"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_temperature"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer"
         self._attr_state_class = "measurement"
+        self._current_temperature = 0.0
 
     @property
     def native_value(self) -> Optional[float]:
@@ -129,9 +131,11 @@ class OblamatikFlowSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Flow Rate ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_flow"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
         self._attr_icon = "mdi:water"
         self._attr_state_class = "measurement"
+        self._current_flow = 0.0
 
     @property
     def native_value(self) -> Optional[float]:
@@ -153,7 +157,9 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Status ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_status"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_status"
         self._attr_icon = "mdi:information"
+        self._current_status = "unknown"
 
     @property
     def native_value(self) -> Optional[str]:
@@ -175,6 +181,7 @@ class OblamatikWaterFlowSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Water Flow State ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_water_flow_state"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_water_flow_state"
         self._attr_icon = "mdi:water-pump"
         self._attr_state_class = None
         self._water_flow_state = "closed"
@@ -200,6 +207,7 @@ class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Current Temperature ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_current_temperature"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_current_temperature"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer-water"
         self._attr_state_class = "measurement"
@@ -225,6 +233,7 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Flow Rate L/h ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow_rate_lh"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_flow_rate_lh"
         self._attr_native_unit_of_measurement = "L/h"
         self._attr_icon = "mdi:water-speed"
         self._attr_state_class = "measurement"
@@ -251,6 +260,7 @@ class OblomatikBathFaucetSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Bath Faucet ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_faucet"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_bath_faucet"
         self._attr_icon = "mdi:faucet"
         self._bath_faucet_state = "closed"
 
@@ -276,6 +286,7 @@ class OblomatikBathButtonSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = f"Bath Button ({self._host})"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_button"
+        self._attr_entity_id = f"sensor.oblamatik_{self._host.replace('.', '_')}_bath_button"
         self._attr_icon = "mdi:button-pointer"
         self._bath_button_state = False
 
