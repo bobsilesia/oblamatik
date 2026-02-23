@@ -1,0 +1,42 @@
+name: Update Repo About
+
+on:
+  workflow_dispatch:
+    inputs:
+      description:
+        description: "New repository description"
+        required: true
+      homepage:
+        description: "Homepage URL (optional)"
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Validate secret exists
+        run: |
+          if [ -z "${{ secrets.REPO_ADMIN_TOKEN }}" ]; then
+            echo "Missing repository secret REPO_ADMIN_TOKEN. Add a PAT with 'repo' scope."
+            exit 1
+          fi
+      - name: Update repository metadata
+        env:
+          TOKEN: ${{ secrets.REPO_ADMIN_TOKEN }}
+          OWNER: ${{ github.repository_owner }}
+          REPO: ${{ github.event.repository.name }}
+          DESC: ${{ github.event.inputs.description }}
+          HOME: ${{ github.event.inputs.homepage }}
+        run: |
+          set -e
+          PAYLOAD=$(jq -n --arg d "$DESC" --arg h "$HOME" \
+            'if $h == "" then {description: $d} else {description: $d, homepage: $h} end')
+          curl -sS -X PATCH \
+            -H "Authorization: Bearer ${TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/${OWNER}/${REPO} \
+            -d "${PAYLOAD}"
