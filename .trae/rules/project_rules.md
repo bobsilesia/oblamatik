@@ -1,0 +1,16 @@
+ - Target Home Assistant Core version: 2025.2+
+ - Always use asynchronous programming (async/await).
+ - Prefer 'DataUpdateCoordinator' for API polling integrations.
+ - Follow 'homeassistant.helpers.config_validation' for schema checks.
+ - All strings must be localized using 'strings.json' and 'en.json'.
+ - Maintain a strict 'custom_components/DOMAIN/' directory structure.
+ - Use ruff for linting: 'ruff check custom_components/oblamatik'
+ - Use ruff for formatting: 'ruff format custom_components/oblamatik'
+ - Use mypy for type checks: 'mypy custom_components/oblamatik'
+ - Validate metadata with hassfest (local or GitHub Action)
+ - Keep manifest.json version synced with Git tags (SemVer)
+ - Create release tags: 'vMAJOR.MINOR.PATCH' and changelog entry
+ - Automate CI on GitHub: ruff, mypy, hassfest on pull_request/push
+ - Do not commit secrets; use '.gitignore' and environment variables
+ - Ensure README covers setup, config_flow, supported platforms
+ - If using HACS: include 'hacs.json' and release asset ZIP
