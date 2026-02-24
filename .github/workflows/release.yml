@@ -3,19 +3,28 @@ on:
   push:
     tags:
       - "v*"
+  workflow_dispatch:
+permissions:
+  contents: write
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Create HACS ZIP
         run: |
           cd custom_components/oblamatik
           zip -r ../../oblamatik.zip .
+          ls -lh ../../oblamatik.zip
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: oblamatik.zip
           generate_release_notes: true
+          fail_on_unmatched_files: true
+          draft: false
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
