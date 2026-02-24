@@ -43,25 +43,7 @@ class ConfigFlow(config_entries.ConfigFlow):
                     },
                 )
             else:
-                return self.async_create_entry(
-                    title=f"Oblamatik ({host})",
-                    data={
-                        CONF_HOST: host,
-                        CONF_PORT: port,
-                        "device_type": "unknown",
-                        "model": "Unknown",
-                        "name": f"Oblamatik {host}",
-                        "devices": [
-                            {
-                                "host": host,
-                                "port": port,
-                                "name": f"Oblamatik {host}",
-                                "type": "unknown",
-                                "model": "Unknown",
-                            }
-                        ],
-                    },
-                )
+                errors["base"] = "cannot_connect"
 
         return self.async_show_form(
             step_id="user",
@@ -75,41 +57,24 @@ class ConfigFlow(config_entries.ConfigFlow):
         )
 
     async def _test_connection_and_detect(self, host: str, port: int) -> dict[str, Any] | None:
-        session = aiohttp_client.async_get_clientsession(self.hass)
-        timeout = aiohttp.ClientTimeout(total=5)
-
-        # Try first endpoint
         try:
             url = f"http://{host}:{port}/api/tlc/1/"
+            session = aiohttp_client.async_get_clientsession(self.hass)
+            timeout = aiohttp.ClientTimeout(total=5)
             async with session.get(url, timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json()
+                    device_type = self._detect_device_type(data)
                     return {
-                        "type": self._detect_device_type(data),
+                        "type": device_type,
                         "model": data.get("model", "Unknown"),
                         "name": data.get("name", f"Oblamatik {host}"),
                         "version": data.get("version", "Unknown"),
                         "serial": data.get("serial", "Unknown"),
                     }
         except Exception as e:
-            _LOGGER.debug(f"Primary endpoint failed: {e}")
-
-        # Try fallback endpoint
-        try:
-            url_state = f"http://{host}:{port}/api/tlc/1/state/"
-            async with session.get(url_state, timeout=timeout) as response2:
-                if response2.status == 200:
-                    data2 = await response2.json()
-                    return {
-                        "type": self._detect_device_type(data2),
-                        "model": data2.get("model", "Unknown"),
-                        "name": data2.get("name", f"Oblamatik {host}"),
-                        "version": data2.get("version", "Unknown"),
-                        "serial": data2.get("serial", "Unknown"),
-                    }
-        except Exception as e:
-            _LOGGER.error(f"Fallback endpoint failed: {e}")
-
+            _LOGGER.error(f"Connection test failed: {e}")
+            return None
         return None
 
     def _detect_device_type(self, data: dict[str, Any]) -> str:

@@ -1,8 +1,4 @@
- {
-   "name": "Oblamatik",
-   "render_readme": true,
-   "zip_release": true,
-   "filename": "oblamatik.zip",
-    "content_in_root": true,
-   "homeassistant": "2025.2.0"
- }
+{
+  "name": "Oblamatik",
+  "render_readme": true
+}
