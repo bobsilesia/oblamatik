@@ -1,37 +1,21 @@
-name: Release (HACS ZIP)
-
+name: release
 on:
   push:
     tags:
       - "v*"
-  workflow_dispatch:
-
-permissions:
-  contents: write
-
 jobs:
-  build-zip:
-    name: Build HACS ZIP
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Verify integration folder exists
+      - uses: actions/checkout@v4
+      - name: Create HACS ZIP
         run: |
-          if [ ! -d "custom_components/oblamatik" ]; then
-            echo "custom_components/oblamatik not found. Ensure integration files are in repo."
-            exit 1
-          fi
-
-      - name: Create ZIP
-        run: |
-          zip -r oblamatik.zip custom_components/oblamatik \
-            -x "**/__pycache__/*" "*.pyc" ".DS_Store"
-
-      - name: Publish Release
+          cd custom_components/oblamatik
+          zip -r ../../oblamatik.zip .
+      - name: Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:
           files: oblamatik.zip
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

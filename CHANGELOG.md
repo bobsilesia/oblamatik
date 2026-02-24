@@ -24,3 +24,8 @@ Instrukcje wydania:
 - Poprawki lint/format: `ruff` uporządkował importy, `mypy` bez błędów
 - Manifest: podbicie wersji do `2.1.5`
 - ZIP dla HACS: bez zagnieżdżeń, pliki integracji w root ZIP
+## v2.1.6 (2026-02-24)
+
+- Automatyczne wydania: workflow GitHub tworzy Release i dołącza asset `oblamatik.zip` przy tagach `v*`
+- Manifest: podbicie wersji do `2.1.6`
+- Utrwalenie wymagań HACS: asset zawiera pliki integracji bezpośrednio w root ZIP
