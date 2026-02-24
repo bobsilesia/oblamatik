@@ -1,20 +1,21 @@
 import logging
 from typing import Any
 
+import aiohttp
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_PORT
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.helpers import aiohttp_client
 
 _LOGGER = logging.getLogger(__name__)
 DOMAIN = "oblamatik"
 
 
-class OblamatikConfigFlow(config_entries.ConfigFlow):
+class ConfigFlow(config_entries.ConfigFlow):
     VERSION = 2
     domain = DOMAIN
 
-    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
         errors = {}
 
         if user_input is not None:
@@ -56,22 +57,21 @@ class OblamatikConfigFlow(config_entries.ConfigFlow):
         )
 
     async def _test_connection_and_detect(self, host: str, port: int) -> dict[str, Any] | None:
-        import aiohttp
-
         try:
             url = f"http://{host}:{port}/api/tlc/1/"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=5) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        device_type = self._detect_device_type(data)
-                        return {
-                            "type": device_type,
-                            "model": data.get("model", "Unknown"),
-                            "name": data.get("name", f"Oblamatik {host}"),
-                            "version": data.get("version", "Unknown"),
-                            "serial": data.get("serial", "Unknown"),
-                        }
+            session = aiohttp_client.async_get_clientsession(self.hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(url, timeout=timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    device_type = self._detect_device_type(data)
+                    return {
+                        "type": device_type,
+                        "model": data.get("model", "Unknown"),
+                        "name": data.get("name", f"Oblamatik {host}"),
+                        "version": data.get("version", "Unknown"),
+                        "serial": data.get("serial", "Unknown"),
+                    }
         except Exception as e:
             _LOGGER.error(f"Connection test failed: {e}")
             return None
@@ -107,7 +107,7 @@ class OblamatikOptionsFlow(config_entries.OptionsFlow):
     def __init__(self, config_entry: config_entries.ConfigEntry) -> None:
         self._entry = config_entry
 
-    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> Any:
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         return self.async_show_form(

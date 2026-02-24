@@ -6,6 +6,7 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature, UnitOfVolumeFlowRate
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -96,19 +97,20 @@ class OblamatikBaseSensor(SensorEntity):
     async def _get_device_state(self) -> dict[str, Any]:
         try:
             base_url = f"http://{self._host}:{self._port}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{base_url}/api/tlc/1/", timeout=5) as response:
-                    if response.status == 200:
-                        return await response.json()
-                    else:
-                        async with session.get(
-                            f"{base_url}/api/tlc/1/state/", timeout=5
-                        ) as response2:
-                            if response2.status == 200:
-                                return await response2.json()
-                            else:
-                                _LOGGER.warning(f"Failed to get device state: {response.status}")
-                                return {}
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/tlc/1/", timeout=timeout) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    async with session.get(
+                        f"{base_url}/api/tlc/1/state/", timeout=timeout
+                    ) as response2:
+                        if response2.status == 200:
+                            return await response2.json()
+                        else:
+                            _LOGGER.warning(f"Failed to get device state: {response.status}")
+                            return {}
         except Exception as e:
             _LOGGER.error(f"Error getting device state: {e}")
             return {}

@@ -6,6 +6,7 @@ from homeassistant.components.number import NumberEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature, UnitOfVolumeFlowRate
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -60,18 +61,17 @@ class OblamatikBaseNumber(NumberEntity):
             base_url = f"http://{self._host}:{self._port}"
             data = f"temperature={temperature}&flow={flow}&changed={1 if changed else 0}"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=5
-                ) as response:
-                    success = response.status == 200
-                    if success:
-                        _LOGGER.info(
-                            f"Successfully sent TLC command: temp={temperature}, flow={flow}"
-                        )
-                    else:
-                        _LOGGER.warning(f"TLC command failed: {response.status}")
-                    return success
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(
+                f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=timeout
+            ) as response:
+                success = response.status == 200
+                if success:
+                    _LOGGER.info(f"Successfully sent TLC command: temp={temperature}, flow={flow}")
+                else:
+                    _LOGGER.warning(f"TLC command failed: {response.status}")
+                return success
         except Exception as e:
             _LOGGER.error("Error sending TLC command: %s", e)
             return False
@@ -92,20 +92,21 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
     async def _get_current_flow(self) -> float | None:
         try:
             base_url = f"http://{self._host}:{self._port}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=5) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if "flow" in data:
-                            return float(data["flow"])
-                        elif "flow_rate" in data:
-                            return float(data["flow_rate"])
-                        else:
-                            _LOGGER.warning(f"Flow not found in response: {data}")
-                            return None
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if "flow" in data:
+                        return float(data["flow"])
+                    elif "flow_rate" in data:
+                        return float(data["flow_rate"])
                     else:
-                        _LOGGER.warning(f"Failed to get state: {response.status}")
+                        _LOGGER.warning(f"Flow not found in response: {data}")
                         return None
+                else:
+                    _LOGGER.warning(f"Failed to get state: {response.status}")
+                    return None
         except Exception as e:
             _LOGGER.error("Error getting current flow: %s", e)
             return None
@@ -141,20 +142,21 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
     async def _get_current_temperature(self) -> float | None:
         try:
             base_url = f"http://{self._host}:{self._port}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=5) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        if "temperature" in data:
-                            return float(data["temperature"])
-                        elif "temp" in data:
-                            return float(data["temp"])
-                        else:
-                            _LOGGER.warning(f"Temperature not found in response: {data}")
-                            return None
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if "temperature" in data:
+                        return float(data["temperature"])
+                    elif "temp" in data:
+                        return float(data["temp"])
                     else:
-                        _LOGGER.warning(f"Failed to get state: {response.status}")
+                        _LOGGER.warning(f"Temperature not found in response: {data}")
                         return None
+                else:
+                    _LOGGER.warning(f"Failed to get state: {response.status}")
+                    return None
         except Exception as e:
             _LOGGER.error("Error getting current temperature: %s", e)
             return None
