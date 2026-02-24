@@ -29,3 +29,8 @@ Instrukcje wydania:
 - Automatyczne wydania: workflow GitHub tworzy Release i dołącza asset `oblamatik.zip` przy tagach `v*`
 - Manifest: podbicie wersji do `2.1.6`
 - Utrwalenie wymagań HACS: asset zawiera pliki integracji bezpośrednio w root ZIP
+## v2.1.7 (2026-02-24)
+
+- Rejestracja ConfigFlow zgodna z HA (`class ConfigFlow(..., domain=DOMAIN)`), eliminuje “Invalid handler specified”
+- mypy: wyłączenie błędu `call-arg` dla config_flow
+- Manifest: podbicie wersji do `2.1.7`
