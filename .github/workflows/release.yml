@@ -38,11 +38,10 @@ jobs:
             echo "title=${{ inputs.title }}" >> "$GITHUB_OUTPUT"
             echo "notes=${{ inputs.notes }}" >> "$GITHUB_OUTPUT"
           fi
-      - name: Create HACS ZIP
+      - name: Create Release ZIP
         run: |
-          cd custom_components/oblamatik
-          zip -r ../../oblamatik.zip .
-          ls -lh ../../oblamatik.zip
+          zip -r oblamatik.zip custom_components/oblamatik
+          ls -lh oblamatik.zip
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v1
         with:

@@ -22,3 +22,9 @@
 - manifest.json: bez backticków w URL; poprawny JSON z 'domain' i 'config_flow': true
 - __init__.py: ustaw 'CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)'
 - Ścieżka HA: używaj wyłącznie '/config/custom_components/oblamatik'; bez zagnieżdżeń katalogów
+ - GitHub Release (Actions): używaj workflow z 'permissions: contents: write', 'fetch-depth: 0'
+ - Release trigger: 'push tags: v*' lub 'workflow_dispatch' z inputem 'tag' (np. v2.1.7)
+ - action-gh-release: ustaw 'tag_name', 'files: oblamatik.zip', 'fail_on_unmatched_files: true'
+ - Budowa ZIP: zip -r oblamatik.zip z katalogu 'custom_components/oblamatik' (content_in_root: true)
+ - Zgodność wersji: 'manifest.json["version"]' musi odpowiadać tagowi (SemVer)
+ - Po Release: w HACS wykonaj 'Clear downloads' → 'Reinstall' → 'Reload' → restart HA
