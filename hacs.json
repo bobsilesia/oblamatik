@@ -3,6 +3,6 @@
    "render_readme": true,
    "zip_release": true,
    "filename": "oblamatik.zip",
-   "content_in_root": false,
+    "content_in_root": true,
    "homeassistant": "2025.2.0"
  }

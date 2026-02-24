@@ -16,3 +16,11 @@ Instrukcje wydania:
 - Utwórz tag zgodny z SemVer, np. `v2.1.3`
 - Opublikuj release — workflow automatycznie doda `oblamatik.zip` jako asset
 - Upewnij się, że README opisuje instalację, config_flow i wspierane platformy
+## v2.1.5 (2026-02-24)
+
+- Naprawa config_flow: rejestracja klasy `ConfigFlow` i eliminacja zależności od `FlowResult`
+- Stabilizacja połączeń HTTP: użycie sesji HA `aiohttp_client.async_get_clientsession(hass)`
+- Spójne timeouty: `aiohttp.ClientTimeout(total=5)` we wszystkich wywołaniach HTTP
+- Poprawki lint/format: `ruff` uporządkował importy, `mypy` bez błędów
+- Manifest: podbicie wersji do `2.1.5`
+- ZIP dla HACS: bez zagnieżdżeń, pliki integracji w root ZIP

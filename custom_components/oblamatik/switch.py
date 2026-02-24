@@ -6,6 +6,7 @@ import aiohttp
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -64,13 +65,14 @@ class OblamatikBaseSwitch(SwitchEntity):
     async def _get_device_state(self) -> dict[str, Any]:
         try:
             base_url = f"http://{self._host}:{self._port}"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=5) as response:
-                    if response.status == 200:
-                        return await response.json()
-                    else:
-                        _LOGGER.warning(f"Failed to get KWC state: {response.status}")
-                        return {}
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                if response.status == 200:
+                    return await response.json()
+                else:
+                    _LOGGER.warning(f"Failed to get KWC state: {response.status}")
+                    return {}
         except Exception as e:
             _LOGGER.error("Error getting KWC state: %s", e)
             return {}
@@ -80,16 +82,17 @@ class OblamatikBaseSwitch(SwitchEntity):
             base_url = f"http://{self._host}:{self._port}"
             data = "data=1"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{base_url}/api/tlc/1/quick/1/", data=data, headers=headers, timeout=5
-                ) as response:
-                    success = response.status == 200
-                    if success:
-                        _LOGGER.info("Successfully activated quick mode")
-                    else:
-                        _LOGGER.warning(f"Quick mode failed: {response.status}")
-                    return success
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(
+                f"{base_url}/api/tlc/1/quick/1/", data=data, headers=headers, timeout=timeout
+            ) as response:
+                success = response.status == 200
+                if success:
+                    _LOGGER.info("Successfully activated quick mode")
+                else:
+                    _LOGGER.warning(f"Quick mode failed: {response.status}")
+                return success
         except Exception as e:
             _LOGGER.error("Error activating quick mode: %s", e)
             return False
@@ -99,18 +102,17 @@ class OblamatikBaseSwitch(SwitchEntity):
             base_url = f"http://{self._host}:{self._port}"
             data = f"temperature={temperature}&flow={flow}&changed={1 if changed else 0}"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=5
-                ) as response:
-                    success = response.status == 200
-                    if success:
-                        _LOGGER.info(
-                            f"Successfully sent TLC command: temp={temperature}, flow={flow}"
-                        )
-                    else:
-                        _LOGGER.warning(f"TLC command failed: {response.status}")
-                    return success
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(
+                f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=timeout
+            ) as response:
+                success = response.status == 200
+                if success:
+                    _LOGGER.info(f"Successfully sent TLC command: temp={temperature}, flow={flow}")
+                else:
+                    _LOGGER.warning(f"TLC command failed: {response.status}")
+                return success
         except Exception as e:
             _LOGGER.error("Error sending TLC command: %s", e)
             return False

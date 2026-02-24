@@ -14,3 +14,11 @@
  - Do not commit secrets; use '.gitignore' and environment variables
  - Ensure README covers setup, config_flow, supported platforms
  - If using HACS: include 'hacs.json' and release asset ZIP
+ - HACS ZIP packaging: dopasuj strukturę do hacs.json, bez podwójnych folderów
+ - Ustaw 'content_in_root': true i pakuj ZIP z plikami integracji w root (manifest.json, __init__.py, config_flow.py, strings.json, translations, platformy); bez 'custom_components/' w ZIP
+ - Jeśli 'content_in_root' = false: root ZIP musi zawierać wyłącznie folder 'oblamatik' (bez dodatkowych poziomów)
+- Config Flow: klasa musi być nazwana 'ConfigFlow' i rejestrowana jako 'class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN)'
+- Unikaj importu 'FlowResult' z 'homeassistant.data_entry_flow' — użyj 'typing.Any' dla zgodności wersji HA
+- manifest.json: bez backticków w URL; poprawny JSON z 'domain' i 'config_flow': true
+- __init__.py: ustaw 'CONFIG_SCHEMA = cv.config_entry_only_config_schema(DOMAIN)'
+- Ścieżka HA: używaj wyłącznie '/config/custom_components/oblamatik'; bez zagnieżdżeń katalogów

@@ -7,6 +7,7 @@ from homeassistant.components.climate.const import ClimateEntityFeature, HVACAct
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -97,18 +98,17 @@ class OblamatikClimate(ClimateEntity):
             base_url = f"http://{self._host}:{self._port}"
             data = f"temperature={temperature}&flow={flow}&changed={1 if changed else 0}"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
-                    f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=5
-                ) as response:
-                    success = response.status == 200
-                    if success:
-                        _LOGGER.info(
-                            f"Successfully sent TLC command: temp={temperature}, flow={flow}"
-                        )
-                    else:
-                        _LOGGER.warning(f"TLC command failed: {response.status}")
-                    return success
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(
+                f"{base_url}/api/tlc/1/", data=data, headers=headers, timeout=timeout
+            ) as response:
+                success = response.status == 200
+                if success:
+                    _LOGGER.info(f"Successfully sent TLC command: temp={temperature}, flow={flow}")
+                else:
+                    _LOGGER.warning(f"TLC command failed: {response.status}")
+                return success
         except Exception as e:
             _LOGGER.error("Error sending TLC command: %s", e)
             return False
