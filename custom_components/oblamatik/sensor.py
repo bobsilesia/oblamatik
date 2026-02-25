@@ -114,16 +114,16 @@ class OblamatikBaseSensor(SensorEntity):
                                 _LOGGER.warning(f"Failed to get device state: {response.status}")
                                 return {}
             except Exception as e:
-                 # Try fallback only if first attempt raised exception (not just bad status)
-                 try:
-                     async with session.get(
-                         f"{base_url}/api/tlc/1/state/", timeout=timeout
-                     ) as response2:
-                         if response2.status == 200:
-                             return await response2.json(content_type=None)
-                 except Exception:
-                     pass # Ignore nested failure
-                 raise e # Re-raise original error if fallback also failed
+                # Try fallback only if first attempt raised exception (not just bad status)
+                try:
+                    async with session.get(
+                        f"{base_url}/api/tlc/1/state/", timeout=timeout
+                    ) as response2:
+                        if response2.status == 200:
+                            return await response2.json(content_type=None)
+                except Exception:
+                    pass  # Ignore nested failure
+                raise e  # Re-raise original error if fallback also failed
 
         except Exception as e:
             _LOGGER.error(f"Error getting device state for {self._host}: {e}")
@@ -147,9 +147,8 @@ class OblamatikTemperatureSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             self._current_temperature = float(state.get("temperature", 0.0))
+            self._current_temperature = float(state.get("temperature", 0.0))
         # Remove direct call to async_write_ha_state() as HA calls async_update automatically
-
 
 
 class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
@@ -169,9 +168,8 @@ class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             self._current_temperature = float(state.get("temperature", 0.0))
+            self._current_temperature = float(state.get("temperature", 0.0))
         # Remove direct call to async_write_ha_state() as HA calls async_update automatically
-
 
 
 class OblamatikFlowSensor(OblamatikBaseSensor):
@@ -194,7 +192,6 @@ class OblamatikFlowSensor(OblamatikBaseSensor):
             self._current_flow = float(state.get("flow", 0.0))
 
 
-
 class OblamatikRequiredTemperatureSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
@@ -212,8 +209,7 @@ class OblamatikRequiredTemperatureSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             self._required_temperature = float(state.get("required_temp", 0.0))
-
+            self._required_temperature = float(state.get("required_temp", 0.0))
 
 
 class OblamatikRequiredFlowSensor(OblamatikBaseSensor):
@@ -236,7 +232,6 @@ class OblamatikRequiredFlowSensor(OblamatikBaseSensor):
             self._required_flow = float(state.get("required_flow", 0.0))
 
 
-
 class OblamatikStatusSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
@@ -252,8 +247,7 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             self._current_status = str(state.get("state", "unknown"))
-
+            self._current_status = str(state.get("state", "unknown"))
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
@@ -272,9 +266,8 @@ class OblamatikWaterFlowSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             flow = float(state.get("flow", 0.0))
-             self._water_flow_state = "open" if flow > 0 else "closed"
-
+            flow = float(state.get("flow", 0.0))
+            self._water_flow_state = "open" if flow > 0 else "closed"
 
 
 class OblamatikBathFaucetSensor(OblamatikBaseSensor):
@@ -292,9 +285,8 @@ class OblamatikBathFaucetSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             device_state = state.get("state", "unknown")
-             self._bath_faucet_state = "open" if device_state == "a" else "closed"
-
+            device_state = state.get("state", "unknown")
+            self._bath_faucet_state = "open" if device_state == "a" else "closed"
 
 
 class OblamatikBathButtonSensor(OblamatikBaseSensor):
@@ -312,9 +304,8 @@ class OblamatikBathButtonSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             popup = state.get("popup", False)
-             self._bath_button_state = bool(popup)
-
+            popup = state.get("popup", False)
+            self._bath_button_state = bool(popup)
 
 
 class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
@@ -334,6 +325,5 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-             flow_lpm = float(state.get("flow", 0.0))
-             self._flow_rate_lh = flow_lpm * 60
-
+            flow_lpm = float(state.get("flow", 0.0))
+            self._flow_rate_lh = flow_lpm * 60
