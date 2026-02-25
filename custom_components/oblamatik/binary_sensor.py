@@ -72,9 +72,7 @@ class OblamatikPopupBinarySensor(OblamatikBaseBinarySensor):
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
-            async with session.get(
-                f"{base_url}/api/tlc/1/popup/", timeout=timeout
-            ) as response:
+            async with session.get(f"{base_url}/api/tlc/1/popup/", timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json(content_type=None)
                     # PHP: echo(json_encode(array('state' => $state)));
