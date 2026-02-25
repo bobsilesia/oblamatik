@@ -30,8 +30,16 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
         url = f"http://{host}:{port}/api/tlc/1/"
         async with session.get(url, timeout=timeout) as response:
             if response.status == 200:
-                data = await response.json()
-                return _process_device_data(data, host)
+                try:
+                    data = await response.json()
+                    _LOGGER.info(f"Device {host} responded to primary endpoint with data: {data}")
+                    return _process_device_data(data, host)
+                except Exception as e:
+                    _LOGGER.warning(f"Device {host} responded 200 OK to primary endpoint but JSON decode failed: {e}")
+                    text = await response.text()
+                    _LOGGER.warning(f"Raw response: {text[:200]}...") # Log first 200 chars
+            else:
+                _LOGGER.debug(f"Device {host} returned status {response.status} on primary endpoint")
     except Exception as e:
         _LOGGER.debug(f"Primary endpoint failed for {host}: {e}")
 
@@ -40,8 +48,16 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
         url_state = f"http://{host}:{port}/api/tlc/1/state/"
         async with session.get(url_state, timeout=timeout) as response2:
             if response2.status == 200:
-                data2 = await response2.json()
-                return _process_device_data(data2, host)
+                try:
+                    data2 = await response2.json()
+                    _LOGGER.info(f"Device {host} responded to fallback endpoint with data: {data2}")
+                    return _process_device_data(data2, host)
+                except Exception as e:
+                    _LOGGER.warning(f"Device {host} responded 200 OK to fallback endpoint but JSON decode failed: {e}")
+                    text = await response2.text()
+                    _LOGGER.warning(f"Raw response: {text[:200]}...")
+            else:
+                 _LOGGER.debug(f"Device {host} returned status {response2.status} on fallback endpoint")
     except Exception as e:
         _LOGGER.error(f"Fallback endpoint failed for {host}: {e}")
 
