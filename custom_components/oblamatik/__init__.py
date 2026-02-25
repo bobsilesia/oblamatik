@@ -158,6 +158,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             Platform.SENSOR,
             Platform.NUMBER,
             Platform.BUTTON,
+            Platform.BINARY_SENSOR,
         ],
     )
 
@@ -168,5 +169,12 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Unloading Oblamatik entry")
     return await hass.config_entries.async_unload_platforms(
         entry,
-        [Platform.SWITCH, Platform.CLIMATE, Platform.SENSOR, Platform.NUMBER, Platform.BUTTON],
+        [
+            Platform.SWITCH,
+            Platform.CLIMATE,
+            Platform.SENSOR,
+            Platform.NUMBER,
+            Platform.BUTTON,
+            Platform.BINARY_SENSOR,
+        ],
     )
