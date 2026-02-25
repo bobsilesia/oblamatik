@@ -83,7 +83,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             url = f"http://{host}:{port}/api/tlc/1/"
             async with session.get(url, timeout=timeout) as response:
                 if response.status == 200:
-                    data = await response.json()
+                    data = await response.json(content_type=None)
                     return {
                         "type": self._detect_device_type(data),
                         "model": data.get("model", "Unknown"),
@@ -99,7 +99,7 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             url_state = f"http://{host}:{port}/api/tlc/1/state/"
             async with session.get(url_state, timeout=timeout) as response2:
                 if response2.status == 200:
-                    data2 = await response2.json()
+                    data2 = await response2.json(content_type=None)
                     return {
                         "type": self._detect_device_type(data2),
                         "model": data2.get("model", "Unknown"),
