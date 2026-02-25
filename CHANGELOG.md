@@ -1,5 +1,12 @@
 # Changelog
 
+## v2.1.26
+- **Documentation**: Added comprehensive Wiki (Home, Installation, Configuration, Devices, Entities, Automations, Troubleshooting).
+- **Security**: Added `SECURITY.md` with vulnerability reporting policy.
+- **Community**: Added `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md`, and Issue Templates.
+- **License**: Added MIT License.
+- **Localization**: Translated all documentation and changelogs to English.
+
 ## v2.1.25 (2026-02-25)
 
 - Fix button visibility in newer HA versions: used `EntityCategory.CONFIG/DIAGNOSTIC`
