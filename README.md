@@ -50,6 +50,8 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 ## Troubleshooting
 - Check HA logs (Settings → System → Logs) for integration errors.
 - Ensure the device returns valid responses at `http://IP:PORT/api/tlc/1/` and `http://IP:PORT/api/tlc/1/state/`.
+- [Detailed Troubleshooting Guide](docs/Troubleshooting.md)
+- [Supported Devices & Features](docs/Supported_Devices.md)
 
 ## Contributing
 
