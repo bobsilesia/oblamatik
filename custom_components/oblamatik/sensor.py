@@ -359,11 +359,15 @@ class OblamatikSystemBaseSensor(OblamatikBaseSensor):
             timeout = aiohttp.ClientTimeout(total=5)
             async with session.get(f"{base_url}/api/", timeout=timeout) as response:
                 if response.status == 200:
-                    return await response.json(content_type=None)
+                    data = await response.json(content_type=None)
+                    # If data is empty or missing key fields, trigger fallback
+                    if data and ("uptime" in data or "serial" in data or "version" in data):
+                        return data
         except Exception as e:
             _LOGGER.debug(f"Error getting system state from /api/ for {self._host}: {e}")
 
-        # Fallback to standard endpoint (/api/tlc/1/) if /api/ fails
+        # Fallback to standard endpoint (/api/tlc/1/) if /api/ fails or returns invalid data
+        _LOGGER.debug(f"Falling back to base endpoint for system info for {self._host}")
         return await super()._get_device_state()
 
 
