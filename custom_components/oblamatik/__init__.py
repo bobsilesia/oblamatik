@@ -75,10 +75,18 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
 
 
 def _process_device_data(data: dict[str, Any], host: str) -> dict[str, Any]:
+    device_type = _detect_device_type(data)
+    name = data.get("name")
+    if not name or name == f"Oblamatik {host}" or name == f"Oblamatik ({host})" or host in name:
+        if device_type != "unknown":
+            name = f"Oblamatik {device_type.title()}"
+        else:
+            name = f"Oblamatik {host}"
+
     return {
-        "type": _detect_device_type(data),
+        "type": device_type,
         "model": data.get("model", "Unknown"),
-        "name": data.get("name", f"Oblamatik {host}"),
+        "name": name,
         "version": data.get("version", "Unknown"),
         "serial": data.get("serial", "Unknown"),
     }
@@ -126,13 +134,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         ]
         entry_updated = True
 
-    # Check and update device info if missing or unknown
+    # Check and update device info if missing or unknown, or if name contains IP
     for device in updated_devices:
-        if (
+        needs_update = (
             device.get("model") == "Unknown"
             or device.get("type") == "unknown"
             or "model" not in device
-        ):
+        )
+
+        # Fix ugly names (containing IP) if type is known
+        if not needs_update:
+            current_name = device.get("name", "")
+            # Check for various IP/Host patterns in name
+            if (
+                current_name == f"Oblamatik {device['host']}"
+                or current_name == f"Oblamatik ({device['host']})"
+                or device["host"] in current_name
+            ):
+                if device.get("type") and device.get("type") != "unknown":
+                    device["name"] = f"Oblamatik {device['type'].title()}"
+                    entry_updated = True
+                    _LOGGER.info(f"Updated device name for {device['host']} to {device['name']}")
+
+        if needs_update:
             _LOGGER.info(f"Attempting to update info for device {device['host']}")
             new_info = await _get_device_info(hass, device["host"], device.get("port", 80))
             if new_info and (new_info["model"] != "Unknown" or new_info["type"] != "unknown"):
