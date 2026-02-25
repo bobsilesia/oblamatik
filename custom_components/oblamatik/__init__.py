@@ -31,7 +31,7 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
         async with session.get(url, timeout=timeout) as response:
             if response.status == 200:
                 try:
-                    data = await response.json()
+                    data = await response.json(content_type=None)
                     _LOGGER.info(f"Device {host} responded to primary endpoint with data: {data}")
                     return _process_device_data(data, host)
                 except Exception as e:
@@ -49,7 +49,7 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
         async with session.get(url_state, timeout=timeout) as response2:
             if response2.status == 200:
                 try:
-                    data2 = await response2.json()
+                    data2 = await response2.json(content_type=None)
                     _LOGGER.info(f"Device {host} responded to fallback endpoint with data: {data2}")
                     return _process_device_data(data2, host)
                 except Exception as e:
