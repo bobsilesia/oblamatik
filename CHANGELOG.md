@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.30
+- **Naming**: Removed IP address from `Water Flow` switch name (e.g., "Water Flow" instead of "Water Flow (IP)").
+- **Fixes**: Cleaned up `manifest.json` structure.
+
 ## v2.1.29
 - **Icons**: Changed "Flow Rate" icon to `mdi:hydro-power`.
 - **Icons**: Changed "Cancel Thermal Desinfection" icon to `mdi:stop-circle-outline`.

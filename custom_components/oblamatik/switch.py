@@ -136,7 +136,7 @@ class OblamatikBaseSwitch(SwitchEntity):
 class OblamatikWaterSwitch(OblamatikBaseSwitch):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Water Flow ({self._host})"
+        self._attr_name = "Water Flow"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_water_flow"
         self._attr_icon = "mdi:water"
 
