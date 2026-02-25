@@ -62,10 +62,10 @@ class OblamatikBaseBinarySensor(BinarySensorEntity):
 class OblamatikPopupBinarySensor(OblamatikBaseBinarySensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Drain position"
+        self._attr_name = "Drain Position"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_popup"
         self._attr_device_class = BinarySensorDeviceClass.OPENING
-        self._attr_icon = "mdi:plug"
+        self._attr_icon = "mdi:valve"
 
     async def async_update(self) -> None:
         try:
