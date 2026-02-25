@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.31
+- **Fixes**: Corrected `manifest.json` key sorting to pass Hassfest validation.
+
 ## v2.1.30
 - **Naming**: Removed IP address from `Water Flow` switch name (e.g., "Water Flow" instead of "Water Flow (IP)").
 - **Fixes**: Cleaned up `manifest.json` structure.
