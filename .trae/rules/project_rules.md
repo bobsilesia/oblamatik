@@ -27,3 +27,6 @@
  - Budowa ZIP: zip -r oblamatik.zip z katalogu 'custom_components/oblamatik' (content_in_root: true)
  - Zgodność wersji: 'manifest.json["version"]' musi odpowiadać tagowi (SemVer)
  - Po Release: w HACS wykonaj 'Clear downloads' → 'Reinstall' → 'Reload' → restart HA
+ - CI Consistency: Pin 'ruff' and 'mypy' versions in 'ci.yml' to match local dev environment (e.g., ruff==0.15.2).
+ - CI Output: Use 'ruff check --output-format=github' in CI actions.
+ - CI Pre-check: MANDATORY - Run 'ruff format', 'ruff check', and 'mypy' locally before EVERY push. Fix all errors before publishing.
