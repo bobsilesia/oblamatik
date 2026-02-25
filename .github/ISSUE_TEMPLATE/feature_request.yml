@@ -1,37 +1,37 @@
-name: Propozycja funkcji
-description: Zasugeruj pomysł na ten projekt
+name: Feature Request
+description: Suggest an idea for this project
 title: "[FEATURE]: "
 labels: ["enhancement"]
 body:
   - type: markdown
     attributes:
       value: |
-        Dziękujemy za zasugerowanie pomysłu! Proszę wypełnić poniższy formularz.
+        Thanks for suggesting an idea! Please fill out the form below.
   - type: textarea
     id: problem
     attributes:
-      label: Czy Twoja propozycja jest związana z problemem?
-      description: Jasny i zwięzły opis problemu. Np. "Zawsze denerwuje mnie, gdy..."
+      label: Is your feature request related to a problem?
+      description: A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
     validations:
       required: false
   - type: textarea
     id: solution
     attributes:
-      label: Opisz rozwiązanie, które chciałbyś zobaczyć
-      description: Jasny i zwięzły opis tego, co ma się stać.
+      label: Describe the solution you'd like
+      description: A clear and concise description of what you want to happen.
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Opisz alternatywy, które rozważyłeś
-      description: Jasny i zwięzły opis wszelkich alternatywnych rozwiązań lub funkcji, które brałeś pod uwagę.
+      label: Describe alternatives you've considered
+      description: A clear and concise description of any alternative solutions or features you've considered.
     validations:
       required: false
   - type: textarea
     id: context
     attributes:
-      label: Dodatkowy kontekst
-      description: Dodaj tutaj wszelkie inne konteksty lub zrzuty ekranu dotyczące prośby o funkcję.
+      label: Additional context
+      description: Add any other context or screenshots about the feature request here.
     validations:
       required: false
