@@ -42,7 +42,7 @@ class OblamatikClimate(ClimateEntity):
         self._device = device
         self._host = device["host"]
         self._port = device.get("port", 80)
-        self._attr_name = f"Temperature Control ({self._host})"
+        self._attr_name = "Temperature Control"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_climate"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, self._host)},
@@ -50,6 +50,7 @@ class OblamatikClimate(ClimateEntity):
             manufacturer="KWC",
             model="TLC15F",
         )
+        self._attr_has_entity_name = True
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_max_temp = 80.0
         self._attr_min_temp = 4.0
