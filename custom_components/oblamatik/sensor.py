@@ -198,7 +198,7 @@ class OblamatikFlowSensor(OblamatikBaseSensor):
         self._attr_name = "Flow Rate"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
-        self._attr_icon = "mdi:water"
+        self._attr_icon = "mdi:water-pump"
         self._attr_state_class = "measurement"
         self._current_flow = 0.0
 
@@ -274,7 +274,7 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Water Flow State"
+        self._attr_name = "Water Flow"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_water_flow_state"
         self._attr_icon = "mdi:water-pump"
         self._attr_state_class = None
@@ -351,8 +351,12 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
 
 
 class OblamatikSystemBaseSensor(OblamatikBaseSensor):
-    async def _get_device_state(self) -> dict[str, Any]:
-        """Get system status from /api/ with fallback to base implementation."""
+    async def _get_device_state(self, required_key: str | None = None) -> dict[str, Any]:
+        """Get system status from /api/ with fallback to base implementation.
+
+        Args:
+            required_key: Optional key that must be present in the response.
+        """
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
@@ -361,13 +365,20 @@ class OblamatikSystemBaseSensor(OblamatikBaseSensor):
                 if response.status == 200:
                     data = await response.json(content_type=None)
                     # If data is empty or missing key fields, trigger fallback
-                    if data and ("uptime" in data or "serial" in data or "version" in data):
-                        return data
+                    if data:
+                        # If a specific key is required, check for it
+                        if required_key and required_key not in data:
+                            _LOGGER.debug(
+                                f"Missing '{required_key}' in /api/ for {self._host}, fallback"
+                            )
+                            pass  # Fall through to fallback
+                        elif "uptime" in data or "serial" in data or "version" in data:
+                            return data
         except Exception as e:
             _LOGGER.debug(f"Error getting system state from /api/ for {self._host}: {e}")
 
-        # Fallback to standard endpoint (/api/tlc/1/) if /api/ fails or returns invalid data
-        _LOGGER.debug(f"Falling back to base endpoint for system info for {self._host}")
+        # Fallback to standard endpoint if /api/ fails or is incomplete
+        _LOGGER.debug(f"System info fallback for {self._host}")
         return await super()._get_device_state()
 
 
@@ -385,12 +396,25 @@ class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
         return self._uptime_str
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
+        state = await self._get_device_state(required_key="uptime")
+        uptime_seconds = 0
         if state:
             uptime_seconds = int(state.get("uptime", 0))
+
+        # If uptime is 0, try fallback to base (skipping SystemBaseSensor logic)
+        if uptime_seconds == 0:
+            _LOGGER.debug(f"Uptime is 0 from /api/, trying fallback for {self._host}")
+            # Call OblamatikBaseSensor._get_device_state directly
+            state_fallback = await super(OblamatikSystemBaseSensor, self)._get_device_state()
+            if state_fallback:
+                uptime_seconds = int(state_fallback.get("uptime", 0))
+
+        if uptime_seconds > 0:
             hours = uptime_seconds // 3600
             minutes = (uptime_seconds % 3600) // 60
             self._uptime_str = f"{hours:02d}:{minutes:02d}"
+        else:
+            self._uptime_str = "00:00"
 
 
 class OblamatikSerialSensor(OblamatikSystemBaseSensor):
@@ -407,7 +431,7 @@ class OblamatikSerialSensor(OblamatikSystemBaseSensor):
         return self._serial
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
+        state = await self._get_device_state(required_key="serial")
         if state:
             self._serial = str(state.get("serial", "Unknown"))
 
@@ -426,7 +450,7 @@ class OblamatikVersionSensor(OblamatikSystemBaseSensor):
         return self._version
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
+        state = await self._get_device_state(required_key="version")
         if state:
             self._version = str(state.get("version", "Unknown"))
 

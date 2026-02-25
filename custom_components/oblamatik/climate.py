@@ -42,7 +42,7 @@ class OblamatikClimate(ClimateEntity):
         self._device = device
         self._host = device["host"]
         self._port = device.get("port", 80)
-        self._attr_name = "Temp control"
+        self._attr_name = "Temp Control"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_climate"
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, self._host)},
