@@ -35,11 +35,16 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
                     _LOGGER.info(f"Device {host} responded to primary endpoint with data: {data}")
                     return _process_device_data(data, host)
                 except Exception as e:
-                    _LOGGER.warning(f"Device {host} responded 200 OK to primary endpoint but JSON decode failed: {e}")
+                    _LOGGER.warning(
+                        f"Device {host} responded 200 OK to primary endpoint "
+                        f"but JSON decode failed: {e}"
+                    )
                     text = await response.text()
-                    _LOGGER.warning(f"Raw response: {text[:200]}...") # Log first 200 chars
+                    _LOGGER.warning(f"Raw response: {text[:200]}...")  # Log first 200 chars
             else:
-                _LOGGER.debug(f"Device {host} returned status {response.status} on primary endpoint")
+                _LOGGER.debug(
+                    f"Device {host} returned status {response.status} on primary endpoint"
+                )
     except Exception as e:
         _LOGGER.debug(f"Primary endpoint failed for {host}: {e}")
 
@@ -53,11 +58,16 @@ async def _get_device_info(hass: HomeAssistant, host: str, port: int) -> dict[st
                     _LOGGER.info(f"Device {host} responded to fallback endpoint with data: {data2}")
                     return _process_device_data(data2, host)
                 except Exception as e:
-                    _LOGGER.warning(f"Device {host} responded 200 OK to fallback endpoint but JSON decode failed: {e}")
+                    _LOGGER.warning(
+                        f"Device {host} responded 200 OK to fallback endpoint "
+                        f"but JSON decode failed: {e}"
+                    )
                     text = await response2.text()
                     _LOGGER.warning(f"Raw response: {text[:200]}...")
             else:
-                 _LOGGER.debug(f"Device {host} returned status {response2.status} on fallback endpoint")
+                _LOGGER.debug(
+                    f"Device {host} returned status {response2.status} on fallback endpoint"
+                )
     except Exception as e:
         _LOGGER.error(f"Fallback endpoint failed for {host}: {e}")
 
@@ -118,7 +128,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Check and update device info if missing or unknown
     for device in updated_devices:
-        if device.get("model") == "Unknown" or device.get("type") == "unknown" or "model" not in device:
+        if (
+            device.get("model") == "Unknown"
+            or device.get("type") == "unknown"
+            or "model" not in device
+        ):
             _LOGGER.info(f"Attempting to update info for device {device['host']}")
             new_info = await _get_device_info(hass, device["host"], device.get("port", 80))
             if new_info and (new_info["model"] != "Unknown" or new_info["type"] != "unknown"):
@@ -127,7 +141,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
                 _LOGGER.info(f"Updated device info for {device['host']}: {new_info}")
 
     if entry_updated:
-        hass.config_entries.async_update_entry(entry, data={**entry.data, "devices": updated_devices})
+        hass.config_entries.async_update_entry(
+            entry, data={**entry.data, "devices": updated_devices}
+        )
 
     _LOGGER.info(f"Setting up {len(updated_devices)} Oblamatik devices")
 
