@@ -84,10 +84,11 @@ class ConfigFlow(config_entries.ConfigFlow):
             async with session.get(url, timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json(content_type=None)
+                    device_type = self._detect_device_type(data)
                     return {
-                        "type": self._detect_device_type(data),
+                        "type": device_type,
                         "model": data.get("model", "Unknown"),
-                        "name": data.get("name", f"Oblamatik {host}"),
+                        "name": self._get_clean_name(data, host, device_type),
                         "version": data.get("version", "Unknown"),
                         "serial": data.get("serial", "Unknown"),
                     }
@@ -100,10 +101,11 @@ class ConfigFlow(config_entries.ConfigFlow):
             async with session.get(url_state, timeout=timeout) as response2:
                 if response2.status == 200:
                     data2 = await response2.json(content_type=None)
+                    device_type = self._detect_device_type(data2)
                     return {
-                        "type": self._detect_device_type(data2),
+                        "type": device_type,
                         "model": data2.get("model", "Unknown"),
-                        "name": data2.get("name", f"Oblamatik {host}"),
+                        "name": self._get_clean_name(data2, host, device_type),
                         "version": data2.get("version", "Unknown"),
                         "serial": data2.get("serial", "Unknown"),
                     }
@@ -111,6 +113,14 @@ class ConfigFlow(config_entries.ConfigFlow):
             _LOGGER.error(f"Fallback endpoint failed: {e}")
 
         return None
+
+    def _get_clean_name(self, data: dict[str, Any], host: str, device_type: str) -> str:
+        name = data.get("name")
+        if not name or name == f"Oblamatik {host}" or name == f"Oblamatik ({host})" or host in name:
+            if device_type != "unknown":
+                return f"Oblamatik {device_type.title()}"
+            return f"Oblamatik {host}"
+        return name
 
     def _detect_device_type(self, data: dict[str, Any]) -> str:
         device_type = data.get("type", "unknown")
