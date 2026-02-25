@@ -3,16 +3,38 @@
   "config": {
     "step": {
       "user": {
-        "title": "Oblamatik",
-        "description": "Configure your Oblamatik device.",
+        "title": "Oblamatik Configuration Mode",
+        "description": "Choose how you want to configure your Oblamatik device.",
+        "menu_options": {
+          "manual": "Manual Configuration",
+          "scan": "Automatic Discovery (Search)"
+        }
+      },
+      "manual": {
+        "title": "Manual Configuration",
+        "description": "Enter the IP address of your Oblamatik device.",
         "data": {
           "host": "Host/IP Address",
           "port": "Port (optional)"
         }
+      },
+      "scan": {
+        "title": "Automatic Discovery",
+        "description": "No new devices found automatically. Please ensure your device is powered on and connected to the same network.\n\nAutomatic discovery relies on DHCP/Zeroconf. If your device is not detected, please try 'Manual Configuration'.\n\nSee [Installation Guide]({link}) for more details."
+      },
+      "confirm_discovery": {
+        "title": "Discovered Device",
+        "description": "Do you want to set up {name}?"
       }
     },
     "error": {
-      "cannot_connect": "Failed to connect to Oblamatik device"
+      "cannot_connect": "Failed to connect to Oblamatik device",
+      "no_devices_found": "No devices found automatically. Please use manual configuration."
+    },
+    "abort": {
+      "already_configured": "Device is already configured",
+      "cannot_connect": "Failed to connect",
+      "no_device_info": "Could not retrieve device information"
     }
   }
 }

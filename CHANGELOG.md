@@ -1,5 +1,10 @@
 # Changelog
 
+## v2.1.28
+- **Discovery**: Added automatic device discovery via DHCP (MAC OUI: 8devices) and Zeroconf (mDNS).
+- **Config Flow**: Introduced "Automatic vs Manual" configuration mode selection.
+- **Config Flow**: Removed default IP address to prevent accidental configuration of incorrect devices.
+
 ## v2.1.27
 - **Naming**: Improved device naming to use device type (e.g., "Oblamatik Kitchen") instead of IP address. This results in cleaner entity IDs for new installations (e.g., `switch.oblamatik_kitchen_water_flow` instead of `switch.water_flow_192_168_1_36`).
 - **Fixes**: Corrected automatic device info updates for existing devices with ugly names.
