@@ -4,6 +4,7 @@ from typing import Any
 import aiohttp
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
@@ -49,7 +50,7 @@ async def async_setup_entry(
             ]
         )
 
-    async_add_entities(buttons, True)
+    async_add_entities(buttons)
 
 
 class OblamatikBaseButton(ButtonEntity):
@@ -111,7 +112,7 @@ class OblamatikWlanRestartButton(OblamatikBaseButton):
         self._attr_name = "Restart WLAN (Reset to AP)"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_wlan_restart"
         self._attr_icon = "mdi:wifi-refresh"
-        self._attr_entity_category = "config"
+        self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
         # Calls wlan/disconnect/ to reset to AP mode (effectively restarting WLAN)
@@ -124,7 +125,7 @@ class OblamatikFunctionTestStep1Button(OblamatikBaseButton):
         self._attr_name = "Function Test Step 1"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_func_test_1"
         self._attr_icon = "mdi:test-tube"
-        self._attr_entity_category = "diagnostic"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/functional-test/step/1/", "")
@@ -136,7 +137,7 @@ class OblamatikFunctionTestStep2Button(OblamatikBaseButton):
         self._attr_name = "Function Test Step 2"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_func_test_2"
         self._attr_icon = "mdi:test-tube"
-        self._attr_entity_category = "diagnostic"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/functional-test/step/2/", "")
@@ -148,7 +149,7 @@ class OblamatikFunctionTestStep3Button(OblamatikBaseButton):
         self._attr_name = "Function Test Step 3"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_func_test_3"
         self._attr_icon = "mdi:test-tube"
-        self._attr_entity_category = "diagnostic"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/functional-test/step/3/", "")
@@ -160,7 +161,7 @@ class OblamatikFunctionTestStopButton(OblamatikBaseButton):
         self._attr_name = "Function Test Stop"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_func_test_stop"
         self._attr_icon = "mdi:stop-circle-outline"
-        self._attr_entity_category = "diagnostic"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/functional-test/step/0/", "")
@@ -172,7 +173,7 @@ class OblamatikHygieneStartButton(OblamatikBaseButton):
         self._attr_name = "Start Thermal Desinfection"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_start"
         self._attr_icon = "mdi:bacteria-outline"
-        self._attr_entity_category = "config"
+        self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
         # tlc_service.js: startDesinfection(TLCid) -> POST .../start/ [TLCid]
@@ -207,7 +208,7 @@ class OblamatikHygieneCancelButton(OblamatikBaseButton):
         self._attr_name = "Cancel Thermal Desinfection"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_cancel"
         self._attr_icon = "mdi:bacteria-off"
-        self._attr_entity_category = "config"
+        self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/hygiene/thermal-desinfection/cancel/", "data=1")
