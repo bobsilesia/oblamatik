@@ -349,6 +349,7 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
             flow_lpm = float(state.get("flow", 0.0))
             self._flow_rate_lh = flow_lpm * 60
 
+
 class OblamatikSystemBaseSensor(OblamatikBaseSensor):
     async def _get_device_state(self) -> dict[str, Any]:
         """Get system status from /api/."""
