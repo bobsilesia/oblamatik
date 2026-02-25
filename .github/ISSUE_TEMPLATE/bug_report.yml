@@ -1,72 +1,72 @@
-name: Zgłoszenie błędu
-description: Zgłoś problem, aby pomóc nam ulepszyć integrację
+name: Bug Report
+description: Create a report to help us improve
 title: "[BUG]: "
 labels: ["bug"]
 body:
   - type: markdown
     attributes:
       value: |
-        Dziękujemy za poświęcenie czasu na wypełnienie zgłoszenia błędu!
+        Thanks for taking the time to fill out this bug report!
   - type: checkboxes
     id: checks
     attributes:
-      label: Wstępna weryfikacja
-      description: Proszę zaznaczyć poniższe punkty przed zgłoszeniem błędu.
+      label: Preliminary Checks
+      description: Please check the following before submitting a bug report.
       options:
-        - label: Sprawdziłem czy podobne zgłoszenie już nie istnieje
+        - label: I have checked that a similar issue does not already exist
           required: true
-        - label: Używam najnowszej wersji integracji
+        - label: I am using the latest version of the integration
           required: true
   - type: input
     id: ha_version
     attributes:
-      label: Wersja Home Assistant
+      label: Home Assistant Version
       placeholder: 2025.2.0
     validations:
       required: true
   - type: input
     id: integration_version
     attributes:
-      label: Wersja integracji Oblamatik
+      label: Oblamatik Integration Version
       placeholder: v2.1.25
     validations:
       required: true
   - type: dropdown
     id: device_model
     attributes:
-      label: Model urządzenia
+      label: Device Model
       options:
         - KWC
         - Viega Multiplex Trio E
         - Crosswater
-        - Inne (opisz w szczegółach)
+        - Other (please describe in details)
     validations:
       required: true
   - type: textarea
     id: description
     attributes:
-      label: Opis błędu
-      description: Jasny i zwięzły opis problemu.
+      label: Description
+      description: A clear and concise description of the bug.
     validations:
       required: true
   - type: textarea
     id: reproduction
     attributes:
-      label: Kroki do powtórzenia błędu
+      label: Steps to Reproduce
       description: |
-        1. Przejdź do '...'
-        2. Kliknij na '....'
-        3. Przewiń do '....'
-        4. Zobacz błąd
+        1. Go to '...'
+        2. Click on '....'
+        3. Scroll down to '....'
+        4. See error
     validations:
       required: true
   - type: textarea
     id: logs
     attributes:
-      label: Logi diagnostyczne
+      label: Diagnostic Logs
       description: |
-        Proszę wkleić logi z Home Assistant (Ustawienia -> System -> Logi).
-        Włącz logowanie debug dla integracji jeśli to możliwe:
+        Please paste logs from Home Assistant (Settings -> System -> Logs).
+        Enable debug logging for the integration if possible:
         ```yaml
         logger:
           default: info

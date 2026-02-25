@@ -1,30 +1,30 @@
-# Współpraca przy projekcie Oblamatik
+# Contributing to Oblamatik
 
-Cieszymy się, że chcesz pomóc w rozwoju integracji Oblamatik! Poniżej znajdziesz kilka wskazówek, które ułatwią nam współpracę.
+We are glad you want to help develop the Oblamatik integration! Below are some guidelines to facilitate our collaboration.
 
-## Zgłaszanie błędów
+## Bug Reporting
 
-Jeśli znalazłeś błąd, zgłoś go w zakładce [Issues](https://github.com/bobsilesia/oblamatik/issues), korzystając z przygotowanego szablonu "Zgłoszenie błędu". Pamiętaj o dołączeniu logów i opisu kroków do powtórzenia błędu.
+If you found a bug, please report it in the [Issues](https://github.com/bobsilesia/oblamatik/issues) tab using the prepared "Bug Report" template. Remember to attach logs and steps to reproduce the error.
 
-## Proponowanie zmian (Pull Requests)
+## Proposing Changes (Pull Requests)
 
-1. **Fork**: Sforkuj repozytorium i utwórz nową gałąź dla swojej zmiany (`git checkout -b feature/moja-zmiana`).
-2. **Standardy kodu**: Przestrzegamy rygorystycznych standardów jakości kodu.
-   - Używamy `ruff` do lintingu i formatowania.
-   - Używamy `mypy` do sprawdzania typów.
-   - Kod musi być w pełni asynchroniczny (`async`/`await`).
-3. **Lokalne testy**: Przed wysłaniem zmian uruchom:
+1. **Fork**: Fork the repository and create a new branch for your change (`git checkout -b feature/my-change`).
+2. **Code Standards**: We adhere to strict code quality standards.
+   - We use `ruff` for linting and formatting.
+   - We use `mypy` for type checking.
+   - Code must be fully asynchronous (`async`/`await`).
+3. **Local Testing**: Before submitting changes, run:
    ```bash
    ruff format custom_components/oblamatik
    ruff check custom_components/oblamatik
    mypy custom_components/oblamatik
    ```
-4. **Zatwierdź zmiany**: Opisz swoje zmiany w commit message w sposób jasny i zwięzły.
-5. **Pull Request**: Wyślij PR do głównej gałęzi (`main`). Opisz, co zmienia Twój kod i dlaczego.
+4. **Commit Changes**: Describe your changes in the commit message clearly and concisely.
+5. **Pull Request**: Submit a PR to the main branch (`main`). Describe what your code changes and why.
 
-## Środowisko deweloperskie
+## Development Environment
 
-Zalecamy korzystanie z `uv` lub `venv` do zarządzania zależnościami.
+We recommend using `uv` or `venv` to manage dependencies.
 
 ```bash
 python3 -m venv .venv
@@ -32,9 +32,9 @@ source .venv/bin/activate
 pip install homeassistant ruff mypy
 ```
 
-## Struktura projektu
+## Project Structure
 
-- `custom_components/oblamatik/` - Główny kod integracji.
-- `.github/workflows/` - Konfiguracja CI/CD.
+- `custom_components/oblamatik/` - Main integration code.
+- `.github/workflows/` - CI/CD configuration.
 
-Dziękujemy za Twój wkład!
+Thank you for your contribution!
