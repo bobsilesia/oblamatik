@@ -1,0 +1,7 @@
+- [Home](Home)
+- [Installation](Installation)
+- [Configuration](Configuration)
+- [Supported Devices](Supported-Devices)
+- [Entities and Controls](Entities-and-Controls)
+- [Automations](Automations)
+- [Troubleshooting](Troubleshooting)
