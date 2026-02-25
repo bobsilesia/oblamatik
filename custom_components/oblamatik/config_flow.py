@@ -16,6 +16,14 @@ class ConfigFlow(config_entries.ConfigFlow):
     VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
+        """Handle the initial step."""
+        return self.async_show_menu(
+            step_id="user",
+            menu_options=["manual", "scan"],
+        )
+
+    async def async_step_manual(self, user_input: dict[str, Any] | None = None) -> Any:
+        """Handle manual configuration."""
         errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -43,35 +51,116 @@ class ConfigFlow(config_entries.ConfigFlow):
                     },
                 )
             else:
-                return self.async_create_entry(
-                    title=f"Oblamatik ({host})",
-                    data={
-                        CONF_HOST: host,
-                        CONF_PORT: port,
-                        "device_type": "unknown",
-                        "model": "Unknown",
-                        "name": f"Oblamatik {host}",
-                        "devices": [
-                            {
-                                "host": host,
-                                "port": port,
-                                "name": f"Oblamatik {host}",
-                                "type": "unknown",
-                                "model": "Unknown",
-                            }
-                        ],
-                    },
-                )
+                errors["base"] = "cannot_connect"
 
         return self.async_show_form(
-            step_id="user",
+            step_id="manual",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_HOST, default="192.168.1.172"): str,
+                    vol.Required(CONF_HOST): str,
                     vol.Optional(CONF_PORT, default=80): int,
                 }
             ),
             errors=errors,
+        )
+
+    async def async_step_scan(self, user_input: dict[str, Any] | None = None) -> Any:
+        """Handle automatic scanning."""
+        # Simple scan logic: check if any devices were discovered via DHCP/Zeroconf
+        # Since active scanning is complex and requires privileges, we rely on HA discovery
+        # If no devices found, we inform user to use manual or check network
+
+        return self.async_show_form(
+            step_id="scan",
+            errors={"base": "no_devices_found"},
+            description_placeholders={
+                "link": "https://github.com/bobsilesia/oblamatik/wiki/Installation"
+            },
+        )
+
+    async def async_step_dhcp(self, discovery_info: Any) -> Any:
+        """Handle DHCP discovery."""
+        host = discovery_info.ip
+        # Check if already configured
+        await self.async_set_unique_id(discovery_info.macaddress)
+        self._abort_if_unique_id_configured(updates={CONF_HOST: host})
+
+        # Test connection
+        device_info = await self._test_connection_and_detect(host, 80)
+        if not device_info:
+            return self.async_abort(reason="cannot_connect")
+
+        device_info["host"] = host  # Ensure host is present
+        self._discovered_device = device_info
+
+        self.context["title_placeholders"] = {"name": device_info["name"]}
+        return await self.async_step_confirm_discovery(None)
+
+    async def async_step_zeroconf(self, discovery_info: Any) -> Any:
+        """Handle Zeroconf discovery."""
+        host = discovery_info.host
+        # Zeroconf host might be oblamatik.local.
+        if host.endswith("."):
+            host = host[:-1]
+
+        # Test connection
+        device_info = await self._test_connection_and_detect(host, 80)
+        if not device_info:
+            return self.async_abort(reason="cannot_connect")
+
+        device_info["host"] = host  # Ensure host is present
+        self._discovered_device = device_info
+
+        # Use serial or MAC if available in device_info as unique_id, else fallback
+        if device_info.get("serial") and device_info["serial"] != "Unknown":
+            await self.async_set_unique_id(device_info["serial"])
+            self._abort_if_unique_id_configured(updates={CONF_HOST: host})
+
+        self.context["title_placeholders"] = {"name": device_info["name"]}
+        return await self.async_step_confirm_discovery(None)
+
+    async def async_step_confirm_discovery(self, user_input: dict[str, Any] | None = None) -> Any:
+        """Confirm discovery."""
+        if user_input is not None:
+            # Retrieve host from context updates or re-detect?
+            # DHCP sets updates={CONF_HOST: host} in _abort_if_unique_id_configured if matched,
+            # but here we are in a new flow.
+            # We need to find where we stored the host.
+            # In async_step_dhcp, we called _test_connection_and_detect, but didn't store
+            # the result for creation.
+            # Let's fix async_step_dhcp and zeroconf to store data in self.context
+
+            # Actually, we should store it in self._discovered_device
+            if not hasattr(self, "_discovered_device") or not self._discovered_device:
+                return self.async_abort(reason="no_device_info")
+
+            device_info = self._discovered_device
+            host = device_info["host"]  # We need to ensure host is in device_info
+            port = 80  # Default
+
+            return self.async_create_entry(
+                title=self.context.get("title_placeholders", {}).get("name", "Oblamatik"),
+                data={
+                    CONF_HOST: host,
+                    CONF_PORT: port,
+                    "device_type": device_info["type"],
+                    "model": device_info["model"],
+                    "name": device_info["name"],
+                    "devices": [
+                        {
+                            "host": host,
+                            "port": port,
+                            "name": device_info["name"],
+                            "type": device_info["type"],
+                            "model": device_info["model"],
+                        }
+                    ],
+                },
+            )
+
+        return self.async_show_form(
+            step_id="confirm_discovery",
+            description_placeholders=self.context.get("title_placeholders", {}),
         )
 
     async def _test_connection_and_detect(self, host: str, port: int) -> dict[str, Any] | None:
