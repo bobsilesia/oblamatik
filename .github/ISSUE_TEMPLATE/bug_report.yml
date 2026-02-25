@@ -1,0 +1,76 @@
+name: Zgłoszenie błędu
+description: Zgłoś problem, aby pomóc nam ulepszyć integrację
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Dziękujemy za poświęcenie czasu na wypełnienie zgłoszenia błędu!
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Wstępna weryfikacja
+      description: Proszę zaznaczyć poniższe punkty przed zgłoszeniem błędu.
+      options:
+        - label: Sprawdziłem czy podobne zgłoszenie już nie istnieje
+          required: true
+        - label: Używam najnowszej wersji integracji
+          required: true
+  - type: input
+    id: ha_version
+    attributes:
+      label: Wersja Home Assistant
+      placeholder: 2025.2.0
+    validations:
+      required: true
+  - type: input
+    id: integration_version
+    attributes:
+      label: Wersja integracji Oblamatik
+      placeholder: v2.1.25
+    validations:
+      required: true
+  - type: dropdown
+    id: device_model
+    attributes:
+      label: Model urządzenia
+      options:
+        - KWC
+        - Viega Multiplex Trio E
+        - Crosswater
+        - Inne (opisz w szczegółach)
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Opis błędu
+      description: Jasny i zwięzły opis problemu.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Kroki do powtórzenia błędu
+      description: |
+        1. Przejdź do '...'
+        2. Kliknij na '....'
+        3. Przewiń do '....'
+        4. Zobacz błąd
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logi diagnostyczne
+      description: |
+        Proszę wkleić logi z Home Assistant (Ustawienia -> System -> Logi).
+        Włącz logowanie debug dla integracji jeśli to możliwe:
+        ```yaml
+        logger:
+          default: info
+          logs:
+            custom_components.oblamatik: debug
+        ```
+      render: shell
