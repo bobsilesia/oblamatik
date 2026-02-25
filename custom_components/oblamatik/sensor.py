@@ -92,6 +92,7 @@ class OblamatikBaseSensor(SensorEntity):
             manufacturer="KWC/Viega/Crosswater",
             model=device.get("model", "Unknown"),
         )
+        self._attr_has_entity_name = True
         self._attr_available = True
 
     async def _get_device_state(self) -> dict[str, Any]:
@@ -119,7 +120,7 @@ class OblamatikBaseSensor(SensorEntity):
 class OblamatikTemperatureSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Temperature ({self._host})"
+        self._attr_name = "Temperature"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_temperature"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer"
@@ -139,7 +140,7 @@ class OblamatikTemperatureSensor(OblamatikBaseSensor):
 class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Current Temperature ({self._host})"
+        self._attr_name = "Current Temperature"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_current_temperature"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer-water"
@@ -159,7 +160,7 @@ class OblamatikCurrentTemperatureSensor(OblamatikBaseSensor):
 class OblamatikFlowSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Flow Rate ({self._host})"
+        self._attr_name = "Flow Rate"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
         self._attr_icon = "mdi:water"
@@ -179,7 +180,7 @@ class OblamatikFlowSensor(OblamatikBaseSensor):
 class OblamatikRequiredTemperatureSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Required Temperature ({self._host})"
+        self._attr_name = "Required Temperature"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_required_temperature"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer"
@@ -199,7 +200,7 @@ class OblamatikRequiredTemperatureSensor(OblamatikBaseSensor):
 class OblamatikRequiredFlowSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Required Flow ({self._host})"
+        self._attr_name = "Required Flow"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_required_flow"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
         self._attr_icon = "mdi:water-pump"
@@ -219,7 +220,7 @@ class OblamatikRequiredFlowSensor(OblamatikBaseSensor):
 class OblamatikStatusSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Status ({self._host})"
+        self._attr_name = "Status"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_status"
         self._attr_icon = "mdi:information"
         self._current_status = "unknown"
@@ -237,7 +238,7 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Water Flow State ({self._host})"
+        self._attr_name = "Water Flow State"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_water_flow_state"
         self._attr_icon = "mdi:water-pump"
         self._attr_state_class = None
@@ -257,7 +258,7 @@ class OblamatikWaterFlowSensor(OblamatikBaseSensor):
 class OblamatikBathFaucetSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Bath Faucet ({self._host})"
+        self._attr_name = "Bath Faucet"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_faucet"
         self._attr_icon = "mdi:faucet"
         self._bath_faucet_state = "closed"
@@ -276,7 +277,7 @@ class OblamatikBathFaucetSensor(OblamatikBaseSensor):
 class OblamatikBathButtonSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Bath Button ({self._host})"
+        self._attr_name = "Bath Button"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_button"
         self._attr_icon = "mdi:button-pointer"
         self._bath_button_state = False
@@ -295,7 +296,7 @@ class OblamatikBathButtonSensor(OblamatikBaseSensor):
 class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Flow Rate L/h ({self._host})"
+        self._attr_name = "Flow Rate L/h"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow_rate_lh"
         self._attr_native_unit_of_measurement = "L/h"
         self._attr_icon = "mdi:water-speed"

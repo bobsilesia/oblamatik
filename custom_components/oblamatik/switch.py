@@ -54,6 +54,7 @@ class OblamatikBaseSwitch(SwitchEntity):
             manufacturer="KWC",
             model="TLC15F",
         )
+        self._attr_has_entity_name = True
         self._is_on = False
         self._current_temperature = 38.0
         self._current_flow = 0.0
@@ -187,9 +188,9 @@ class OblamatikWaterSwitch(OblamatikBaseSwitch):
 class OblamatikHeatingSwitch(OblamatikBaseSwitch):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Heating ({self._host})"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_heating"
-        self._attr_icon = "mdi:thermometer"
+        self._attr_name = "Heating"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_heating_switch"
+        self._attr_icon = "mdi:fire"
 
     @property
     def is_on(self) -> bool:

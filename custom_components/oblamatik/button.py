@@ -58,6 +58,7 @@ class OblamatikBaseButton(ButtonEntity):
             manufacturer="KWC/Viega/Crosswater",
             model=device.get("model", "Unknown"),
         )
+        self._attr_has_entity_name = True
         self._attr_available = True
 
     async def _post_command(self, endpoint: str, data: str) -> bool:
@@ -81,7 +82,7 @@ class OblamatikBaseButton(ButtonEntity):
 class OblamatikStopButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Stop ({self._host})"
+        self._attr_name = "Stop"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_stop"
         self._attr_icon = "mdi:stop"
 
@@ -92,7 +93,7 @@ class OblamatikStopButton(OblamatikBaseButton):
 class OblamatikQuickAction1Button(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Quick Action 1 ({self._host})"
+        self._attr_name = "Quick Action 1"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_quick_1"
         self._attr_icon = "mdi:numeric-1-box"
 
@@ -103,7 +104,7 @@ class OblamatikQuickAction1Button(OblamatikBaseButton):
 class OblamatikOpenDrainButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Open Drain ({self._host})"
+        self._attr_name = "Open Drain"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_open_drain"
         self._attr_icon = "mdi:valve-open"
 
@@ -115,7 +116,7 @@ class OblamatikOpenDrainButton(OblamatikBaseButton):
 class OblamatikCloseDrainButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Close Drain ({self._host})"
+        self._attr_name = "Close Drain"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_close_drain"
         self._attr_icon = "mdi:valve-closed"
 

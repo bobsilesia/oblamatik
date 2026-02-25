@@ -54,6 +54,7 @@ class OblamatikBaseNumber(NumberEntity):
             manufacturer="KWC",
             model="TLC15F",
         )
+        self._attr_has_entity_name = True
         self._attr_available = True
 
     async def _post_tlc(self, temperature: float, flow: float, changed: bool) -> bool:
@@ -80,7 +81,7 @@ class OblamatikBaseNumber(NumberEntity):
 class OblamatikTemperatureNumber(OblamatikBaseNumber):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Temperature ({self._host})"
+        self._attr_name = "Temperature"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_temperature_number"
         self._attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
         self._attr_icon = "mdi:thermometer"
@@ -130,7 +131,7 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
 class OblamatikFlowNumber(OblamatikBaseNumber):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = f"Flow Rate ({self._host})"
+        self._attr_name = "Flow Rate"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow_number"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
         self._attr_icon = "mdi:water"
