@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.29
+- **Icons**: Changed "Flow Rate" icon to `mdi:hydro-power`.
+- **Icons**: Changed "Cancel Thermal Desinfection" icon to `mdi:stop-circle-outline`.
+
 ## v2.1.28
 - **Discovery**: Added automatic device discovery via DHCP (MAC OUI: 8devices) and Zeroconf (mDNS).
 - **Config Flow**: Introduced "Automatic vs Manual" configuration mode selection.

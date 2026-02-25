@@ -198,7 +198,7 @@ class OblamatikFlowSensor(OblamatikBaseSensor):
         self._attr_name = "Flow Rate"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow"
         self._attr_native_unit_of_measurement = UnitOfVolumeFlowRate.LITERS_PER_MINUTE
-        self._attr_icon = "mdi:water-pump"
+        self._attr_icon = "mdi:hydro-power"
         self._attr_state_class = "measurement"
         self._current_flow = 0.0
 
