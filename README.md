@@ -1,6 +1,7 @@
 # Oblamatik — integracja Home Assistant
 
 ![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver) ![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg) ![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main) ![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)
+![License](https://img.shields.io/github/license/bobsilesia/oblamatik) ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json) ![Mypy](https://img.shields.io/badge/mypy-checked-blue)
 
 [Latest release →](https://github.com/bobsilesia/oblamatik/releases)
 
@@ -48,3 +49,10 @@ Oblamatik to integracja dla Home Assistant, umożliwiająca sterowanie i odczyt 
 ## Rozwiązywanie problemów
 - Sprawdź logi HA (Settings → System → Logs) dla błędów integracji.
 - Upewnij się, że urządzenie zwraca poprawne odpowiedzi pod `http://IP:PORT/api/tlc/1/` i `http://IP:PORT/api/tlc/1/state/`.
+
+## Współpraca (Contributing)
+
+Chcesz pomóc w rozwoju projektu? Zapoznaj się z naszymi zasadami:
+- [Zasady współpracy (CONTRIBUTING.md)](CONTRIBUTING.md)
+- [Kodeks postępowania (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)
+- [Zgłoś błąd lub propozycję](https://github.com/bobsilesia/oblamatik/issues/new/choose)
