@@ -8,7 +8,6 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfInformation,
     UnitOfTemperature,
-    UnitOfTime,
     UnitOfVolumeFlowRate,
 )
 from homeassistant.core import HomeAssistant
@@ -268,7 +267,8 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-            self._current_status = str(state.get("state", "unknown"))
+            raw_status = str(state.get("state", "unknown"))
+            self._current_status = "ok" if raw_status == "a" else raw_status
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
@@ -352,7 +352,7 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
 
 class OblamatikSystemBaseSensor(OblamatikBaseSensor):
     async def _get_device_state(self) -> dict[str, Any]:
-        """Get system status from /api/."""
+        """Get system status from /api/ with fallback to base implementation."""
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
@@ -361,8 +361,10 @@ class OblamatikSystemBaseSensor(OblamatikBaseSensor):
                 if response.status == 200:
                     return await response.json(content_type=None)
         except Exception as e:
-            _LOGGER.debug(f"Error getting system state for {self._host}: {e}")
-        return {}
+            _LOGGER.debug(f"Error getting system state from /api/ for {self._host}: {e}")
+
+        # Fallback to standard endpoint (/api/tlc/1/) if /api/ fails
+        return await super()._get_device_state()
 
 
 class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
@@ -370,20 +372,21 @@ class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
         super().__init__(hass, device)
         self._attr_name = "Uptime"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_uptime"
-        self._attr_native_unit_of_measurement = UnitOfTime.SECONDS
-        self._attr_device_class = "duration"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:clock-outline"
-        self._uptime = 0
+        self._uptime_str = "00:00"
 
     @property
-    def native_value(self) -> int | None:
-        return self._uptime
+    def native_value(self) -> str | None:
+        return self._uptime_str
 
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-            self._uptime = int(state.get("uptime", 0))
+            uptime_seconds = int(state.get("uptime", 0))
+            hours = uptime_seconds // 3600
+            minutes = (uptime_seconds % 3600) // 60
+            self._uptime_str = f"{hours:02d}:{minutes:02d}"
 
 
 class OblamatikSerialSensor(OblamatikSystemBaseSensor):

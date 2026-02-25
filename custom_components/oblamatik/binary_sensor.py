@@ -62,7 +62,7 @@ class OblamatikBaseBinarySensor(BinarySensorEntity):
 class OblamatikPopupBinarySensor(OblamatikBaseBinarySensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Popup"
+        self._attr_name = "Drain"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_popup"
         self._attr_device_class = BinarySensorDeviceClass.OPENING
         self._attr_icon = "mdi:plug"
