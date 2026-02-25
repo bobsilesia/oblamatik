@@ -4,7 +4,13 @@ from typing import Any
 import aiohttp
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import UnitOfTemperature, UnitOfVolumeFlowRate
+from homeassistant.const import (
+    EntityCategory,
+    UnitOfInformation,
+    UnitOfTemperature,
+    UnitOfTime,
+    UnitOfVolumeFlowRate,
+)
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
@@ -43,6 +49,11 @@ async def async_setup_entry(
                     OblamatikStatusSensor(hass, device),
                     OblamatikWaterFlowSensor(hass, device),
                     OblamatikRequiredTemperatureSensor(hass, device),
+                    OblamatikUptimeSensor(hass, device),
+                    OblamatikSerialSensor(hass, device),
+                    OblamatikVersionSensor(hass, device),
+                    OblamatikFreeDiskSensor(hass, device),
+                    OblamatikFreeMemorySensor(hass, device),
                 ]
             )
         elif device_type in ["bath", "shower"]:
@@ -58,6 +69,11 @@ async def async_setup_entry(
                     OblamatikBathFaucetSensor(hass, device),
                     OblamatikBathButtonSensor(hass, device),
                     OblamatikFlowRateLiterPerHourSensor(hass, device),
+                    OblamatikUptimeSensor(hass, device),
+                    OblamatikSerialSensor(hass, device),
+                    OblamatikVersionSensor(hass, device),
+                    OblamatikFreeDiskSensor(hass, device),
+                    OblamatikFreeMemorySensor(hass, device),
                 ]
             )
         else:
@@ -73,6 +89,11 @@ async def async_setup_entry(
                     OblamatikBathFaucetSensor(hass, device),
                     OblamatikBathButtonSensor(hass, device),
                     OblamatikFlowRateLiterPerHourSensor(hass, device),
+                    OblamatikUptimeSensor(hass, device),
+                    OblamatikSerialSensor(hass, device),
+                    OblamatikVersionSensor(hass, device),
+                    OblamatikFreeDiskSensor(hass, device),
+                    OblamatikFreeMemorySensor(hass, device),
                 ]
             )
     async_add_entities(sensors, True)
@@ -327,3 +348,120 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
         if state:
             flow_lpm = float(state.get("flow", 0.0))
             self._flow_rate_lh = flow_lpm * 60
+
+class OblamatikSystemBaseSensor(OblamatikBaseSensor):
+    async def _get_device_state(self) -> dict[str, Any]:
+        """Get system status from /api/."""
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/", timeout=timeout) as response:
+                if response.status == 200:
+                    return await response.json(content_type=None)
+        except Exception as e:
+            _LOGGER.debug(f"Error getting system state for {self._host}: {e}")
+        return {}
+
+
+class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Uptime"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_uptime"
+        self._attr_native_unit_of_measurement = UnitOfTime.SECONDS
+        self._attr_device_class = "duration"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:clock-outline"
+        self._uptime = 0
+
+    @property
+    def native_value(self) -> int | None:
+        return self._uptime
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._uptime = int(state.get("uptime", 0))
+
+
+class OblamatikSerialSensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Serial Number"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_serial"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:barcode"
+        self._serial = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._serial
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._serial = str(state.get("serial", "Unknown"))
+
+
+class OblamatikVersionSensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Firmware Version"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_version"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:tag-text-outline"
+        self._version = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._version
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._version = str(state.get("version", "Unknown"))
+
+
+class OblamatikFreeDiskSensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Free Disk Space"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_free_disk"
+        self._attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
+        self._attr_device_class = "data_size"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:harddisk"
+        self._attr_state_class = "measurement"
+        self._free_disk = 0
+
+    @property
+    def native_value(self) -> int | None:
+        return self._free_disk
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._free_disk = int(state.get("disk", 0))
+
+
+class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Free Memory"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_free_memory"
+        self._attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
+        self._attr_device_class = "data_size"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:memory"
+        self._attr_state_class = "measurement"
+        self._free_memory = 0
+
+    @property
+    def native_value(self) -> int | None:
+        return self._free_memory
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._free_memory = int(state.get("mem", 0))
