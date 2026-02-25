@@ -16,7 +16,7 @@ class ConfigFlow(config_entries.ConfigFlow):
     domain = DOMAIN
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
-        errors = {}
+        errors: dict[str, str] = {}
 
         if user_input is not None:
             host = user_input[CONF_HOST]
