@@ -207,7 +207,7 @@ class OblamatikHygieneCancelButton(OblamatikBaseButton):
         super().__init__(hass, device)
         self._attr_name = "Cancel Thermal Desinfection"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_cancel"
-        self._attr_icon = "mdi:bacteria-off"
+        self._attr_icon = "mdi:stop-circle-outline"
         self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
