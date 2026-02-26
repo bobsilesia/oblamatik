@@ -38,6 +38,8 @@ async def async_setup_entry(
             [
                 OblamatikStopButton(hass, device),
                 OblamatikQuickAction1Button(hass, device),
+                OblamatikQuickAction2Button(hass, device),
+                OblamatikQuickAction3Button(hass, device),
                 OblamatikOpenDrainButton(hass, device),
                 OblamatikCloseDrainButton(hass, device),
                 OblamatikWlanRestartButton(hass, device),
@@ -107,6 +109,28 @@ class OblamatikQuickAction1Button(OblamatikBaseButton):
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/quick/1/", "data=1")
+
+
+class OblamatikQuickAction2Button(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Quick Action 2"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_quick_2"
+        self._attr_icon = "mdi:numeric-2-box"
+
+    async def async_press(self) -> None:
+        await self._post_command("/api/tlc/1/quick/2/", "data=1")
+
+
+class OblamatikQuickAction3Button(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Quick Action 3"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_quick_3"
+        self._attr_icon = "mdi:numeric-3-box"
+
+    async def async_press(self) -> None:
+        await self._post_command("/api/tlc/1/quick/3/", "data=1")
 
 
 class OblamatikWlanRestartButton(OblamatikBaseButton):

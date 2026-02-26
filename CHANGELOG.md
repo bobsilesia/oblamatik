@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.37
+- **New Feature**: Added buttons for `Quick Action 2` and `Quick Action 3` (based on user request and Multiplex Trio E capabilities).
+
 ## v2.1.36
 - **Fix**: Added missing `async_press` implementation for `Quick Action 1` button.
 
