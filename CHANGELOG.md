@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.39
+- **Change**: Disabled `Free Disk Space`, `Free Memory`, and `Uptime` sensors by default (can be enabled manually).
+
 ## v2.1.38
 - **Fix**: Removed temperature sensors for devices reporting invalid temperatures (>99°C), which indicates a missing thermistor (e.g., KWC models).
 

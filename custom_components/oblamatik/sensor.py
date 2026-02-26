@@ -417,6 +417,7 @@ class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
         self._attr_unique_id = f"{DOMAIN}_{self._host}_uptime"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:clock-outline"
+        self._attr_entity_registry_enabled_default = False
         self._uptime_str = "00:00"
 
     @property
@@ -493,6 +494,7 @@ class OblamatikFreeDiskSensor(OblamatikSystemBaseSensor):
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:harddisk"
         self._attr_state_class = "measurement"
+        self._attr_entity_registry_enabled_default = False
         self._free_disk = 0
 
     @property
@@ -515,6 +517,7 @@ class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:memory"
         self._attr_state_class = "measurement"
+        self._attr_entity_registry_enabled_default = False
         self._free_memory = 0
 
     @property
