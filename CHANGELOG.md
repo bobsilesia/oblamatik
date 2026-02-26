@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.34
+- **Icons**: Fixed invalid icon for `Flow Rate L/h` sensor (changed to `mdi:hydro-power`).
+
 ## v2.1.33
 - **Branding**: Verified and confirmed local brand structure for Home Assistant 2026.3.0+.
 - **Cleanup**: Removed legacy brand submission folder.
