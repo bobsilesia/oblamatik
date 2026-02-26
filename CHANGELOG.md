@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.35
+- **Icons**: Changed icon for `Flow Rate L/h` sensor to `mdi:gauge-low` (requested by user).
+
 ## v2.1.34
 - **Icons**: Fixed invalid icon for `Flow Rate L/h` sensor (changed to `mdi:hydro-power`).
 
