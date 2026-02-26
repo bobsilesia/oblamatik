@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.32
+- **Branding**: Added local brand icons (logo and icon) to support Home Assistant 2026.3.0+ features.
+
 ## v2.1.31
 - **Fixes**: Corrected `manifest.json` key sorting to pass Hassfest validation.
 
