@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.1
+- **Documentation**: Added professional "Open in Home Assistant" badges for easy installation (HACS) and configuration (Config Flow) in `README.md`.
+- **Version**: Bumped version to 3.0.1 to reflect major documentation and usability improvements.
+
 ## v2.1.39
 - **Change**: Disabled `Free Disk Space`, `Free Memory`, and `Uptime` sensors by default (can be enabled manually).
 
