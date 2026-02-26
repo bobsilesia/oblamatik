@@ -1,5 +1,9 @@
 # Changelog
 
+## v2.1.33
+- **Branding**: Verified and confirmed local brand structure for Home Assistant 2026.3.0+.
+- **Cleanup**: Removed legacy brand submission folder.
+
 ## v2.1.32
 - **Branding**: Added local brand icons (logo and icon) to support Home Assistant 2026.3.0+ features.
 
