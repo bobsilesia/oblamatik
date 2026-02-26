@@ -9,7 +9,8 @@
  - Use mypy for type checks: 'mypy custom_components/oblamatik'
  - Validate metadata with hassfest (local or GitHub Action)
  - Keep manifest.json version synced with Git tags (SemVer)
- - Create release tags: 'vMAJOR.MINOR.PATCH' and changelog entry
+ - Create release tags: 'vMAJOR.MINOR.PATCH'
+ - MANDATORY: Update 'CHANGELOG.md' with version details before every release/tag push.
  - Automate CI on GitHub: ruff, mypy, hassfest on pull_request/push
  - Do not commit secrets; use '.gitignore' and environment variables
  - Ensure README covers setup, config_flow, supported platforms
@@ -30,3 +31,4 @@
  - CI Consistency: Pin 'ruff' and 'mypy' versions in 'ci.yml' to match local dev environment (e.g., ruff==0.15.2).
  - CI Output: Use 'ruff check --output-format=github' in CI actions.
  - CI Pre-check: MANDATORY - Run 'ruff format', 'ruff check', and 'mypy' locally before EVERY push. Fix all errors before publishing.
+ - Stay Updated: Regularly consult Home Assistant Developer Docs (https://developers.home-assistant.io) to adopt latest standards and solutions.

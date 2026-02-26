@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.38
+- **Fix**: Removed temperature sensors for devices reporting invalid temperatures (>99°C), which indicates a missing thermistor (e.g., KWC models).
+
 ## v2.1.37
 - **New Feature**: Added buttons for `Quick Action 2` and `Quick Action 3` (based on user request and Multiplex Trio E capabilities).
 

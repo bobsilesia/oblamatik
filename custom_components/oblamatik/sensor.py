@@ -38,63 +38,91 @@ async def async_setup_entry(
             }
         ]
     sensors = []
+
+    # Helper to check for valid temperature sensor
+    async def _has_valid_temperature_sensor(host: str, port: int) -> bool:
+        try:
+            base_url = f"http://{host}:{port}"
+            session = aiohttp_client.async_get_clientsession(hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            # Try primary endpoint
+            try:
+                async with session.get(f"{base_url}/api/tlc/1/", timeout=timeout) as response:
+                    if response.status == 200:
+                        data = await response.json(content_type=None)
+                        temp = float(data.get("temperature", 0.0))
+                        if temp > 99.0:
+                            _LOGGER.warning(
+                                "Device at %s reports invalid temperature (%.1f°C). "
+                                "Temperature sensor will be disabled.",
+                                host,
+                                temp,
+                            )
+                            return False
+                        return True
+            except Exception:
+                pass
+
+            # Try fallback endpoint
+            try:
+                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                    if response.status == 200:
+                        data = await response.json(content_type=None)
+                        temp = float(data.get("temperature", 0.0))
+                        if temp > 99.0:
+                            _LOGGER.warning(
+                                "Device at %s reports invalid temperature (%.1f°C). "
+                                "Temperature sensor will be disabled.",
+                                host,
+                                temp,
+                            )
+                            return False
+                        return True
+            except Exception:
+                pass
+
+            return True  # Default to True if check fails to avoid disabling on temporary error
+        except Exception as e:
+            _LOGGER.warning(f"Failed to check temperature sensor for {host}: {e}")
+            return True
+
     for device in devices:
+        host = device["host"]
+        port = device.get("port", 80)
+        has_temp_sensor = await _has_valid_temperature_sensor(host, port)
+
         device_type = device.get("type", "unknown")
-        if device_type == "kitchen":
-            sensors.extend(
+
+        # Common sensors for all types
+        device_sensors = [
+            OblamatikFlowSensor(hass, device),
+            OblamatikStatusSensor(hass, device),
+            OblamatikWaterFlowSensor(hass, device),
+            OblamatikRequiredTemperatureSensor(hass, device),
+            OblamatikUptimeSensor(hass, device),
+            OblamatikSerialSensor(hass, device),
+            OblamatikVersionSensor(hass, device),
+            OblamatikFreeDiskSensor(hass, device),
+            OblamatikFreeMemorySensor(hass, device),
+        ]
+
+        if has_temp_sensor:
+            device_sensors.append(OblamatikTemperatureSensor(hass, device))
+            if device_type in ["bath", "shower"] or device_type not in ["kitchen"]:
+                device_sensors.append(OblamatikCurrentTemperatureSensor(hass, device))
+
+        if device_type in ["bath", "shower"] or device_type not in ["kitchen"]:
+            device_sensors.extend(
                 [
-                    OblamatikTemperatureSensor(hass, device),
-                    OblamatikFlowSensor(hass, device),
-                    OblamatikStatusSensor(hass, device),
-                    OblamatikWaterFlowSensor(hass, device),
-                    OblamatikRequiredTemperatureSensor(hass, device),
-                    OblamatikUptimeSensor(hass, device),
-                    OblamatikSerialSensor(hass, device),
-                    OblamatikVersionSensor(hass, device),
-                    OblamatikFreeDiskSensor(hass, device),
-                    OblamatikFreeMemorySensor(hass, device),
-                ]
-            )
-        elif device_type in ["bath", "shower"]:
-            sensors.extend(
-                [
-                    OblamatikTemperatureSensor(hass, device),
-                    OblamatikCurrentTemperatureSensor(hass, device),
-                    OblamatikFlowSensor(hass, device),
-                    OblamatikRequiredTemperatureSensor(hass, device),
                     OblamatikRequiredFlowSensor(hass, device),
-                    OblamatikStatusSensor(hass, device),
-                    OblamatikWaterFlowSensor(hass, device),
                     OblamatikBathFaucetSensor(hass, device),
                     OblamatikBathButtonSensor(hass, device),
                     OblamatikFlowRateLiterPerHourSensor(hass, device),
-                    OblamatikUptimeSensor(hass, device),
-                    OblamatikSerialSensor(hass, device),
-                    OblamatikVersionSensor(hass, device),
-                    OblamatikFreeDiskSensor(hass, device),
-                    OblamatikFreeMemorySensor(hass, device),
                 ]
             )
-        else:
-            sensors.extend(
-                [
-                    OblamatikTemperatureSensor(hass, device),
-                    OblamatikCurrentTemperatureSensor(hass, device),
-                    OblamatikFlowSensor(hass, device),
-                    OblamatikRequiredTemperatureSensor(hass, device),
-                    OblamatikRequiredFlowSensor(hass, device),
-                    OblamatikStatusSensor(hass, device),
-                    OblamatikWaterFlowSensor(hass, device),
-                    OblamatikBathFaucetSensor(hass, device),
-                    OblamatikBathButtonSensor(hass, device),
-                    OblamatikFlowRateLiterPerHourSensor(hass, device),
-                    OblamatikUptimeSensor(hass, device),
-                    OblamatikSerialSensor(hass, device),
-                    OblamatikVersionSensor(hass, device),
-                    OblamatikFreeDiskSensor(hass, device),
-                    OblamatikFreeMemorySensor(hass, device),
-                ]
-            )
+
+        sensors.extend(device_sensors)
+
     async_add_entities(sensors, True)
 
 
