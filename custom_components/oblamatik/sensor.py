@@ -335,7 +335,7 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
         self._attr_name = "Flow Rate L/h"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_flow_rate_lh"
         self._attr_native_unit_of_measurement = "L/h"
-        self._attr_icon = "mdi:hydro-power"
+        self._attr_icon = "mdi:gauge-low"
         self._attr_state_class = "measurement"
         self._flow_rate_lh = 0.0
 
