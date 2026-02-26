@@ -1,5 +1,8 @@
 # Changelog
 
+## v2.1.36
+- **Fix**: Added missing `async_press` implementation for `Quick Action 1` button.
+
 ## v2.1.35
 - **Icons**: Changed icon for `Flow Rate L/h` sensor to `mdi:gauge-low` (requested by user).
 

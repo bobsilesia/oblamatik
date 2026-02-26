@@ -105,6 +105,9 @@ class OblamatikQuickAction1Button(OblamatikBaseButton):
         self._attr_unique_id = f"{DOMAIN}_{self._host}_quick_1"
         self._attr_icon = "mdi:numeric-1-box"
 
+    async def async_press(self) -> None:
+        await self._post_command("/api/tlc/1/quick/1/", "data=1")
+
 
 class OblamatikWlanRestartButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
