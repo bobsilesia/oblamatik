@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.0
+- Enhancement: Fast post-command refresh — after any successful command, the integration forces the Status sensor to update every ~1s for ~10s, so state changes (e.g., Idle/Running) appear quickly in HA.
+- Internal: Applied across Buttons, Switches, Climate, and Number platforms without changing user-facing configuration.
+
 ## v3.0.9
 - **Change**: Mapped device `state` values to friendly names in `Status` sensor (`a`→`Idle`, `b`→`Running`).
 
