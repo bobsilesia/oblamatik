@@ -1,3 +1,8 @@
+## v3.1.14
+- **Maintenance**: Repository cleanup for HACS Default compliance (removed outdated `docs/` folder, `.DS_Store`, `RELEASE_TEMPLATE.md`).
+- **Fix**: Resolved deprecated ConfigFlow decorator warning (HA 2025.2+).
+- **Docs**: Updated README to point to GitHub Wiki for documentation.
+
 ## v3.1.13
 - **Maintenance**: Code cleanup for HACS compliance (removed deprecated ConfigFlow decorator, cleaned up repository root).
 
