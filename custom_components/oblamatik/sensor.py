@@ -10,10 +10,11 @@ from homeassistant.const import (
     UnitOfTemperature,
     UnitOfVolumeFlowRate,
 )
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_call_later
 
 from . import DOMAIN
 
@@ -289,10 +290,24 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         self._attr_unique_id = f"{DOMAIN}_{self._host}_status"
         self._attr_icon = "mdi:information"
         self._current_status = "unknown"
+        self._cancel_keep_alive = None
 
     @property
     def native_value(self) -> str | None:
         return self._current_status
+
+    async def async_will_remove_from_hass(self) -> None:
+        """Run when entity will be removed from hass."""
+        if self._cancel_keep_alive:
+            self._cancel_keep_alive()
+            self._cancel_keep_alive = None
+        await super().async_will_remove_from_hass()
+
+    @callback
+    async def _force_update(self, *_: Any) -> None:
+        """Force update of the entity."""
+        self._cancel_keep_alive = None
+        await self.async_update_ha_state(force_refresh=True)
 
     async def async_update(self) -> None:
         state = await self._get_device_state()
@@ -302,8 +317,21 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
                 self._current_status = "Idle"
             elif raw_status == "b":
                 self._current_status = "Running"
+            elif raw_status == "f":
+                self._current_status = "Hygiene Active"
             else:
                 self._current_status = raw_status
+
+            # Keep-alive logic: ensure frequent updates while running
+            # This is critical for Thermal Desinfection which may time out without polling
+            if raw_status in ["b", "f"]:
+                if self._cancel_keep_alive:
+                    self._cancel_keep_alive()
+                    self._cancel_keep_alive = None
+
+                # Schedule next update in 2 seconds (safe keep-alive interval)
+                self._cancel_keep_alive = async_call_later(self.hass, 2, self._force_update)
+
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
