@@ -37,6 +37,23 @@ If you encounter issues with the Oblamatik integration, follow these steps to di
 - Check if they are disabled by default in HA (Settings -> Devices -> Oblamatik -> Entities).
 - Make sure you are on HA 2025.2+ and integration v2.1.25+.
 
+### 4. Frequent polling/logs during Hygiene mode (Keep-Alive)
+
+**Symptoms:**
+- You see frequent network activity or logs when Hygiene mode is active.
+- Device stays connected and responsive during long operations.
+
+**Explanation:**
+- The integration implements an aggressive **Keep-Alive mechanism** (polling every 1 second with `?q=random`) when the device is in a running state (Hygiene/Flow active).
+- This is **required behavior** to prevent the device from timing out or sleeping during operation, mimicking the official app's behavior. Do not disable this.
+
+### 5. Firmware Updates
+
+**Status:**
+- Official firmware updates for these modules (Viega/Oblamatik/Crosswater) are **not publicly available**.
+- Known versions: `1.0-3.12`, `1.0-4.03`.
+- **Warning:** Do not attempt to flash generic OpenWrt/Carambola firmware. This will likely brick your device and remove the proprietary Oblamatik control software.
+
 ## Debugging
 
 To get detailed logs, enable debug logging in `configuration.yaml`:
