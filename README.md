@@ -5,6 +5,11 @@
 
 [Latest release →](https://github.com/bobsilesia/oblamatik/releases)
 
+> [!WARNING]
+> **DEVELOPER / TEST VERSION**
+> You are currently on the `develop` branch. This version is for testing and development purposes only.
+> It may contain unstable features or bugs. For stable releases, please use the `main` branch or the latest release from HACS.
+
 Oblamatik is a Home Assistant integration that allows control and parameter reading of KWC/Viega/Crosswater (TLC) devices.
 
 ## Requirements
