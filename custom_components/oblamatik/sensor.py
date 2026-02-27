@@ -569,4 +569,4 @@ class OblamatikMacAddressSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             wlan = state.get("wlan") or {}
-            self._mac = str(wlan.get("mac_address", "Unknown"))
+            self._mac = str(state.get("mac_address") or wlan.get("mac_address") or "Unknown")
