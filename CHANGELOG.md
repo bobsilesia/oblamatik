@@ -1,3 +1,6 @@
+## v3.1.5
+- **Fix**: Code formatting compliance (ruff).
+
 ## v3.1.4
 - **Fix**: Added "Hygiene Active" state recognition (`f`) and implemented Keep-Alive polling (2s interval) for active states (`Running`, `Hygiene Active`) to prevent premature process termination.
 - **Fix**: Replaced `mdi:octagon-alert` (too new) with `mdi:alert-octagon` to ensure compatibility with all Home Assistant versions.

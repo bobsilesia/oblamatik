@@ -333,7 +333,6 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
                 self._cancel_keep_alive = async_call_later(self.hass, 2, self._force_update)
 
 
-
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
