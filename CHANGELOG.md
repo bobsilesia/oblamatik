@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.0.4
+- **New Feature**: Added "Reboot Device" button (replaces "Function Test Stop") based on user request and code analysis.
+- **Enhancement**: Renamed "Function Test Stop" to "Reboot Device" as they use the same API endpoint (`/api/tlc/1/functional-test/step/0/`).
+
 ## v3.0.3
 - **Fix**: Corrected `Flow Rate` slider to use target temperature (`required_temp`) instead of actual temperature, preventing temperature drops during adjustment.
 - **Fix**: Corrected `Stop` button to preserve the current target temperature instead of resetting it to 10°C.
