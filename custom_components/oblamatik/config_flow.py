@@ -11,8 +11,7 @@ _LOGGER = logging.getLogger(__name__)
 DOMAIN = "oblamatik"
 
 
-@config_entries.HANDLERS.register(DOMAIN)
-class ConfigFlow(config_entries.ConfigFlow):
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     VERSION = 2
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:

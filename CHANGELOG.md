@@ -1,3 +1,6 @@
+## v3.1.13
+- **Maintenance**: Code cleanup for HACS compliance (removed deprecated ConfigFlow decorator, cleaned up repository root).
+
 ## v3.1.12
 - **Change**: Switched license to Apache 2.0.
 
