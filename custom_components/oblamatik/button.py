@@ -46,7 +46,7 @@ async def async_setup_entry(
                 OblamatikFunctionTestStep1Button(hass, device),
                 OblamatikFunctionTestStep2Button(hass, device),
                 OblamatikFunctionTestStep3Button(hass, device),
-                OblamatikFunctionTestStopButton(hass, device),
+                OblamatikRebootButton(hass, device),
                 OblamatikHygieneStartButton(hass, device),
                 OblamatikHygieneCancelButton(hass, device),
             ]
@@ -200,13 +200,13 @@ class OblamatikFunctionTestStep3Button(OblamatikBaseButton):
         await self._post_command("/api/tlc/1/functional-test/step/3/", "")
 
 
-class OblamatikFunctionTestStopButton(OblamatikBaseButton):
+class OblamatikRebootButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Function Test Stop"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_func_test_stop"
-        self._attr_icon = "mdi:stop-circle-outline"
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_name = "Reboot Device"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_reboot"
+        self._attr_icon = "mdi:restart"
+        self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/functional-test/step/0/", "")
