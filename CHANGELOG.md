@@ -1,3 +1,6 @@
+## v3.1.12
+- **Change**: Switched license to Apache 2.0.
+
 ## v3.1.11
 - **Fix**: Ignore 'brands' check in HACS validation (pending HACS Action update for local brands support).
 
