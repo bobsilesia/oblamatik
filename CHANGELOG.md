@@ -1,3 +1,6 @@
+## v3.1.10
+- **Maintenance**: Added HACS validation workflow and compliance fixes.
+
 ## v3.1.9
 - **Change**: Renamed `sensor.oblamatik_bath_button` to `sensor.oblamatik_bath_drain` to better reflect its function (Drain Position).
 - **Change**: Updated icon for `sensor.oblamatik_bath_drain` to `mdi:valve`.
