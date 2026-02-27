@@ -11,8 +11,8 @@ _LOGGER = logging.getLogger(__name__)
 DOMAIN = "oblamatik"
 
 
-class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
-    VERSION = 2
+class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+    VERSION = 3
 
     async def async_step_user(self, user_input: dict[str, Any] | None = None) -> Any:
         """Handle the initial step."""
