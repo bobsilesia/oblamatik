@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.1.3
+- **Fix**: Replaced `mdi:octagon-alert` (too new) with `mdi:alert-octagon` to ensure compatibility with all Home Assistant versions.
+
 ## v3.1.2
 - **Change**: Renamed "Stop" button to "Emergency Stop" and updated icon to `mdi:octagon-alert`.
 - **Enhancement**: "Emergency Stop" now sends both `flow=0` (stop water) and `hygiene/cancel` commands to ensure all active water functions are terminated immediately.
