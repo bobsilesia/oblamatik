@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.9
+- **Change**: Mapped device `state` values to friendly names in `Status` sensor (`a`→`Idle`, `b`→`Running`).
+
 ## v3.0.8
 - **Fix**: Fixed `MAC Address` sensor to read from `mac_address` in `/api/tlc/1/` response.
 

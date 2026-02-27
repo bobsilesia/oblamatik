@@ -298,7 +298,12 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             raw_status = str(state.get("state", "unknown"))
-            self._current_status = "ok" if raw_status == "a" else raw_status
+            if raw_status == "a":
+                self._current_status = "Idle"
+            elif raw_status == "b":
+                self._current_status = "Running"
+            else:
+                self._current_status = raw_status
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
