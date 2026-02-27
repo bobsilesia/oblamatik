@@ -1,3 +1,7 @@
+## v3.1.8
+- **Change**: Renamed "Start Thermal Desinfection" button to "Hygiene Start".
+- **Change**: Renamed "Cancel Thermal Desinfection" button to "Hygiene Stop".
+
 ## v3.1.7
 - **Fix**: Removed "DEVELOPER / TEST VERSION" warning from README (merged into main by mistake).
 - **Fix**: Replaced potentially invalid license badge with static MIT badge.

@@ -245,7 +245,7 @@ class OblamatikRebootButton(OblamatikBaseButton):
 class OblamatikHygieneStartButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Start Thermal Desinfection"
+        self._attr_name = "Hygiene Start"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_start"
         self._attr_icon = "mdi:bacteria-outline"
         self._attr_entity_category = EntityCategory.CONFIG
@@ -280,7 +280,7 @@ class OblamatikHygieneStartButton(OblamatikBaseButton):
 class OblamatikHygieneCancelButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Cancel Thermal Desinfection"
+        self._attr_name = "Hygiene Stop"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_cancel"
         self._attr_icon = "mdi:stop-circle-outline"
         self._attr_entity_category = EntityCategory.CONFIG
