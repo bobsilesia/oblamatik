@@ -1,14 +1,9 @@
 # Oblamatik — Home Assistant Integration
 
 ![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver) ![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg) ![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main) ![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)
-![License](https://img.shields.io/github/license/bobsilesia/oblamatik) ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json) ![Mypy](https://img.shields.io/badge/mypy-checked-blue)
+![License](https://img.shields.io/badge/License-MIT-blue.svg) ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json) ![Mypy](https://img.shields.io/badge/mypy-checked-blue)
 
 [Latest release →](https://github.com/bobsilesia/oblamatik/releases)
-
-> [!WARNING]
-> **DEVELOPER / TEST VERSION**
-> You are currently on the `develop` branch. This version is for testing and development purposes only.
-> It may contain unstable features or bugs. For stable releases, please use the `main` branch or the latest release from HACS.
 
 Oblamatik is a Home Assistant integration that allows control and parameter reading of KWC/Viega/Crosswater (TLC) devices.
 

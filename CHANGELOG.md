@@ -1,3 +1,7 @@
+## v3.1.7
+- **Fix**: Removed "DEVELOPER / TEST VERSION" warning from README (merged into main by mistake).
+- **Fix**: Replaced potentially invalid license badge with static MIT badge.
+
 ## v3.1.6
 - **Fix**: Improved Keep-Alive mechanism with aggressive 1s heartbeat and random query parameter (`?q=...`) to mimic original app behavior and prevent "Hygiene Active" timeouts.
 
