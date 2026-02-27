@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.5
+- **Fix**: Aligned "Reboot Device" request payload with device UI (`Content-Type: application/x-www-form-urlencoded`, body `0=1`).
+
 ## v3.0.4
 - **New Feature**: Added "Reboot Device" button (replaces "Function Test Stop") based on user request and code analysis.
 - **Enhancement**: Renamed "Function Test Stop" to "Reboot Device" as they use the same API endpoint (`/api/tlc/1/functional-test/step/0/`).
