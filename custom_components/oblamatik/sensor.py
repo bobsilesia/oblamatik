@@ -104,6 +104,7 @@ async def async_setup_entry(
             OblamatikVersionSensor(hass, device),
             OblamatikFreeDiskSensor(hass, device),
             OblamatikFreeMemorySensor(hass, device),
+            OblamatikWifiSsidSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -528,3 +529,22 @@ class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
         state = await self._get_device_state()
         if state:
             self._free_memory = int(state.get("mem", 0))
+
+
+class OblamatikWifiSsidSensor(OblamatikSystemBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Wi-Fi SSID"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_wifi_ssid"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:wifi"
+        self._ssid = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._ssid
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state(required_key="ssid")
+        if state:
+            self._ssid = str(state.get("ssid", "Unknown"))

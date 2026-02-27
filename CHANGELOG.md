@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.0.3
+- **Fix**: Corrected `Flow Rate` slider to use target temperature (`required_temp`) instead of actual temperature, preventing temperature drops during adjustment.
+- **Fix**: Corrected `Stop` button to preserve the current target temperature instead of resetting it to 10°C.
+- **Fix**: Corrected `Temperature` slider to use target flow (`required_flow`) instead of actual flow.
+
+## v3.0.2
+- **Enhancement**: Renamed "Restart WLAN (Reset to AP)" button to "WLAN (AP mode)" for clarity.
+- **New Feature**: Added a diagnostic sensor displaying the current Wi-Fi SSID.
+- **Documentation**: Added acknowledgements to the authors of `homebridge-trio-e` and `viega_multiplex_trio_e` for their pioneering work.
+
 ## v3.0.1
 - **Documentation**: Added professional "Open in Home Assistant" badges for easy installation (HACS) and configuration (Config Flow) in `README.md`.
 - **Version**: Bumped version to 3.0.1 to reflect major documentation and usability improvements.

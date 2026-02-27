@@ -96,8 +96,26 @@ class OblamatikStopButton(OblamatikBaseButton):
         self._attr_unique_id = f"{DOMAIN}_{self._host}_stop"
         self._attr_icon = "mdi:stop"
 
+    async def _get_current_target_temp(self) -> float | None:
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                if response.status == 200:
+                    data = await response.json()
+                    if "required_temp" in data:
+                        return float(data["required_temp"])
+        except Exception as e:
+            _LOGGER.warning(f"Failed to get current target temp: {e}")
+        return None
+
     async def async_press(self) -> None:
-        await self._post_command("/api/tlc/1/", "temperature=10&flow=0&changed=1")
+        target_temp = await self._get_current_target_temp()
+        if target_temp is None:
+            target_temp = 10.0  # Fallback
+
+        await self._post_command("/api/tlc/1/", f"temperature={target_temp}&flow=0&changed=1")
 
 
 class OblamatikQuickAction1Button(OblamatikBaseButton):
@@ -136,7 +154,7 @@ class OblamatikQuickAction3Button(OblamatikBaseButton):
 class OblamatikWlanRestartButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Restart WLAN (Reset to AP)"
+        self._attr_name = "WLAN (AP mode)"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_wlan_restart"
         self._attr_icon = "mdi:wifi-refresh"
         self._attr_entity_category = EntityCategory.CONFIG
