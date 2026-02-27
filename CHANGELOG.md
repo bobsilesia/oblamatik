@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.1.2
+- **Change**: Renamed "Stop" button to "Emergency Stop" and updated icon to `mdi:octagon-alert`.
+- **Enhancement**: "Emergency Stop" now sends both `flow=0` (stop water) and `hygiene/cancel` commands to ensure all active water functions are terminated immediately.
+
 ## v3.1.1
 - **Fix**: Corrected logic for retrieving status sensor `entity_id` in fast refresh mechanism (replaced incorrect `er.async_get_entity_id` with `registry.async_get_entity_id`).
 
