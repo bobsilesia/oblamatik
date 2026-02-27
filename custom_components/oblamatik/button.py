@@ -38,7 +38,7 @@ async def async_setup_entry(
     for device in devices:
         buttons.extend(
             [
-                OblamatikStopButton(hass, device),
+                OblamatikEmergencyStopButton(hass, device),
                 OblamatikQuickAction1Button(hass, device),
                 OblamatikQuickAction2Button(hass, device),
                 OblamatikQuickAction3Button(hass, device),
@@ -116,12 +116,12 @@ class OblamatikBaseButton(ButtonEntity):
             await asyncio.sleep(1)
 
 
-class OblamatikStopButton(OblamatikBaseButton):
+class OblamatikEmergencyStopButton(OblamatikBaseButton):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Stop"
+        self._attr_name = "Emergency Stop"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_stop"
-        self._attr_icon = "mdi:stop"
+        self._attr_icon = "mdi:octagon-alert"
 
     async def _get_current_target_temp(self) -> float | None:
         try:
@@ -142,7 +142,10 @@ class OblamatikStopButton(OblamatikBaseButton):
         if target_temp is None:
             target_temp = 10.0  # Fallback
 
+        # Stop water flow immediately
         await self._post_command("/api/tlc/1/", f"temperature={target_temp}&flow=0&changed=1")
+        # Ensure hygiene mode is cancelled if active
+        await self._post_command("/api/tlc/1/hygiene/thermal-desinfection/cancel/", "data=1")
 
 
 class OblamatikQuickAction1Button(OblamatikBaseButton):
