@@ -121,7 +121,7 @@ class OblamatikEmergencyStopButton(OblamatikBaseButton):
         super().__init__(hass, device)
         self._attr_name = "Emergency Stop"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_stop"
-        self._attr_icon = "mdi:octagon-alert"
+        self._attr_icon = "mdi:alert-octagon"
 
     async def _get_current_target_temp(self) -> float | None:
         try:
