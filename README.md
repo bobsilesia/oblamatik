@@ -17,6 +17,9 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 - HTTP access to the device (e.g., `http://IP:PORT`)
 
 ## Installation (HACS)
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bobsilesia&repository=oblamatik&category=integration)
+
 1. Ensure the repository contains the `custom_components/oblamatik` directory.
 2. In HACS, add the repository as a Custom Repository or use the available source if the repo is publicly supported by HACS.
 3. Install the integration and restart Home Assistant.
@@ -26,6 +29,9 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 2. Restart Home Assistant.
 
 ## Configuration (Config Flow)
+
+[![Open your Home Assistant instance and start setting up a new integration.](https://my.home-assistant.io/badges/config_flow_start.svg)](https://my.home-assistant.io/redirect/config_flow_start/?domain=oblamatik)
+
 1. Go to: Settings → Devices & Services → Add Integration → Oblamatik.
 2. Enter the host (IP) and optionally the port (default `80`).
 3. The integration will detect the device type and create the appropriate entities.
@@ -64,3 +70,10 @@ Want to help develop the project? Check out our guidelines:
 - [Contributing Guidelines (CONTRIBUTING.md)](CONTRIBUTING.md)
 - [Code of Conduct (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)
 - [Report a bug or feature request](https://github.com/bobsilesia/oblamatik/issues/new/choose)
+
+## Acknowledgements
+
+Special thanks to the authors of the following repositories, whose work served as a guide for creating this integration:
+
+- [AxelTerizaki/homebridge-trio-e](https://github.com/AxelTerizaki/homebridge-trio-e)
+- [roelbroersma/viega_multiplex_trio_e](https://github.com/roelbroersma/viega_multiplex_trio_e)

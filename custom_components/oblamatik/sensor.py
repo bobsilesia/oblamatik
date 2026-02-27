@@ -104,6 +104,8 @@ async def async_setup_entry(
             OblamatikVersionSensor(hass, device),
             OblamatikFreeDiskSensor(hass, device),
             OblamatikFreeMemorySensor(hass, device),
+            OblamatikWifiSsidSensor(hass, device),
+            OblamatikMacAddressSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -296,7 +298,12 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             raw_status = str(state.get("state", "unknown"))
-            self._current_status = "ok" if raw_status == "a" else raw_status
+            if raw_status == "a":
+                self._current_status = "Idle"
+            elif raw_status == "b":
+                self._current_status = "Running"
+            else:
+                self._current_status = raw_status
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
@@ -528,3 +535,43 @@ class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
         state = await self._get_device_state()
         if state:
             self._free_memory = int(state.get("mem", 0))
+
+
+class OblamatikWifiSsidSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Wi-Fi SSID"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_wifi_ssid"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:wifi"
+        self._ssid = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._ssid
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            wlan = state.get("wlan") or {}
+            self._ssid = str(wlan.get("name", "Unknown"))
+
+
+class OblamatikMacAddressSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "MAC Address"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_mac_address"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:network"
+        self._mac = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._mac
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            wlan = state.get("wlan") or {}
+            self._mac = str(state.get("mac_address") or wlan.get("mac_address") or "Unknown")

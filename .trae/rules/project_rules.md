@@ -32,3 +32,5 @@
  - CI Output: Use 'ruff check --output-format=github' in CI actions.
  - CI Pre-check: MANDATORY - Run 'ruff format', 'ruff check', and 'mypy' locally before EVERY push. Fix all errors before publishing.
  - Stay Updated: Regularly consult Home Assistant Developer Docs (https://developers.home-assistant.io) to adopt latest standards and solutions.
+- Zanim zastosujesz jakiekolwiek zmiany, najpierw wyjaśnij plan i poczekaj na wyraźną akceptację użytkownika.
+- Przy każdej publikacji przygotuj Release Notes do GitHub Release (skrót zmian, ewentualne breaking changes), spójne z wpisem w CHANGELOG.md.
