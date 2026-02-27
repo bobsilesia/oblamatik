@@ -65,3 +65,10 @@ Want to help develop the project? Check out our guidelines:
 - [Contributing Guidelines (CONTRIBUTING.md)](CONTRIBUTING.md)
 - [Code of Conduct (CODE_OF_CONDUCT.md)](CODE_OF_CONDUCT.md)
 - [Report a bug or feature request](https://github.com/bobsilesia/oblamatik/issues/new/choose)
+
+## Acknowledgements
+
+Special thanks to the authors of the following repositories, whose work served as a guide for creating this integration:
+
+- [AxelTerizaki/homebridge-trio-e](https://github.com/AxelTerizaki/homebridge-trio-e)
+- [roelbroersma/viega_multiplex_trio_e](https://github.com/roelbroersma/viega_multiplex_trio_e)

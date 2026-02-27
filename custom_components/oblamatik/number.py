@@ -98,7 +98,9 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
             async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json()
-                    if "flow" in data:
+                    if "required_flow" in data:
+                        return float(data["required_flow"])
+                    elif "flow" in data:
                         return float(data["flow"])
                     elif "flow_rate" in data:
                         return float(data["flow_rate"])
@@ -148,7 +150,9 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
             async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json()
-                    if "temperature" in data:
+                    if "required_temp" in data:
+                        return float(data["required_temp"])
+                    elif "temperature" in data:
                         return float(data["temperature"])
                     elif "temp" in data:
                         return float(data["temp"])
