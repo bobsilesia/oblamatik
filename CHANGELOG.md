@@ -1,3 +1,6 @@
+## v3.1.11
+- **Fix**: Ignore 'brands' check in HACS validation (pending HACS Action update for local brands support).
+
 ## v3.1.10
 - **Maintenance**: Added HACS validation workflow and compliance fixes.
 
