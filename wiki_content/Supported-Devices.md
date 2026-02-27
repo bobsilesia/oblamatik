@@ -4,23 +4,25 @@ The Oblamatik integration supports various devices based on the **TLC (Touch Log
 
 ## Verified Models
 
-| Manufacturer | Model | Connection | Features | Notes |
-| :--- | :--- | :--- | :--- | :--- |
-| **Viega** | **Multiplex Trio E** | WLAN | Temp, Flow, Drain, Hygiene | Fully supported. Standard API `/api/tlc/1/` works. |
-| **KWC** | **Kitchen Faucet (Various)** | WLAN | Temp, Flow, Info | Supported. Some older firmware versions may report `uptime: 0` (handled by fallback). |
-| **Crosswater** | **Digital Shower** | WLAN | Temp, Flow, Hygiene | Supported. Uses same TLC protocol. |
+| Manufacturer | Model | Module Type | Notes |
+| :--- | :--- | :--- | :--- |
+| **Viega** | **Multiplex Trio E** | **Viega WLAN module 708870** | Fully supported. Identical hardware to Crosswater DGXWLAN-E. Standard API `/api/tlc/1/` works. |
+| **Crosswater** | **Digital Shower (Duo/Elite)** | **DGXWLAN-E** | Fully supported. Identical hardware to Viega 708870. Uses standard TLC protocol. |
+| **KWC** | **Kitchen Faucet (Various)** | **C-module** (and others) | **Experimental**. Some C-modules may restrict local API access or require specific pairing. Functionality might be limited compared to Viega/Crosswater modules. |
+
+> **Note:** The **Viega WLAN module 708870** and **Crosswater DGXWLAN-E** are manufactured by Oblamatik and are hardware-identical. They offer the most complete feature set and stability with this integration.
 
 ## Feature Support Matrix
 
-| Feature | Viega Multiplex Trio E | KWC Faucets | Crosswater Shower |
-| :--- | :---: | :---: | :---: |
-| **Temperature Control** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| **Flow Rate Control** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| **Drain Position (Popup)** | :white_check_mark: | :question: (Model dependent) | :question: (Model dependent) |
-| **Functional Tests** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| **Hygiene Mode** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| **WLAN Restart** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| **Quick Actions** | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Feature | Viega (708870) / Crosswater (DGXWLAN-E) | KWC Faucets (C-module) |
+| :--- | :---: | :---: |
+| **Temperature Control** | :white_check_mark: | :white_check_mark: |
+| **Flow Rate Control** | :white_check_mark: | :white_check_mark: |
+| **Drain Position (Popup)** | :white_check_mark: | :question: (Model dependent) |
+| **Functional Tests** | :white_check_mark: | :white_check_mark: |
+| **Hygiene Mode** | :white_check_mark: | :warning: (Keep-Alive required) |
+| **WLAN Restart** | :white_check_mark: | :white_check_mark: |
+| **Quick Actions** | :white_check_mark: | :white_check_mark: |
 
 ## Connection Requirements
 
