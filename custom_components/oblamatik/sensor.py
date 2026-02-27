@@ -531,7 +531,7 @@ class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
             self._free_memory = int(state.get("mem", 0))
 
 
-class OblamatikWifiSsidSensor(OblamatikSystemBaseSensor):
+class OblamatikWifiSsidSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
         self._attr_name = "Wi-Fi SSID"
@@ -545,6 +545,6 @@ class OblamatikWifiSsidSensor(OblamatikSystemBaseSensor):
         return self._ssid
 
     async def async_update(self) -> None:
-        state = await self._get_device_state(required_key="ssid")
+        state = await self._get_device_state()
         if state:
             self._ssid = str(state.get("ssid", "Unknown"))
