@@ -48,8 +48,8 @@ jobs:
           first="$(printf "%s\n%s\n" "$SANITIZED" "$BASE" | sort -V | head -n1)"
           if [[ "$SANITIZED" != "" && "$first" == "$SANITIZED" && "$SANITIZED" != "$BASE" ]]; then
             echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "title_prefix=[beta] " >> "$GITHUB_OUTPUT"
-            echo "target_branch=beta" >> "$GITHUB_OUTPUT"
+            echo "title_prefix=[develop] " >> "$GITHUB_OUTPUT"
+            echo "target_branch=develop" >> "$GITHUB_OUTPUT"
           else
             echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
             echo "title_prefix=" >> "$GITHUB_OUTPUT"
