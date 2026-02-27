@@ -209,7 +209,7 @@ class OblamatikRebootButton(OblamatikBaseButton):
         self._attr_entity_category = EntityCategory.CONFIG
 
     async def async_press(self) -> None:
-        await self._post_command("/api/tlc/1/functional-test/step/0/", "")
+        await self._post_command("/api/tlc/1/functional-test/step/0/", "0=1")
 
 
 class OblamatikHygieneStartButton(OblamatikBaseButton):
