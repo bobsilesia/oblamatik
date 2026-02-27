@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.1.1
+- **Fix**: Corrected logic for retrieving status sensor `entity_id` in fast refresh mechanism (replaced incorrect `er.async_get_entity_id` with `registry.async_get_entity_id`).
+
 ## v3.1.0
 - Enhancement: Fast post-command refresh — after any successful command, the integration forces the Status sensor to update every ~1s for ~10s, so state changes (e.g., Idle/Running) appear quickly in HA.
 - Internal: Applied across Buttons, Switches, Climate, and Number platforms without changing user-facing configuration.

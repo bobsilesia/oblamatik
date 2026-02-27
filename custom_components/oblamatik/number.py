@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from typing import Any
 
@@ -7,6 +8,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature, UnitOfVolumeFlowRate
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -70,12 +72,37 @@ class OblamatikBaseNumber(NumberEntity):
                 success = response.status == 200
                 if success:
                     _LOGGER.info(f"Successfully sent TLC command: temp={temperature}, flow={flow}")
+                    self._start_fast_status_refresh()
                 else:
                     _LOGGER.warning(f"TLC command failed: {response.status}")
                 return success
         except Exception as e:
             _LOGGER.error("Error sending TLC command: %s", e)
             return False
+
+    def _start_fast_status_refresh(self) -> None:
+        runtime = self._hass.data.setdefault(DOMAIN, {}).setdefault("runtime", {})
+        tasks: dict[str, Any] = runtime.setdefault("fast_status_refresh_tasks", {})
+        key = f"{self._host}:{self._port}"
+        existing = tasks.get(key)
+        if existing is not None and not existing.done():
+            return
+        tasks[key] = self._hass.async_create_task(self._async_fast_status_refresh())
+
+    async def _async_fast_status_refresh(self) -> None:
+        registry = er.async_get(self._hass)
+        status_unique_id = f"{DOMAIN}_{self._host}_status"
+        entity_id = er.async_get_entity_id(registry, "sensor", DOMAIN, status_unique_id)
+        if not entity_id:
+            return
+        for _ in range(10):
+            await self._hass.services.async_call(
+                "homeassistant",
+                "update_entity",
+                {"entity_id": entity_id},
+                blocking=False,
+            )
+            await asyncio.sleep(1)
 
 
 class OblamatikTemperatureNumber(OblamatikBaseNumber):
