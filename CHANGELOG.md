@@ -1,3 +1,6 @@
+## v3.1.6
+- **Fix**: Improved Keep-Alive mechanism with aggressive 1s heartbeat and random query parameter (`?q=...`) to mimic original app behavior and prevent "Hygiene Active" timeouts.
+
 ## v3.1.5
 - **Fix**: Code formatting compliance (ruff).
 

@@ -1,4 +1,5 @@
 import logging
+import random
 from typing import Any
 
 import aiohttp
@@ -146,18 +147,20 @@ class OblamatikBaseSensor(SensorEntity):
         self._attr_has_entity_name = True
         self._attr_available = True
 
-    async def _get_device_state(self) -> dict[str, Any]:
+    async def _get_device_state(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
             try:
-                async with session.get(f"{base_url}/api/tlc/1/", timeout=timeout) as response:
+                async with session.get(
+                    f"{base_url}/api/tlc/1/", params=params, timeout=timeout
+                ) as response:
                     if response.status == 200:
                         return await response.json(content_type=None)
                     else:
                         async with session.get(
-                            f"{base_url}/api/tlc/1/state/", timeout=timeout
+                            f"{base_url}/api/tlc/1/state/", params=params, timeout=timeout
                         ) as response2:
                             if response2.status == 200:
                                 return await response2.json(content_type=None)
@@ -168,7 +171,7 @@ class OblamatikBaseSensor(SensorEntity):
                 # Try fallback only if first attempt raised exception (not just bad status)
                 try:
                     async with session.get(
-                        f"{base_url}/api/tlc/1/state/", timeout=timeout
+                        f"{base_url}/api/tlc/1/state/", params=params, timeout=timeout
                     ) as response2:
                         if response2.status == 200:
                             return await response2.json(content_type=None)
@@ -310,7 +313,10 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
         await self.async_update_ha_state(force_refresh=True)
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
+        # Use random query parameter to prevent caching and ensure Keep-Alive works
+        # This mimics the behavior of the original app which sends ?q=...
+        params = {"q": str(random.random())}
+        state = await self._get_device_state(params=params)
         if state:
             raw_status = str(state.get("state", "unknown"))
             if raw_status == "a":
@@ -329,8 +335,8 @@ class OblamatikStatusSensor(OblamatikBaseSensor):
                     self._cancel_keep_alive()
                     self._cancel_keep_alive = None
 
-                # Schedule next update in 2 seconds (safe keep-alive interval)
-                self._cancel_keep_alive = async_call_later(self.hass, 2, self._force_update)
+                # Schedule next update in 1 second (aggressive heartbeat)
+                self._cancel_keep_alive = async_call_later(self.hass, 1, self._force_update)
 
 
 class OblamatikWaterFlowSensor(OblamatikBaseSensor):
@@ -413,17 +419,20 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
 
 
 class OblamatikSystemBaseSensor(OblamatikBaseSensor):
-    async def _get_device_state(self, required_key: str | None = None) -> dict[str, Any]:
+    async def _get_device_state(
+        self, params: dict[str, Any] | None = None, required_key: str | None = None
+    ) -> dict[str, Any]:
         """Get system status from /api/ with fallback to base implementation.
 
         Args:
+            params: Optional query parameters.
             required_key: Optional key that must be present in the response.
         """
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
-            async with session.get(f"{base_url}/api/", timeout=timeout) as response:
+            async with session.get(f"{base_url}/api/", params=params, timeout=timeout) as response:
                 if response.status == 200:
                     data = await response.json(content_type=None)
                     # If data is empty or missing key fields, trigger fallback
@@ -441,7 +450,7 @@ class OblamatikSystemBaseSensor(OblamatikBaseSensor):
 
         # Fallback to standard endpoint if /api/ fails or is incomplete
         _LOGGER.debug(f"System info fallback for {self._host}")
-        return await super()._get_device_state()
+        return await super()._get_device_state(params=params)
 
 
 class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
