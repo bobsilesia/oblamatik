@@ -105,6 +105,7 @@ async def async_setup_entry(
             OblamatikFreeDiskSensor(hass, device),
             OblamatikFreeMemorySensor(hass, device),
             OblamatikWifiSsidSensor(hass, device),
+            OblamatikMacAddressSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -547,4 +548,25 @@ class OblamatikWifiSsidSensor(OblamatikBaseSensor):
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
-            self._ssid = str(state.get("ssid", "Unknown"))
+            wlan = state.get("wlan") or {}
+            self._ssid = str(wlan.get("name", "Unknown"))
+
+
+class OblamatikMacAddressSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "MAC Address"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_mac_address"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:network"
+        self._mac = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._mac
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            wlan = state.get("wlan") or {}
+            self._mac = str(wlan.get("mac_address", "Unknown"))
