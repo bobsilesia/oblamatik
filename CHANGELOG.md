@@ -1,3 +1,7 @@
+## v3.1.9
+- **Change**: Renamed `sensor.oblamatik_bath_button` to `sensor.oblamatik_bath_drain` to better reflect its function (Drain Position).
+- **Change**: Updated icon for `sensor.oblamatik_bath_drain` to `mdi:valve`.
+
 ## v3.1.8
 - **Change**: Renamed "Start Thermal Desinfection" button to "Hygiene Start".
 - **Change**: Renamed "Cancel Thermal Desinfection" button to "Hygiene Stop".

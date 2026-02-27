@@ -120,7 +120,7 @@ async def async_setup_entry(
                 [
                     OblamatikRequiredFlowSensor(hass, device),
                     OblamatikBathFaucetSensor(hass, device),
-                    OblamatikBathButtonSensor(hass, device),
+                    OblamatikBathDrainSensor(hass, device),
                     OblamatikFlowRateLiterPerHourSensor(hass, device),
                 ]
             )
@@ -378,23 +378,23 @@ class OblamatikBathFaucetSensor(OblamatikBaseSensor):
             self._bath_faucet_state = "open" if device_state == "a" else "closed"
 
 
-class OblamatikBathButtonSensor(OblamatikBaseSensor):
+class OblamatikBathDrainSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Bath Button"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_button"
-        self._attr_icon = "mdi:button-pointer"
-        self._bath_button_state = False
+        self._attr_name = "Bath Drain"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_bath_drain"
+        self._attr_icon = "mdi:valve"
+        self._bath_drain_state = False
 
     @property
     def native_value(self) -> bool | None:
-        return self._bath_button_state
+        return self._bath_drain_state
 
     async def async_update(self) -> None:
         state = await self._get_device_state()
         if state:
             popup = state.get("popup", False)
-            self._bath_button_state = bool(popup)
+            self._bath_drain_state = bool(popup)
 
 
 class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
