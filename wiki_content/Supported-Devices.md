@@ -1,34 +1,55 @@
 # Supported Devices
 
-The Oblamatik integration supports various devices based on the **TLC (Touch Logic Control)** system. These devices are typically used for smart water control in bathrooms and kitchens.
+This integration supports devices manufactured by **Oblamatik AG**, which are often sold under different brand names depending on the region.
 
-## Verified Models
+## Confirmed Supported Models
 
-| Manufacturer | Model | Module Type | Notes |
+The following devices share the same underlying hardware and API, making them fully compatible with this integration:
+
+| Brand | Model Name | Region | Notes |
 | :--- | :--- | :--- | :--- |
-| **Viega** | **Multiplex Trio E** | **Viega WLAN module 708870** | Fully supported. Identical hardware to Crosswater DGXWLAN-E. Standard API `/api/tlc/1/` works. |
-| **Crosswater** | **Digital Shower (Duo/Elite)** | **DGXWLAN-E** | Fully supported. Identical hardware to Viega 708870. Uses standard TLC protocol. |
-| **KWC** | **Kitchen Faucet (Various)** | **C-module** (and others) | **Experimental**. Some C-modules may restrict local API access or require specific pairing. Functionality might be limited compared to Viega/Crosswater modules. |
+| **Viega** | Multiplex Trio E / E2 / E3 | Europe / USA | The most common version. WLAN module usually 708870. |
+| **Oblamatik** | Prime / Gentle | Global (OEM) | The original manufacturer's branding. |
+| **Crosswater** | Digital Duo / Elite | UK / USA | Uses **DGXWLAN-E** module (hardware-identical to Viega 708870). |
+| **Deca** | Touch Digital / Digital Banho | Brazil | E.g. **2875.C.TCH.DIG** (Monocomando). Uses the same control logic. |
+| **Sigma** | Sigma Touch (Discontinued) | USA | Sold by **American Faucet & Coatings Corp**. SKU **1.0000710.xx**. Internal model **TLC30**. |
 
-> **Note:** The **Viega WLAN module 708870** and **Crosswater DGXWLAN-E** are manufactured by Oblamatik and are hardware-identical. They offer the most complete feature set and stability with this integration.
+> **Note:** The **Viega WLAN module 708870** and **Crosswater DGXWLAN-E** are manufactured by Oblamatik and are hardware-identical.
 
-## Feature Support Matrix
+## Experimental / Likely Compatible
 
-| Feature | Viega (708870) / Crosswater (DGXWLAN-E) | KWC Faucets (C-module) |
-| :--- | :---: | :---: |
-| **Temperature Control** | :white_check_mark: | :white_check_mark: |
-| **Flow Rate Control** | :white_check_mark: | :white_check_mark: |
-| **Drain Position (Popup)** | :white_check_mark: | :question: (Model dependent) |
-| **Functional Tests** | :white_check_mark: | :white_check_mark: |
-| **Hygiene Mode** | :white_check_mark: | :warning: (Keep-Alive required) |
-| **WLAN Restart** | :white_check_mark: | :white_check_mark: |
-| **Quick Actions** | :white_check_mark: | :white_check_mark: |
+| Brand | Model Name | Region | Notes |
+| :--- | :--- | :--- | :--- |
+| **KWC** | ONO touch light PRO | Global | Based on Oblamatik technology ("TLC" = Touch Light Control). |
+| **Laufen / Arwa** | arwa-twinprime tronic | Switzerland / EU | "Tronic" series (electronic mixers) share features like bath fill/presets. |
+| **Similor Kugler** | Electronic Mixers | Switzerland | Part of Laufen group; high probability of shared Oblamatik OEM platform. |
+| **Hansa** | Electra | Europe | Some high-end digital models may share this platform. |
 
-## Connection Requirements
+## Hardware Identification
 
--   **Network**: The device must be connected to the same local network (WLAN) as Home Assistant.
--   **Static IP**: Highly recommended to prevent the IP from changing.
--   **Port 80**: Default HTTP port used for communication.
--   **API Access**: The device must expose the `/api/` endpoints. Most modern TLC devices have this enabled by default.
+If your device has a WLAN module that looks like a small white or grey box with a label mentioning **Oblamatik**, **Viega**, or FCC ID starting with **2AC...** (or similar Swiss/German codes), it is likely supported.
 
-If you have a device that is not listed but works with this integration, please open a [Feature Request](https://github.com/bobsilesia/oblamatik/issues) to add it to the list!
+The firmware typically runs on an **8devices Carambola** (OpenWrt-based) module.
+
+### Model Codes
+You might find these codes on the controller unit (black box):
+- **TLC30...** (e.g., `TLC30FTD`) - Likely stands for "**T**ouch **L**ight **C**ontrol".
+- **1.0000710.xx** - Sigma Touch commercial SKU (e.g., 1.0000710.26 for Chrome).
+- **Vision Bad** - Internal project name seen on some units.
+
+## Feature Support by Device
+
+| Feature | Viega / Oblamatik | Crosswater | Deca Touch | Sigma Touch |
+| :--- | :--- | :--- | :--- | :--- |
+| **On/Off Control** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Temperature Set** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Flow Rate Set** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Presets (Quick)** | ✅ Yes (3 slots) | ✅ Yes | ✅ Yes | ✅ Yes |
+| **Bath Fill Mode** | ✅ Yes | ✅ Yes | ✅ Yes | ✅ Yes |
+
+## Troubleshooting
+
+If your device is not discovered automatically:
+1. Ensure it is connected to the same Wi-Fi network as Home Assistant.
+2. Check if you can access `http://<device_ip>/api/` in your browser.
+3. Try adding it manually using the IP address in the integration configuration.
