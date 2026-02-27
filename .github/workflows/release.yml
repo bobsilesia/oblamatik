@@ -38,6 +38,23 @@ jobs:
             echo "title=${{ inputs.title }}" >> "$GITHUB_OUTPUT"
             echo "notes=${{ inputs.notes }}" >> "$GITHUB_OUTPUT"
           fi
+      - name: Compute release channel
+        id: channel
+        run: |
+          TAG="${{ steps.resolve.outputs.tag_name }}"
+          VER="${TAG#v}"
+          SANITIZED="$(echo "$VER" | sed -E 's/[^0-9.].*$//')"
+          BASE="3.0.1"
+          first="$(printf "%s\n%s\n" "$SANITIZED" "$BASE" | sort -V | head -n1)"
+          if [[ "$SANITIZED" != "" && "$first" == "$SANITIZED" && "$SANITIZED" != "$BASE" ]]; then
+            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+            echo "title_prefix=[beta] " >> "$GITHUB_OUTPUT"
+            echo "target_branch=beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+            echo "title_prefix=" >> "$GITHUB_OUTPUT"
+            echo "target_branch=main" >> "$GITHUB_OUTPUT"
+          fi
       - name: Extract release notes
         id: extract_release_notes
         env:
@@ -93,9 +110,10 @@ jobs:
           generate_release_notes: true
           fail_on_unmatched_files: true
           draft: false
-          prerelease: false
+          prerelease: ${{ steps.channel.outputs.is_prerelease }}
           tag_name: ${{ steps.resolve.outputs.tag_name }}
-          name: ${{ steps.resolve.outputs.title }}
+          name: ${{ steps.channel.outputs.title_prefix }}${{ steps.resolve.outputs.title }}
           body_path: release_notes.md
+          target_commitish: ${{ steps.channel.outputs.target_branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
