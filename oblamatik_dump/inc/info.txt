@@ -1,0 +1,1 @@
+{"version":"1.0-3.12","serial_number":"1802210108","serial_number_iot":"1606230143","password":"4f9b3c410a12b519da9444cf16b27998fdbfb35cff265b98752cf7eff1165b5dab8791690245672f74586481a942e4547081ec4db4a79ae66e6973d906b17a70","name":"TWINLEVEL","ip":"192.168.1.173"}

@@ -69,6 +69,7 @@ class OblamatikBaseButton(ButtonEntity):
             name=device.get("name", f"Oblamatik ({self._host})"),
             manufacturer="KWC/Viega/Crosswater",
             model=device.get("model", "Unknown"),
+            configuration_url=f"http://{self._host}:{self._port}/",
         )
         self._attr_has_entity_name = True
         self._attr_available = True

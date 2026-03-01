@@ -5,3 +5,4 @@
 - [Entities and Controls](Entities-and-Controls)
 - [Automations](Automations)
 - [Troubleshooting](Troubleshooting)
+- [Hardware Replication](Hardware-Replication)

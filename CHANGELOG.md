@@ -1,3 +1,15 @@
+## v3.1.16
+- **New**: Added "Visit Device" link to Device Info panel (via `configuration_url`) for easy access to device Web UI.
+- **Fix**: Resolved `number` entity bug where changing Flow Rate incorrectly triggered Temperature updates.
+- **Fix**: Improved Flow and Temperature control logic for better real-time regulation and presetting.
+- **Improvement**: Enhanced code compliance (removed unused imports, fixed line lengths).
+
+## v3.1.15
+- **New**: Added `sensor.oblamatik_network_mode` to diagnose connection type (`Access Point`, `Client (WiFi)`, `Client (Ethernet)`, `Client (Bridged)`).
+- **New**: Added `sensor.oblamatik_ip_address` for better network diagnostics.
+- **Improvement**: Enhanced `sensor.oblamatik_mac_address` reliability by ensuring correct update logic.
+- **Improvement**: Reflected firmware findings (e.g., `br-lan` handling) in integration logic to improve stability and diagnostics.
+
 ## v3.1.14
 - **Maintenance**: Repository cleanup for HACS Default compliance (removed outdated `docs/` folder, `.DS_Store`, `RELEASE_TEMPLATE.md`).
 - **Fix**: Resolved deprecated ConfigFlow decorator warning (HA 2025.2+).
