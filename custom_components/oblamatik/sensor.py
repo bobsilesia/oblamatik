@@ -550,13 +550,11 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
         return self._serial
 
     async def async_update(self) -> None:
-        # Try getting from /inc/info.txt first as it is the most reliable source for IoT Serial
         serial = None
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
-            # Use /inc/info.txt directly as it is a static file on the device
             async with session.get(f"{base_url}/inc/info.txt", timeout=timeout) as response:
                 if response.status == 200:
                     try:
@@ -574,12 +572,10 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
         except Exception:
             pass
 
-        # Fallback to /api/info (mapped to info.php)
         if not serial:
             state = await self._get_device_state(required_key="serial_number_iot")
             serial = state.get("serial_number_iot")
 
-        # Fallback to /api/tlc/1/
         if not serial:
             try:
                 base_url = f"http://{self._host}:{self._port}"
@@ -592,8 +588,22 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
             except Exception:
                 pass
 
+        if not serial:
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with session.get(f"{base_url}/api/tlc/1/state/", timeout=timeout) as response:
+                    if response.status == 200:
+                        data = await response.json(content_type=None)
+                        serial = data.get("serial_number_iot")
+            except Exception:
+                pass
+
         if serial:
             self._serial = str(serial)
+        else:
+            self._serial = "Unknown"
 
 
 class OblamatikWifiSsidSensor(OblamatikBaseSensor):
