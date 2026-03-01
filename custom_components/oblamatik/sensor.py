@@ -429,26 +429,27 @@ class OblamatikIoTSensorBase(OblamatikBaseSensor):
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
             # Use /api/info which corresponds to info.php in firmware
-            async with session.get(
-                f"{base_url}/api/info", params=params, timeout=timeout
-            ) as response:
-                if response.status == 200:
-                    data = await response.json(content_type=None)
-                    if data:
-                        return data
+            # Or /api/index.php?url=info for some firmware versions
+            urls = [
+                f"{base_url}/api/info",
+                f"{base_url}/api/index.php?url=info",
+                f"{base_url}/api/",
+            ]
+
+            for url in urls:
+                try:
+                    async with session.get(url, params=params, timeout=timeout) as response:
+                        if response.status == 200:
+                            data = await response.json(content_type=None)
+                            if data:
+                                if required_key and required_key not in data:
+                                    continue
+                                return data
+                except Exception:
+                    pass
+
         except Exception as e:
-            _LOGGER.debug(f"Error getting IoT info from /api/info for {self._host}: {e}")
-            # Try fallback to /api/ (some firmwares might differ)
-            try:
-                async with session.get(
-                    f"{base_url}/api/", params=params, timeout=timeout
-                ) as response:
-                    if response.status == 200:
-                        data = await response.json(content_type=None)
-                        if data:
-                            return data
-            except Exception:
-                pass
+            _LOGGER.debug(f"Error getting IoT info from {self._host}: {e}")
 
         return {}
 
@@ -511,6 +512,7 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
+            # Use /inc/info.txt directly as it is a static file on the device
             async with session.get(f"{base_url}/inc/info.txt", timeout=timeout) as response:
                 if response.status == 200:
                     try:
@@ -520,12 +522,15 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
                         text = await response.text()
                         import json
 
-                        data = json.loads(text)
-                        serial = data.get("serial_number_iot")
+                        try:
+                            data = json.loads(text)
+                            serial = data.get("serial_number_iot")
+                        except Exception:
+                            pass
         except Exception:
             pass
 
-        # Fallback to /api/info
+        # Fallback to /api/info (mapped to info.php)
         if not serial:
             state = await self._get_device_state(required_key="serial_number_iot")
             serial = state.get("serial_number_iot")
