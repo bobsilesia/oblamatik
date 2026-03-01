@@ -1,0 +1,3 @@
+* * * * * /usr/bin/php-cli /www/network.php
+*/15 * * * * /etc/init.d/odhcpd restart
+*/15 * * * * /etc/init.d/avahi-daemon restart

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Ebene_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 100 100" enable-background="new 0 0 100 100" xml:space="preserve">
+<g id="Abfluss_geschlossen">
+</g>
+<path id="Kreis_1_" fill="#5B5B5B" d="M50,5.6c24.4,0,44.5,20,44.5,44.4S74.4,94.4,50,94.4S5.5,74.4,5.5,50S25.6,5.6,50,5.6 M50,0
+	C22.4,0-0.1,22.5-0.1,50s22.5,50,50.1,50s50.1-22.5,50.1-50S77.6,0,50,0L50,0z"/>
+<rect x="33.3" y="52.8" fill="#5B5B5B" width="33.3" height="5.6"/>
+<g>
+	<path fill="#EBEBEB" d="M44.4,83.1c0-1.4,0-2.5,0-3.6c1.1,0,2.5,0,3.6,0c0,1.1,0,2.5,0,3.6C46.9,83.1,45.8,83.1,44.4,83.1z"/>
+	<path fill="#EBEBEB" d="M48.1,71.7c0,1.1,0,2.5,0,3.6c-1.1,0-2.5,0-3.6,0c0-1.1,0-2.5,0-3.6C45.6,71.7,46.9,71.7,48.1,71.7z"/>
+	<path fill="#EBEBEB" d="M44.4,67.5c0-1.4,0-2.5,0-3.6c1.1,0,2.5,0,3.6,0c0,1.1,0,2.5,0,3.6C46.9,67.5,45.8,67.5,44.4,67.5z"/>
+	<g>
+		<path fill="#EBEBEB" d="M51.9,83.1c0-1.4,0-2.5,0-3.6c1.1,0,2.5,0,3.6,0c0,1.1,0,2.5,0,3.6C54.4,83.1,53.1,83.1,51.9,83.1z"/>
+		<path fill="#EBEBEB" d="M51.9,90.3c0-1.4,0-2.5,0-3.6c1.1,0,2.5,0,3.6,0c0,1.1,0,2.5,0,3.6C54.4,90.3,53.1,90.3,51.9,90.3z"/>
+		<path fill="#EBEBEB" d="M55.6,71.7c0,1.1,0,2.5,0,3.6c-1.1,0-2.5,0-3.6,0c0-1.1,0-2.5,0-3.6C53.1,71.7,54.2,71.7,55.6,71.7z"/>
+		<path fill="#EBEBEB" d="M51.9,67.5c0-1.4,0-2.5,0-3.6c1.1,0,2.5,0,3.6,0c0,1.1,0,2.5,0,3.6C54.4,67.5,53.1,67.5,51.9,67.5z"/>
+	</g>
+</g>
+<g>
+	<path fill="#5B5B5B" d="M77.8,38.9v15.6c0,4.7-3.1,9.4-8.3,9.4h-8.3v5.6h8.3c8.1,0,13.9-7.2,13.9-15V38.9H77.8z"/>
+	<path fill="#5B5B5B" d="M38.9,63.9h-8.3c-5.3,0-8.3-4.4-8.3-9.4V38.9h-5.6v15.6c0,7.5,5.8,15,13.9,15h8.3V63.9z"/>
+</g>
+<g>
+	<rect x="36.1" y="44.4" fill="#EBEBEB" width="11.1" height="2.8"/>
+	<rect x="52.8" y="44.4" fill="#EBEBEB" width="11.1" height="2.8"/>
+	<g>
+		<rect x="22.2" y="44.4" fill="#EBEBEB" width="8.3" height="2.8"/>
+		<rect x="69.4" y="44.4" fill="#EBEBEB" width="8.3" height="2.8"/>
+	</g>
+</g>
+</svg>

@@ -55,14 +55,15 @@ class OblamatikBaseNumber(NumberEntity):
             name=device.get("name", f"Oblamatik ({self._host})"),
             manufacturer="KWC",
             model="TLC15F",
+            configuration_url=f"http://{self._host}:{self._port}/",
         )
         self._attr_has_entity_name = True
         self._attr_available = True
 
-    async def _post_tlc(self, temperature: float, flow: float, changed: bool) -> bool:
+    async def _post_tlc(self, temperature: float, flow: float, changed_type: int) -> bool:
         try:
             base_url = f"http://{self._host}:{self._port}"
-            data = f"temperature={temperature}&flow={flow}&changed={1 if changed else 0}"
+            data = f"temperature={temperature}&flow={flow}&changed={changed_type}"
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
@@ -71,7 +72,9 @@ class OblamatikBaseNumber(NumberEntity):
             ) as response:
                 success = response.status == 200
                 if success:
-                    _LOGGER.info(f"Successfully sent TLC command: temp={temperature}, flow={flow}")
+                    _LOGGER.info(
+                        f"Sent TLC command: temp={temperature}, flow={flow}, changed={changed_type}"
+                    )
                     self._start_fast_status_refresh()
                 else:
                     _LOGGER.warning(f"TLC command failed: {response.status}")
@@ -148,7 +151,7 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
         if current_flow is None:
             current_flow = 0.0
             _LOGGER.warning(f"Could not get current flow, using fallback: {current_flow} L/min")
-        if await self._post_tlc(value, current_flow, True):
+        if await self._post_tlc(value, current_flow, 1):
             _LOGGER.info(
                 f"Temperature set successfully to {value}°C with flow {current_flow} L/min"
             )
@@ -199,11 +202,9 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
         current_temp = await self._get_current_temperature()
         if current_temp is None:
             current_temp = 38.0
-            _LOGGER.warning(f"Could not get current temperature, using fallback: {current_temp}°C")
-        if await self._post_tlc(current_temp, value, True):
-            _LOGGER.info(
-                f"Flow rate set successfully to {value} L/min with temperature {current_temp}°C"
-            )
+            _LOGGER.warning(f"Could not get current temp, using fallback: {current_temp}°C")
+        if await self._post_tlc(current_temp, value, 2):
+            _LOGGER.info(f"Flow rate set successfully to {value} L/min with temp {current_temp}°C")
             self.async_write_ha_state()
         else:
             _LOGGER.error("Failed to set flow rate")

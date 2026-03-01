@@ -54,6 +54,7 @@ class OblamatikBaseSwitch(SwitchEntity):
             name=device.get("name", f"Oblamatik ({self._host})"),
             manufacturer="KWC",
             model="TLC15F",
+            configuration_url=f"http://{self._host}:{self._port}/",
         )
         self._attr_has_entity_name = True
         self._is_on = False

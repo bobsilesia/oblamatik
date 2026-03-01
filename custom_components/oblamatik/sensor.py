@@ -7,7 +7,6 @@ from homeassistant.components.sensor import SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     EntityCategory,
-    UnitOfInformation,
     UnitOfTemperature,
     UnitOfVolumeFlowRate,
 )
@@ -101,13 +100,15 @@ async def async_setup_entry(
             OblamatikStatusSensor(hass, device),
             OblamatikWaterFlowSensor(hass, device),
             OblamatikRequiredTemperatureSensor(hass, device),
-            OblamatikUptimeSensor(hass, device),
-            OblamatikSerialSensor(hass, device),
-            OblamatikVersionSensor(hass, device),
-            OblamatikFreeDiskSensor(hass, device),
-            OblamatikFreeMemorySensor(hass, device),
+            OblamatikDeviceSerialSensor(hass, device),
+            OblamatikDeviceVersionSensor(hass, device),
             OblamatikWifiSsidSensor(hass, device),
             OblamatikMacAddressSensor(hass, device),
+            OblamatikNetworkModeSensor(hass, device),
+            OblamatikIPAddressSensor(hass, device),
+            OblamatikIoTSerialSensor(hass, device),
+            OblamatikIoTVersionSensor(hass, device),
+            OblamatikSignalStrengthSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -141,8 +142,9 @@ class OblamatikBaseSensor(SensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, self._host)},
             name=device.get("name", f"Oblamatik ({self._host})"),
-            manufacturer="KWC/Viega/Crosswater",
+            manufacturer="KWC",
             model=device.get("model", "Unknown"),
+            configuration_url=f"http://{self._host}:{self._port}/",
         )
         self._attr_has_entity_name = True
         self._attr_available = True
@@ -418,81 +420,44 @@ class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):
             self._flow_rate_lh = flow_lpm * 60
 
 
-class OblamatikSystemBaseSensor(OblamatikBaseSensor):
+class OblamatikIoTSensorBase(OblamatikBaseSensor):
     async def _get_device_state(
         self, params: dict[str, Any] | None = None, required_key: str | None = None
     ) -> dict[str, Any]:
-        """Get system status from /api/ with fallback to base implementation.
-
-        Args:
-            params: Optional query parameters.
-            required_key: Optional key that must be present in the response.
-        """
+        """Get IoT system status from /api/info (mapped to info.php)."""
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
-            async with session.get(f"{base_url}/api/", params=params, timeout=timeout) as response:
+            # Use /api/info which corresponds to info.php in firmware
+            async with session.get(
+                f"{base_url}/api/info", params=params, timeout=timeout
+            ) as response:
                 if response.status == 200:
                     data = await response.json(content_type=None)
-                    # If data is empty or missing key fields, trigger fallback
                     if data:
-                        # If a specific key is required, check for it
-                        if required_key and required_key not in data:
-                            _LOGGER.debug(
-                                f"Missing '{required_key}' in /api/ for {self._host}, fallback"
-                            )
-                            pass  # Fall through to fallback
-                        elif "uptime" in data or "serial" in data or "version" in data:
-                            return data
+                        return data
         except Exception as e:
-            _LOGGER.debug(f"Error getting system state from /api/ for {self._host}: {e}")
+            _LOGGER.debug(f"Error getting IoT info from /api/info for {self._host}: {e}")
+            # Try fallback to /api/ (some firmwares might differ)
+            try:
+                async with session.get(
+                    f"{base_url}/api/", params=params, timeout=timeout
+                ) as response:
+                    if response.status == 200:
+                        data = await response.json(content_type=None)
+                        if data:
+                            return data
+            except Exception:
+                pass
 
-        # Fallback to standard endpoint if /api/ fails or is incomplete
-        _LOGGER.debug(f"System info fallback for {self._host}")
-        return await super()._get_device_state(params=params)
+        return {}
 
 
-class OblamatikUptimeSensor(OblamatikSystemBaseSensor):
+class OblamatikDeviceSerialSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Uptime"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_uptime"
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:clock-outline"
-        self._attr_entity_registry_enabled_default = False
-        self._uptime_str = "00:00"
-
-    @property
-    def native_value(self) -> str | None:
-        return self._uptime_str
-
-    async def async_update(self) -> None:
-        state = await self._get_device_state(required_key="uptime")
-        uptime_seconds = 0
-        if state:
-            uptime_seconds = int(state.get("uptime", 0))
-
-        # If uptime is 0, try fallback to base (skipping SystemBaseSensor logic)
-        if uptime_seconds == 0:
-            _LOGGER.debug(f"Uptime is 0 from /api/, trying fallback for {self._host}")
-            # Call OblamatikBaseSensor._get_device_state directly
-            state_fallback = await super(OblamatikSystemBaseSensor, self)._get_device_state()
-            if state_fallback:
-                uptime_seconds = int(state_fallback.get("uptime", 0))
-
-        if uptime_seconds > 0:
-            hours = uptime_seconds // 3600
-            minutes = (uptime_seconds % 3600) // 60
-            self._uptime_str = f"{hours:02d}:{minutes:02d}"
-        else:
-            self._uptime_str = "00:00"
-
-
-class OblamatikSerialSensor(OblamatikSystemBaseSensor):
-    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
-        super().__init__(hass, device)
-        self._attr_name = "Serial Number"
+        self._attr_name = "Device Serial Number"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_serial"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:barcode"
@@ -503,15 +468,15 @@ class OblamatikSerialSensor(OblamatikSystemBaseSensor):
         return self._serial
 
     async def async_update(self) -> None:
-        state = await self._get_device_state(required_key="serial")
+        state = await self._get_device_state()
         if state:
             self._serial = str(state.get("serial", "Unknown"))
 
 
-class OblamatikVersionSensor(OblamatikSystemBaseSensor):
+class OblamatikDeviceVersionSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Firmware Version"
+        self._attr_name = "Device Firmware Version"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_version"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:tag-text-outline"
@@ -522,55 +487,86 @@ class OblamatikVersionSensor(OblamatikSystemBaseSensor):
         return self._version
 
     async def async_update(self) -> None:
-        state = await self._get_device_state(required_key="version")
+        state = await self._get_device_state()
         if state:
             self._version = str(state.get("version", "Unknown"))
 
 
-class OblamatikFreeDiskSensor(OblamatikSystemBaseSensor):
+class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Free Disk Space"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_free_disk"
-        self._attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
-        self._attr_device_class = "data_size"
+        self._attr_name = "IoT Serial Number"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_iot_serial"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:harddisk"
-        self._attr_state_class = "measurement"
-        self._attr_entity_registry_enabled_default = False
-        self._free_disk = 0
+        self._attr_icon = "mdi:barcode-scan"
+        self._serial = "Unknown"
 
     @property
-    def native_value(self) -> int | None:
-        return self._free_disk
+    def native_value(self) -> str | None:
+        return self._serial
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
-        if state:
-            self._free_disk = int(state.get("disk", 0))
+        # Try getting from /api/info first
+        state = await self._get_device_state(required_key="serial_number_iot")
+        serial = state.get("serial_number_iot")
+
+        # If not found, try getting from /api/tlc/1/ (fallback 1)
+        if not serial:
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with session.get(f"{base_url}/api/tlc/1/", timeout=timeout) as response:
+                    if response.status == 200:
+                        data = await response.json(content_type=None)
+                        serial = data.get("serial_number_iot")
+            except Exception:
+                pass
+
+        # If still not found, try getting from /inc/info.txt (fallback 2)
+        if not serial:
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with session.get(f"{base_url}/inc/info.txt", timeout=timeout) as response:
+                    if response.status == 200:
+                        # info.txt content: {"version":"...","serial_number_iot":"..."}
+                        # It might be JSON or text. Based on file content, it is JSON.
+                        try:
+                            data = await response.json(content_type=None)
+                            serial = data.get("serial_number_iot")
+                        except Exception:
+                            # Try parsing as text if JSON fails
+                            text = await response.text()
+                            import json
+
+                            data = json.loads(text)
+                            serial = data.get("serial_number_iot")
+            except Exception:
+                pass
+
+        if serial:
+            self._serial = str(serial)
 
 
-class OblamatikFreeMemorySensor(OblamatikSystemBaseSensor):
+class OblamatikIoTVersionSensor(OblamatikIoTSensorBase):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Free Memory"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_free_memory"
-        self._attr_native_unit_of_measurement = UnitOfInformation.KILOBYTES
-        self._attr_device_class = "data_size"
+        self._attr_name = "IoT Firmware Version"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_iot_version"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:memory"
-        self._attr_state_class = "measurement"
-        self._attr_entity_registry_enabled_default = False
-        self._free_memory = 0
+        self._attr_icon = "mdi:chip"
+        self._version = "Unknown"
 
     @property
-    def native_value(self) -> int | None:
-        return self._free_memory
+    def native_value(self) -> str | None:
+        return self._version
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
+        state = await self._get_device_state(required_key="version")
         if state:
-            self._free_memory = int(state.get("mem", 0))
+            self._version = str(state.get("version", "Unknown"))
 
 
 class OblamatikWifiSsidSensor(OblamatikBaseSensor):
@@ -611,3 +607,108 @@ class OblamatikMacAddressSensor(OblamatikBaseSensor):
         if state:
             wlan = state.get("wlan") or {}
             self._mac = str(state.get("mac_address") or wlan.get("mac_address") or "Unknown")
+
+
+class OblamatikNetworkModeSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Network Mode"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_network_mode"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:access-point-network"
+        self._network_mode = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._network_mode
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            raw_mode = str(state.get("network", "Unknown"))
+            if raw_mode == "wlan_ap":
+                self._network_mode = "Access Point"
+                self._attr_icon = "mdi:access-point-network"
+            elif raw_mode == "wlan_cl":
+                self._network_mode = "Client (WiFi)"
+                self._attr_icon = "mdi:wifi"
+            elif raw_mode == "ethernet":
+                self._network_mode = "Client (Ethernet)"
+                self._attr_icon = "mdi:ethernet"
+            elif raw_mode == "br-lan":
+                self._network_mode = "Client (Bridged)"
+                self._attr_icon = "mdi:lan-connect"
+            else:
+                self._network_mode = raw_mode
+                self._attr_icon = "mdi:help-network"
+
+
+class OblamatikIPAddressSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "IP Address"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_ip_address"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:ip-network"
+        self._ip = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._ip
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            self._ip = str(state.get("ip", "Unknown"))
+
+
+class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Wi-Fi Signal Strength"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_signal_strength"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:wifi-strength-2"
+        self._attr_native_unit_of_measurement = "%"
+        self._attr_state_class = "measurement"
+        # Disable by default as it requires scanning which might be slow
+        self._attr_entity_registry_enabled_default = False
+        self._signal_strength = 0
+
+    @property
+    def native_value(self) -> int | None:
+        return self._signal_strength
+
+    async def async_update(self) -> None:
+        # First get current SSID from device state
+        state = await self._get_device_state()
+        if not state:
+            return
+
+        wlan = state.get("wlan") or {}
+        current_ssid = str(wlan.get("name", ""))
+
+        if not current_ssid or current_ssid == "Unknown":
+            return
+
+        # Now scan for networks to get signal strength
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=10)  # Scan takes time
+            async with session.get(f"{base_url}/api/wlan/", timeout=timeout) as response:
+                if response.status == 200:
+                    networks = await response.json(content_type=None)
+
+                    if isinstance(networks, dict):
+                        networks = list(networks.values())
+
+                    for network in networks:
+                        if isinstance(network, dict) and network.get("name") == current_ssid:
+                            raw_signal = float(network.get("rawsignal", 0))
+                            # Convert raw signal (0-70 or similar) to percentage
+                            # Assuming 70 is max quality
+                            self._signal_strength = int(min(100, max(0, (raw_signal / 70) * 100)))
+                            break
+        except Exception as e:
+            _LOGGER.debug(f"Error scanning wifi for {self._host}: {e}")
