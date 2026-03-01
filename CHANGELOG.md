@@ -1,3 +1,6 @@
+## 4.0.4
+- **Docs**: Added 'Release Date' and 'Pull Requests' badges to README.
+
 ## 4.0.3
 - **Docs**: Added GitHub stats badges (Stars, Issues, Last Commit) to README.
 
