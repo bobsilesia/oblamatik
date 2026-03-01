@@ -1,3 +1,11 @@
+## v4.0.7
+- **Docs-only**: Usprawnienia nawigacji i kontekstu:
+  - Language toggles (PL/EN) na wszystkich stronach wiki + kotwice #pl/#en.
+  - Widoczny sidebar z linkami PL/EN dla początkujących.
+  - Sekcja „Getting Started” na Home (PL/EN).
+  - Wzmianki i linki do projektów: Homebridge (Axel Terizaki) oraz Carambola (Roel Broersma) — README i Home/Hardware.
+- **No Breaking Changes**: brak zmian w API/funcjonalności integracji.
+
 ## v4.0.6
 - **Docs**: Dwujęzyczna wiki (PL + EN) rozszerzona o:
   - FAQ oraz FAQ Highlights na stronie głównej (skrótowe automatyzacje: Guarded Fill, Emergency Stop, powiadomienia).
