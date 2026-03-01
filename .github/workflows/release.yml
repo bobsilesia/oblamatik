@@ -1,4 +1,5 @@
-name: release
+name: Release
+
 on:
   push:
     tags:
@@ -6,114 +7,34 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Tag to release (e.g., v2.1.7)"
-        required: true
-        type: string
-      title:
-        description: "Release title"
+        description: "Tag to release (e.g., v4.0.8)"
         required: false
-        type: string
-      notes:
-        description: "Release notes/body"
-        required: false
-        type: string
+
 permissions:
   contents: write
+
 jobs:
-  release:
+  build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: Resolve tag name
-        id: resolve
-        run: |
-          if [[ "${GITHUB_REF_TYPE}" == "tag" && "${GITHUB_REF_NAME}" == v* ]]; then
-            echo "tag_name=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-            echo "title=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
-            echo "notes=" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag_name=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
-            echo "title=${{ inputs.title }}" >> "$GITHUB_OUTPUT"
-            echo "notes=${{ inputs.notes }}" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Compute release channel
-        id: channel
-        run: |
-          TAG="${{ steps.resolve.outputs.tag_name }}"
-          VER="${TAG#v}"
-          SANITIZED="$(echo "$VER" | sed -E 's/[^0-9.].*$//')"
-          BASE="3.0.1"
-          first="$(printf "%s\n%s\n" "$SANITIZED" "$BASE" | sort -V | head -n1)"
-          if [[ "$SANITIZED" != "" && "$first" == "$SANITIZED" && "$SANITIZED" != "$BASE" ]]; then
-            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
-            echo "title_prefix=[develop] " >> "$GITHUB_OUTPUT"
-            echo "target_branch=develop" >> "$GITHUB_OUTPUT"
-          else
-            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
-            echo "title_prefix=" >> "$GITHUB_OUTPUT"
-            echo "target_branch=main" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Extract release notes
-        id: extract_release_notes
-        env:
-          TAG_NAME: ${{ steps.resolve.outputs.tag_name }}
-          NOTES_INPUT: ${{ steps.resolve.outputs.notes }}
-        run: |
-          python3 -c "
-          import re
-          import os
 
-          tag = os.environ.get('TAG_NAME')
-          notes_input = os.environ.get('NOTES_INPUT')
-          changelog_file = 'CHANGELOG.md'
-          output_file = 'release_notes.md'
-
-          if notes_input:
-              print(f'Using provided notes for {tag}')
-              notes = notes_input
-          else:
-              try:
-                  with open(changelog_file, 'r') as f:
-                      content = f.read()
-                  
-                  # Escape tag for regex just in case
-                  tag_escaped = re.escape(tag)
-                  
-                  # Pattern to find the section for the tag
-                  # Matches ## v2.1.25 (YYYY-MM-DD) ... until next ## or EOF
-                  pattern = rf'## {tag_escaped}.*?\n(.*?)(?=\n## |$)'
-                  match = re.search(pattern, content, re.DOTALL)
-                  
-                  if match:
-                      notes = match.group(1).strip()
-                      print(f'Found notes for {tag} in CHANGELOG.md')
-                  else:
-                      notes = f'Release {tag}'
-                      print(f'No notes found for {tag} in CHANGELOG.md, using default.')
-              except Exception as e:
-                  print(f'Error extracting notes: {e}')
-                  notes = f'Release {tag}'
-
-          with open(output_file, 'w') as f:
-              f.write(notes)
-          "
-      - name: Create Release ZIP
+      - name: Build ZIP (content in root)
         run: |
-          zip -r oblamatik.zip custom_components/oblamatik
-          ls -lh oblamatik.zip
-      - name: Publish GitHub Release
-        uses: softprops/action-gh-release@v1
+          cd custom_components/oblamatik
+          zip -r ../../oblamatik.zip .
+          cd -
+          ls -l oblamatik.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
         with:
-          files: oblamatik.zip
-          generate_release_notes: true
+          tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          files: |
+            oblamatik.zip
           fail_on_unmatched_files: true
-          draft: false
-          prerelease: ${{ steps.channel.outputs.is_prerelease }}
-          tag_name: ${{ steps.resolve.outputs.tag_name }}
-          name: ${{ steps.channel.outputs.title_prefix }}${{ steps.resolve.outputs.title }}
-          body_path: release_notes.md
-          target_commitish: ${{ steps.channel.outputs.target_branch }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

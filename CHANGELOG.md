@@ -1,3 +1,10 @@
+## v4.0.8
+- **Fix**: Rozdzielenie źródeł numerów seryjnych:
+  - IoT Serial pobierany wyłącznie z `serial_number_iot` (moduł WLAN).
+  - Zwykły Serial pozostaje oddzielnym sensorem (`serial_number`/`serial`) — jednostka wykonawcza (procesor wody).
+- **Improvement**: IoT Serial ma wielopoziomowy fallback po endpointach (`inc/info.txt`, `api/index.php?url=info`, `api/info`, `api/tlc/1/`, `api/tlc/1/state/`) bez mieszania pól.
+- **No Breaking Changes**: nazwy encji bez zmian; zachowanie spójne na różnych firmware (Crosswater/KWC/Viega).
+
 ## v4.0.7
 - **Docs-only**: Usprawnienia nawigacji i kontekstu:
   - Language toggles (PL/EN) na wszystkich stronach wiki + kotwice #pl/#en.
