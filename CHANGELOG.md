@@ -1,3 +1,6 @@
+## 4.0.2
+- **Fix**: Reverted `OblamatikIPAddressSensor` to read from API response (reflects true device IP after firmware fix).
+
 ## 4.0.1
 
 > **Versioning Change**: Starting from version 4.0.0, the versioning scheme follows `Major.Minor.Patch` where `Patch` cycles from 1 to 9. When `Patch` reaches 9, the next version increments `Minor` by 1 and resets `Patch` to 0 (e.g., `4.0.9` -> `4.1.0`).
