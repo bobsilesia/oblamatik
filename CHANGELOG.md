@@ -1,3 +1,6 @@
+## 4.0.3
+- **Docs**: Added GitHub stats badges (Stars, Issues, Last Commit) to README.
+
 ## 4.0.2
 - **Fix**: Reverted `OblamatikIPAddressSensor` to read from API response (reflects true device IP after firmware fix).
 
