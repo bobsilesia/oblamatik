@@ -62,6 +62,8 @@ class OblamatikClimate(ClimateEntity):
         self._attr_hvac_mode = HVACMode.OFF
         self._attr_hvac_action = HVACAction.IDLE
         self._attr_supported_features = ClimateEntityFeature.TARGET_TEMPERATURE
+        # Disable by default as most users prefer direct controls (sliders/presets)
+        self._attr_entity_registry_enabled_default = False
 
     @property
     def available(self) -> bool:

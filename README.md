@@ -50,7 +50,7 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 
 ## CI and Publishing
 - CI: Ruff (lint/format), Mypy (types), Hassfest (metadata validation).
-- Release: tag `vMAJOR.MINOR.PATCH` (e.g., `v2.0.10`) — workflow publishes `oblamatik.zip`.
+- Release: tag `vMAJOR.MINOR.PATCH` (e.g., `v4.0.1`). Patch version cycles 1-9. When Patch reaches 9, increment Minor and reset Patch to 0 (e.g., `4.0.9` -> `4.1.0`).
 - The version in `manifest.json` must match the version tag.
 
 ## Troubleshooting
