@@ -6,3 +6,4 @@
 - [Automations](Automations)
 - [Troubleshooting](Troubleshooting)
 - [Hardware Replication](Hardware-Replication)
+- [FAQ](FAQ)

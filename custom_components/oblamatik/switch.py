@@ -37,6 +37,7 @@ async def async_setup_entry(
             [
                 OblamatikWaterSwitch(hass, device),
                 OblamatikHeatingSwitch(hass, device),
+                OblamatikHygieneActiveSwitch(hass, device),
             ]
         )
     async_add_entities(switches, True)
@@ -244,3 +245,106 @@ class OblamatikHeatingSwitch(OblamatikBaseSwitch):
             _LOGGER.info("Heating turned off successfully")
         else:
             _LOGGER.error("Failed to turn off heating")
+
+
+class OblamatikHygieneActiveSwitch(OblamatikBaseSwitch):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Hygiene Active"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_hygiene_active"
+        self._attr_icon = "mdi:bacteria"
+        self._is_on = False
+
+    @property
+    def is_on(self) -> bool:
+        return self._is_on
+
+    async def _get_hygiene_state(self) -> dict[str, Any] | None:
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(
+                f"{base_url}/api/index.php?url=tlc-hygiene/1/", timeout=timeout
+            ) as response:
+                if response.status != 200:
+                    return None
+                return await response.json(content_type=None)
+        except Exception as e:
+            _LOGGER.debug("Error getting hygiene state for %s: %s", self._host, e)
+            return None
+
+    async def _post_hygiene(
+        self, repetition_period: float, flush_duration: float, active: bool
+    ) -> bool:
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            active_str = "true" if active else "false"
+            data = (
+                f"repetition_period={repetition_period}"
+                f"&flush_duration={flush_duration}"
+                f"&hygiene_flush_active={active_str}"
+            )
+            headers = {"Content-Type": "application/x-www-form-urlencoded"}
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.post(
+                f"{base_url}/api/index.php?url=tlc-hygiene/1/",
+                data=data,
+                headers=headers,
+                timeout=timeout,
+            ) as response:
+                if response.status == 200:
+                    _LOGGER.info(
+                        "Updated hygiene config on %s: interval=%s days, duration=%s s, active=%s",
+                        self._host,
+                        repetition_period,
+                        flush_duration,
+                        active,
+                    )
+                    return True
+                _LOGGER.warning(
+                    "Failed to update hygiene config for %s: %s", self._host, response.status
+                )
+                return False
+        except Exception as e:
+            _LOGGER.error("Error updating hygiene config for %s: %s", self._host, e)
+            return False
+
+    async def async_update(self) -> None:
+        state = await self._get_hygiene_state()
+        if not isinstance(state, dict):
+            return
+        self._is_on = bool(state.get("hygiene_flush_active", False))
+
+    async def async_turn_on(self, **kwargs: Any) -> None:
+        state = await self._get_hygiene_state()
+        if not isinstance(state, dict):
+            return
+        try:
+            repetition_period = float(state.get("repetition_period", 0.0))
+        except (TypeError, ValueError):
+            repetition_period = 0.0
+        try:
+            flush_duration = float(state.get("flush_duration", 60.0))
+        except (TypeError, ValueError):
+            flush_duration = 60.0
+        if await self._post_hygiene(repetition_period, flush_duration, True):
+            self._is_on = True
+            self.async_write_ha_state()
+
+    async def async_turn_off(self, **kwargs: Any) -> None:
+        state = await self._get_hygiene_state()
+        if not isinstance(state, dict):
+            return
+        try:
+            repetition_period = float(state.get("repetition_period", 0.0))
+        except (TypeError, ValueError):
+            repetition_period = 0.0
+        try:
+            flush_duration = float(state.get("flush_duration", 60.0))
+        except (TypeError, ValueError):
+            flush_duration = 60.0
+        if await self._post_hygiene(repetition_period, flush_duration, False):
+            self._is_on = False
+            self.async_write_ha_state()

@@ -2,6 +2,27 @@
 
 To guide explains how to replicate or clone the Oblamatik/Viega WLAN module based on the findings from the [bobsilesia/viega_multiplex_trio_e](https://github.com/bobsilesia/viega_multiplex_trio_e) repository.
 
+---
+
+## Wersja PL (skrót)
+
+Architektura:
+- Rdzeń: **8devices Carambola 2** (OpenWrt, MIPS AR9331).
+- Interfejs: **RS232** do jednostki kąpielowej (konwersja poziomów wymagana: **MAX3232**).
+- Zasilanie: sprawdź **VCC** (brązowy przewód), użyj przetwornicy do 3.3V/5V.
+
+Klonowanie:
+- Opcja A (1:1): Carambola 2 + OpenWrt + lighttpd + PHP, wyłącz konsolę na UART, skopiuj `/www`.
+- Opcja B (emulacja): ESP32/RPi + MAX3232, logika „HTTP → Serial → HTTP”.
+
+Bezpieczeństwo:
+- Nigdy nie łącz bezpośrednio RS232 z TTL – używaj **MAX3232**.
+- Nie flashuj przypadkowego OpenWrt na oryginalnym module – ryzyko brick.
+
+Zrzut firmware:
+- Konsola UART → U-Boot/Failsafe → odczyt MTD/TFTP.
+
+---
 ## 1. Hardware Architecture
 
 The original module consists of:

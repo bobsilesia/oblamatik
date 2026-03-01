@@ -2,6 +2,35 @@
 
 Here are some examples of how you can use the Oblamatik integration in your Home Assistant automations.
 
+## Najlepsze praktyki (PL)
+
+- Używaj rozsądnych limitów:
+  - Fill Amount: 10–300 L (zalecane limity guard w automatyce, np. < 200 L).
+  - Fill Temperature: 20–50°C (bezpieczny komfort).
+- Nie uruchamiaj „Start Fill” bezpośrednio z triggera czasowego – dodaj warunki (presence, drain closed, max amount).
+- Dodaj powiadomienia po zakończeniu lub błędzie (czujnik „Water Fill State”).
+- Zawsze miej „Emergency Stop” pod ręką (przycisk integracji).
+- Higiena: modyfikuj interwał/duration razem z przeglądem instalacji (np. po serwisie), nie ustawiaj bardzo krótkich interwałów w ruchu ciągłym.
+
+### Guard dla objętości (PL)
+
+```yaml
+alias: "Start Fill (z limitem)"
+description: "Uruchom napełnianie tylko gdy ilość <= 200 L"
+trigger:
+  - platform: state
+    entity_id: button.oblamatik_start_fill
+    to: "pressed"
+condition:
+  - condition: numeric_state
+    entity_id: number.oblamatik_fill_amount
+    below: 200
+action:
+  - service: button.press
+    target:
+      entity_id: button.oblamatik_start_fill
+```
+
 ## 1. Notification when Bath is Ready
 
 Send a notification to your phone when the bath reaches the desired temperature.
@@ -88,4 +117,71 @@ action:
   - service: button.press
     target:
       entity_id: button.oblamatik_close_drain
+```
+
+## 6. Universal Water Fill (Faucet/Shower/Bath)
+
+Use the new universal entities to start a controlled fill with defined amount and temperature.
+
+### Manual Start from Dashboard
+- Set `number.oblamatik_*_fill_amount` (liters)
+- Set `number.oblamatik_*_fill_temperature` (°C)
+- Press `button.oblamatik_*_start_fill`
+
+### Safe Start with Amount Guard
+
+```yaml
+alias: "Start Fill (Guarded)"
+description: "Start fill only if amount <= 200 L"
+trigger:
+  - platform: state
+    entity_id: button.oblamatik_start_fill
+    to: "pressed"
+condition:
+  - condition: numeric_state
+    entity_id: number.oblamatik_fill_amount
+    below: 200
+action:
+  - service: button.press
+    target:
+      entity_id: button.oblamatik_start_fill
+```
+
+### Start Fill via Scene
+
+```yaml
+alias: "Evening Bath Scene"
+sequence:
+  - service: number.set_value
+    data:
+      value: 120
+    target:
+      entity_id: number.oblamatik_fill_amount
+  - service: number.set_value
+    data:
+      value: 39
+    target:
+      entity_id: number.oblamatik_fill_temperature
+  - service: button.press
+    target:
+      entity_id: button.oblamatik_start_fill
+mode: single
+```
+
+## 7. Measuring Cup Dispense
+
+Dispense a precise amount using the measuring cup.
+
+```yaml
+alias: "Dispense Measuring Cup"
+sequence:
+  - service: number.set_value
+    data:
+      value: 0.5
+    target:
+      entity_id: number.oblamatik_measuring_cup_amount
+  - service: button.press
+    target:
+      entity_id: button.oblamatik_measuring_cup_start
+mode: single
 ```

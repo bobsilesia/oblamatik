@@ -2,6 +2,23 @@
 
 Setting up the Oblamatik integration is done through the Home Assistant UI using the **Config Flow**.
 
+---
+
+## Wersja PL (skrót)
+
+Konfiguracja odbywa się w UI Home Assistant:
+1. Przejdź do **Ustawienia → Urządzenia i Usługi**.
+2. Kliknij **+ Dodaj Integrację**.
+3. Wyszukaj **Oblamatik**.
+4. Podaj **Host/IP** urządzenia (port domyślnie `80`).
+5. Zatwierdź.
+
+Integracja automatycznie spróbuje wykryć typ urządzenia i utworzy odpowiednie encje.  
+Opcje (zmiana host/port) dostępne są w karcie integracji → **Configure**.  
+Zalecane: przypisz urządzeniu **statyczny IP** w routerze.
+
+---
+
 ## Adding the Integration
 
 1.  In Home Assistant, go to **Settings > Devices & Services**.

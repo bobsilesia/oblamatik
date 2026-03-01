@@ -124,6 +124,7 @@ async def async_setup_entry(
                     OblamatikFlowRateLiterPerHourSensor(hass, device),
                 ]
             )
+            device_sensors.append(OblamatikFillStateSensor(hass, device))
 
         sensors.extend(device_sensors)
 
@@ -396,6 +397,49 @@ class OblamatikBathDrainSensor(OblamatikBaseSensor):
         if state:
             popup = state.get("popup", False)
             self._bath_drain_state = bool(popup)
+
+
+class OblamatikFillStateSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Water Fill State"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_fill_state"
+        self._attr_icon = "mdi:water-plus"
+        self._state = "unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._state
+
+    async def async_update(self) -> None:
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(
+                f"{base_url}/api/index.php?url=tlc-bathtub-fill/1/", timeout=timeout
+            ) as response:
+                if response.status != 200:
+                    return
+                data = await response.json(content_type=None)
+        except Exception:
+            return
+
+        state_code = None
+        if isinstance(data, dict):
+            try:
+                state_code = int(data.get("state", -1))
+            except (TypeError, ValueError):
+                state_code = None
+
+        if state_code == 2:
+            self._state = "ready"
+        elif state_code == 1:
+            self._state = "running"
+        elif state_code == 0:
+            self._state = "idle"
+        else:
+            self._state = "unknown"
 
 
 class OblamatikFlowRateLiterPerHourSensor(OblamatikBaseSensor):

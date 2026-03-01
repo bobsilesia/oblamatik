@@ -39,6 +39,8 @@ async def async_setup_entry(
         buttons.extend(
             [
                 OblamatikEmergencyStopButton(hass, device),
+                OblamatikMeasuringCupStartButton(hass, device),
+                OblamatikStartFillButton(hass, device),
                 OblamatikQuickAction1Button(hass, device),
                 OblamatikQuickAction2Button(hass, device),
                 OblamatikQuickAction3Button(hass, device),
@@ -147,6 +149,62 @@ class OblamatikEmergencyStopButton(OblamatikBaseButton):
         await self._post_command("/api/tlc/1/", f"temperature={target_temp}&flow=0&changed=1")
         # Ensure hygiene mode is cancelled if active
         await self._post_command("/api/tlc/1/hygiene/thermal-desinfection/cancel/", "data=1")
+
+
+class OblamatikMeasuringCupStartButton(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Measuring Cup Start"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_measuring_cup_start"
+        self._attr_icon = "mdi:cup-water"
+        self._attr_entity_category = EntityCategory.CONFIG
+
+    async def _get_current_amount(self) -> float:
+        registry = er.async_get(self._hass)
+        unique_id = f"{DOMAIN}_{self._host}_measuring_cup_amount"
+        entity_id = er.async_get_entity_id(registry, "number", DOMAIN, unique_id)
+        if not entity_id:
+            return 0.5
+        state = self._hass.states.get(entity_id)
+        if state is None:
+            return 0.5
+        try:
+            return float(state.state)
+        except (TypeError, ValueError):
+            return 0.5
+
+    async def async_press(self) -> None:
+        amount = await self._get_current_amount()
+        data = f"quantity={amount}"
+        await self._post_command("/api/index.php?url=tlc-measuring-cup/1/", data)
+
+
+class OblamatikStartFillButton(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Start Fill"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_start_fill"
+        self._attr_icon = "mdi:water-plus"
+        self._attr_entity_category = EntityCategory.CONFIG
+
+    async def _get_number_value(self, unique_id: str, fallback: float) -> float:
+        registry = er.async_get(self._hass)
+        entity_id = er.async_get_entity_id(registry, "number", DOMAIN, unique_id)
+        if not entity_id:
+            return fallback
+        state = self._hass.states.get(entity_id)
+        if state is None:
+            return fallback
+        try:
+            return float(state.state)
+        except (TypeError, ValueError):
+            return fallback
+
+    async def async_press(self) -> None:
+        amount = await self._get_number_value(f"{DOMAIN}_{self._host}_fill_amount", 50.0)
+        temperature = await self._get_number_value(f"{DOMAIN}_{self._host}_fill_temperature", 38.0)
+        data = f"amount={amount}&temperature={temperature}"
+        await self._post_command("/api/index.php?url=tlc-bathtub-fill/1/", data)
 
 
 class OblamatikQuickAction1Button(OblamatikBaseButton):
