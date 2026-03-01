@@ -62,31 +62,40 @@ function get_local_ip()
 
 	for($i = 0; $i < 3; $i++)
 	{
-		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $eth);
-		$eth = explode(' ', $eth[1]);
+		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $output);
+		$interfaces[$i]['ip'] = '';
 
-		$array = array();
-		for($j = 0; $j < sizeof($eth); $j++)
+		if(isset($output))
 		{
-			if($eth[$j])
-				$array[] = $eth[$j];
+			foreach($output as $line)
+			{
+				if(preg_match("/inet (?:addr:)?(\d+\.\d+\.\d+\.\d+)/", $line, $matches))
+				{
+					$interfaces[$i]['ip'] = $matches[1];
+					break;
+				}
+			}
 		}
-		if($array[0] == 'inet')
-		{
-			// We found an ip address
-			$tmp = explode(':', $array[1]);
-			$interfaces[$i]['ip'] = $tmp[1];
-		}
-		else
-			$interfaces[$i]['ip'] = '';
-		unset($eth);
+		unset($output);
 	}
+
+	// Prioritize non-1.1.1.1 IPs
+	for($i = 0; $i < 3; $i++)
+	{
+		if($interfaces[$i]['ip'] && $interfaces[$i]['ip'] != "1.1.1.1")
+		{
+			echo $interfaces[$i]['ip'];
+			return;
+		}
+	}
+
+	// Fallback
 	for($i = 0; $i < 3; $i++)
 	{
 		if($interfaces[$i]['ip'])
 		{
 			echo $interfaces[$i]['ip'];
-			break;
+			return;
 		}
 	}
 }
@@ -100,31 +109,43 @@ function get_local_ip2()
 
 	for($i = 0; $i < 3; $i++)
 	{
-		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $eth);
-		$eth = explode(' ', $eth[1]);
+		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $output);
+		$interfaces[$i]['ip'] = '';
 
-		$array = array();
-		for($j = 0; $j < sizeof($eth); $j++)
+		if(isset($output))
 		{
-			if($eth[$j])
-				$array[] = $eth[$j];
+			foreach($output as $line)
+			{
+				if(preg_match("/inet (?:addr:)?(\d+\.\d+\.\d+\.\d+)/", $line, $matches))
+				{
+					$interfaces[$i]['ip'] = $matches[1];
+					break;
+				}
+			}
 		}
-		if($array[0] == 'inet')
-		{
-			// We found an ip address
-			$tmp = explode(':', $array[1]);
-			$interfaces[$i]['ip'] = $tmp[1];
-		}
-		else
-			$interfaces[$i]['ip'] = '';
-		unset($eth);
+		unset($output);
 	}
+
+	// Prioritize non-1.1.1.1 IPs
 	for($i = 0; $i < 3; $i++)
 	{
-		if($interfaces[$i]['ip'])
+		if($interfaces[$i]['ip'] && $interfaces[$i]['ip'] != "1.1.1.1")
 		{
 			$local = $interfaces[$i]['ip'];
 			break;
+		}
+	}
+
+	// Fallback
+	if(!$local)
+	{
+		for($i = 0; $i < 3; $i++)
+		{
+			if($interfaces[$i]['ip'])
+			{
+				$local = $interfaces[$i]['ip'];
+				break;
+			}
 		}
 	}
 	return($local);
