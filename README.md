@@ -61,6 +61,13 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 - [Supported Devices & Features](wiki_content/Supported-Devices.md)
 - [FAQ (PL + EN)](wiki_content/FAQ.md)
 
+## Quick Links (PL / EN)
+- Home: [PL](wiki_content/Home.md#pl) | [EN](wiki_content/Home.md#en)
+- Installation: [PL](wiki_content/Installation.md#pl) | [EN](wiki_content/Installation.md#en)
+- Configuration: [PL](wiki_content/Configuration.md#pl) | [EN](wiki_content/Configuration.md#en)
+- Automations: [PL](wiki_content/Automations.md#pl) | [EN](wiki_content/Automations.md#en)
+- FAQ: [PL](wiki_content/FAQ.md#pl) | [EN](wiki_content/FAQ.md#en)
+
 ## Contributing
 
 Want to help develop the project? Check out our guidelines:
@@ -74,3 +81,14 @@ Special thanks to the authors of the following repositories, whose work served a
 
 - [AxelTerizaki/homebridge-trio-e](https://github.com/AxelTerizaki/homebridge-trio-e)
 - [roelbroersma/viega_multiplex_trio_e](https://github.com/roelbroersma/viega_multiplex_trio_e)
+
+### Priority references (Viega topics)
+- **Viega Multiplex Trio E (API & control logic)** — AxelTerizaki documents endpoints and control sequences used by the official app and Homebridge, useful for understanding device behavior and safe control patterns.  
+  Repo: https://github.com/AxelTerizaki/homebridge-trio-e
+- **Viega hardware, wiring and serial interface (reverse engineering)** — Roel Broersma’s notes cover module identification, RS232/TTL levels, wiring, and firmware behavior on Carambola.  
+  Repo: https://github.com/roelbroersma/viega_multiplex_trio_e
+
+## Related Projects
+- Homebridge plugin for Viega Multiplex Trio E (by Axel Terizaki):  
+  https://github.com/AxelTerizaki/homebridge-trio-e  
+  If you use Apple HomeKit via Homebridge, this plugin exposes Viega devices to HomeKit. Our project targets Home Assistant; the Homebridge plugin is an alternative path for Apple-centric setups.

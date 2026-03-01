@@ -2,9 +2,15 @@
 
 The Oblamatik integration exposes various entities to Home Assistant, allowing you to monitor and control your device comprehensively.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Integracja udostępnia encje pozwalające na:
 - odczyt temperatury, przepływu, stanu i parametrów sieciowych,
