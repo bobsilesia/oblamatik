@@ -1,3 +1,6 @@
+## 4.0.5
+- **Fix**: Improved implementation of `OblamatikIoTSerialSensor` to reliably fetch serial number from `/inc/info.txt` or fallback API endpoints.
+
 ## 4.0.4
 - **Docs**: Added 'Release Date' and 'Pull Requests' badges to README.
 
