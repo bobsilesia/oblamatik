@@ -9,7 +9,7 @@
  - Use mypy for type checks: 'mypy custom_components/oblamatik'
  - Validate metadata with hassfest (local or GitHub Action)
  - Keep manifest.json version synced with Git tags (SemVer)
- - Create release tags: 'vMAJOR.MINOR.PATCH'
+ - Release tags: 'vMAJOR.MINOR.PATCH'. Patch version cycles 1-9. When Patch reaches 9, increment Minor and reset Patch to 0 (e.g., 4.0.9 -> 4.1.0).
  - MANDATORY: Update 'CHANGELOG.md' with version details before every release/tag push.
  - Automate CI on GitHub: ruff, mypy, hassfest on pull_request/push
  - Do not commit secrets; use '.gitignore' and environment variables

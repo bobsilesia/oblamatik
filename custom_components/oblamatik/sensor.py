@@ -107,7 +107,6 @@ async def async_setup_entry(
             OblamatikNetworkModeSensor(hass, device),
             OblamatikIPAddressSensor(hass, device),
             OblamatikIoTSerialSensor(hass, device),
-            OblamatikIoTVersionSensor(hass, device),
             OblamatikSignalStrengthSensor(hass, device),
         ]
 
@@ -506,11 +505,32 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
         return self._serial
 
     async def async_update(self) -> None:
-        # Try getting from /api/info first
-        state = await self._get_device_state(required_key="serial_number_iot")
-        serial = state.get("serial_number_iot")
+        # Try getting from /inc/info.txt first as it is the most reliable source for IoT Serial
+        serial = None
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/inc/info.txt", timeout=timeout) as response:
+                if response.status == 200:
+                    try:
+                        data = await response.json(content_type=None)
+                        serial = data.get("serial_number_iot")
+                    except Exception:
+                        text = await response.text()
+                        import json
 
-        # If not found, try getting from /api/tlc/1/ (fallback 1)
+                        data = json.loads(text)
+                        serial = data.get("serial_number_iot")
+        except Exception:
+            pass
+
+        # Fallback to /api/info
+        if not serial:
+            state = await self._get_device_state(required_key="serial_number_iot")
+            serial = state.get("serial_number_iot")
+
+        # Fallback to /api/tlc/1/
         if not serial:
             try:
                 base_url = f"http://{self._host}:{self._port}"
@@ -523,50 +543,8 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
             except Exception:
                 pass
 
-        # If still not found, try getting from /inc/info.txt (fallback 2)
-        if not serial:
-            try:
-                base_url = f"http://{self._host}:{self._port}"
-                session = aiohttp_client.async_get_clientsession(self._hass)
-                timeout = aiohttp.ClientTimeout(total=5)
-                async with session.get(f"{base_url}/inc/info.txt", timeout=timeout) as response:
-                    if response.status == 200:
-                        # info.txt content: {"version":"...","serial_number_iot":"..."}
-                        # It might be JSON or text. Based on file content, it is JSON.
-                        try:
-                            data = await response.json(content_type=None)
-                            serial = data.get("serial_number_iot")
-                        except Exception:
-                            # Try parsing as text if JSON fails
-                            text = await response.text()
-                            import json
-
-                            data = json.loads(text)
-                            serial = data.get("serial_number_iot")
-            except Exception:
-                pass
-
         if serial:
             self._serial = str(serial)
-
-
-class OblamatikIoTVersionSensor(OblamatikIoTSensorBase):
-    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
-        super().__init__(hass, device)
-        self._attr_name = "IoT Firmware Version"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_iot_version"
-        self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:chip"
-        self._version = "Unknown"
-
-    @property
-    def native_value(self) -> str | None:
-        return self._version
-
-    async def async_update(self) -> None:
-        state = await self._get_device_state(required_key="version")
-        if state:
-            self._version = str(state.get("version", "Unknown"))
 
 
 class OblamatikWifiSsidSensor(OblamatikBaseSensor):
@@ -657,9 +635,10 @@ class OblamatikIPAddressSensor(OblamatikBaseSensor):
         return self._ip
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
-        if state:
-            self._ip = str(state.get("ip", "Unknown"))
+        # Use the host address we use to connect to the device
+        # This is more reliable than the IP reported by the device itself
+        # which might be its internal AP address or incorrect
+        self._ip = self._host
 
 
 class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
@@ -671,8 +650,8 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
         self._attr_icon = "mdi:wifi-strength-2"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = "measurement"
-        # Disable by default as it requires scanning which might be slow
-        self._attr_entity_registry_enabled_default = False
+        # Enable by default as requested by user
+        self._attr_entity_registry_enabled_default = True
         self._signal_strength = 0
 
     @property
