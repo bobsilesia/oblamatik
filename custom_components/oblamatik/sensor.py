@@ -635,10 +635,9 @@ class OblamatikIPAddressSensor(OblamatikBaseSensor):
         return self._ip
 
     async def async_update(self) -> None:
-        # Use the host address we use to connect to the device
-        # This is more reliable than the IP reported by the device itself
-        # which might be its internal AP address or incorrect
-        self._ip = self._host
+        state = await self._get_device_state()
+        if state:
+            self._ip = str(state.get("ip", "Unknown"))
 
 
 class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
