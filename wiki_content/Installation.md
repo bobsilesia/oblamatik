@@ -2,9 +2,15 @@
 
 There are two ways to install the Oblamatik integration: using **HACS (Home Assistant Community Store)** or manually.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Są dwa sposoby instalacji integracji **Oblamatik**: przez **HACS** (zalecane) lub **manualnie**.
 

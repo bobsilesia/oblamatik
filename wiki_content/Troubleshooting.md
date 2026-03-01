@@ -2,9 +2,15 @@
 
 If you encounter issues with the Oblamatik integration, follow these steps to diagnose and resolve them.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Najczęstsze problemy:
 - Brak połączenia (timeout/refused): sprawdź zasilanie, Wi-Fi i dostęp do `http://IP/`.

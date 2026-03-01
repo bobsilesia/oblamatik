@@ -2,9 +2,15 @@
 
 To guide explains how to replicate or clone the Oblamatik/Viega WLAN module based on the findings from the [bobsilesia/viega_multiplex_trio_e](https://github.com/bobsilesia/viega_multiplex_trio_e) repository.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Architektura:
 - Rdzeń: **8devices Carambola 2** (OpenWrt, MIPS AR9331).
@@ -89,3 +95,9 @@ If you possess a working unit and want the exact `1.0-4.03` image:
 1.  **Serial Console:** Solder wires to the Carambola's console pins.
 2.  **Bootloader:** Interrupt boot (press 'f' or any key) to enter U-Boot/Failsafe.
 3.  **Read Flash:** Use `cat /dev/mtd0 > /tmp/dump.bin` (if Linux boots) or U-Boot commands to read memory and transfer via TFTP/Serial (kermit).
+
+## Author Findings (Carambola) / Odkrycia autora (Carambola)
+- Roel Broersma — szczegółowe reverse engineering modułu **8devices Carambola 2** używanego w Viega/Oblamatik:
+  - Identyfikacja sprzętu i pinoutu, rozróżnienie **RS232** vs **TTL** oraz potrzeba konwertera **MAX3232**.
+  - Uwagi dot. wyłączenia konsoli UART, zrzutu pamięci (MTD/U-Boot) i zachowania firmware.
+  - Repozytorium: https://github.com/roelbroersma/viega_multiplex_trio_e

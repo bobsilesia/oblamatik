@@ -1,8 +1,14 @@
 # FAQ
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL
+
+<a id="pl"></a>
 
 - **Dlaczego w trybie Higieny widzę intensywne odpytywanie (keep-alive)?**  
   Aby urządzenie nie usypiało połączenia i nie przerwało długiej operacji, integracja co 1s odświeża status z losowym parametrem `?q=`. To świadome zachowanie, inspirowane oficjalną aplikacją.

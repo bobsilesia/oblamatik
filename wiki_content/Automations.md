@@ -2,7 +2,13 @@
 
 Here are some examples of how you can use the Oblamatik integration in your Home Assistant automations.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ## Najlepsze praktyki (PL)
+
+<a id="pl"></a>
 
 - Używaj rozsądnych limitów:
   - Fill Amount: 10–300 L (zalecane limity guard w automatyce, np. < 200 L).

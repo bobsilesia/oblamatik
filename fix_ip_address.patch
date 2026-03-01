@@ -1,0 +1,121 @@
+diff --git a/local_firmware_work/files_clean/www/inc/functions.php b/local_firmware_work/files_clean/www/inc/functions.php
+index eedac2a..ab61e31 100755
+--- a/local_firmware_work/files_clean/www/inc/functions.php
++++ b/local_firmware_work/files_clean/www/inc/functions.php
+@@ -62,31 +62,40 @@ function get_local_ip()
+ 
+ 	for($i = 0; $i < 3; $i++)
+ 	{
+-		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $eth);
+-		$eth = explode(' ', $eth[1]);
++		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $output);
++		$interfaces[$i]['ip'] = '';
+ 
+-		$array = array();
+-		for($j = 0; $j < sizeof($eth); $j++)
++		if(isset($output))
+ 		{
+-			if($eth[$j])
+-				$array[] = $eth[$j];
++			foreach($output as $line)
++			{
++				if(preg_match("/inet (?:addr:)?(\d+\.\d+\.\d+\.\d+)/", $line, $matches))
++				{
++					$interfaces[$i]['ip'] = $matches[1];
++					break;
++				}
++			}
+ 		}
+-		if($array[0] == 'inet')
++		unset($output);
++	}
++
++	// Prioritize non-1.1.1.1 IPs
++	for($i = 0; $i < 3; $i++)
++	{
++		if($interfaces[$i]['ip'] && $interfaces[$i]['ip'] != "1.1.1.1")
+ 		{
+-			// We found an ip address
+-			$tmp = explode(':', $array[1]);
+-			$interfaces[$i]['ip'] = $tmp[1];
++			echo $interfaces[$i]['ip'];
++			return;
+ 		}
+-		else
+-			$interfaces[$i]['ip'] = '';
+-		unset($eth);
+ 	}
++
++	// Fallback
+ 	for($i = 0; $i < 3; $i++)
+ 	{
+ 		if($interfaces[$i]['ip'])
+ 		{
+ 			echo $interfaces[$i]['ip'];
+-			break;
++			return;
+ 		}
+ 	}
+ }
+@@ -100,33 +109,45 @@ function get_local_ip2()
+ 
+ 	for($i = 0; $i < 3; $i++)
+ 	{
+-		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $eth);
+-		$eth = explode(' ', $eth[1]);
++		exec("/sbin/ifconfig " . $interfaces[$i]['name'], $output);
++		$interfaces[$i]['ip'] = '';
+ 
+-		$array = array();
+-		for($j = 0; $j < sizeof($eth); $j++)
+-		{
+-			if($eth[$j])
+-				$array[] = $eth[$j];
+-		}
+-		if($array[0] == 'inet')
++		if(isset($output))
+ 		{
+-			// We found an ip address
+-			$tmp = explode(':', $array[1]);
+-			$interfaces[$i]['ip'] = $tmp[1];
++			foreach($output as $line)
++			{
++				if(preg_match("/inet (?:addr:)?(\d+\.\d+\.\d+\.\d+)/", $line, $matches))
++				{
++					$interfaces[$i]['ip'] = $matches[1];
++					break;
++				}
++			}
+ 		}
+-		else
+-			$interfaces[$i]['ip'] = '';
+-		unset($eth);
++		unset($output);
+ 	}
++
++	// Prioritize non-1.1.1.1 IPs
+ 	for($i = 0; $i < 3; $i++)
+ 	{
+-		if($interfaces[$i]['ip'])
++		if($interfaces[$i]['ip'] && $interfaces[$i]['ip'] != "1.1.1.1")
+ 		{
+ 			$local = $interfaces[$i]['ip'];
+ 			break;
+ 		}
+ 	}
++
++	// Fallback
++	if(!$local)
++	{
++		for($i = 0; $i < 3; $i++)
++		{
++			if($interfaces[$i]['ip'])
++			{
++				$local = $interfaces[$i]['ip'];
++				break;
++			}
++		}
++	}
+ 	return($local);
+ }
+ 

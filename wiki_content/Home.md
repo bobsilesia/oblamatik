@@ -4,9 +4,15 @@
 
 This integration allows you to monitor and control water temperature, flow rate, drain position, and perform maintenance tasks directly from your smart home dashboard.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Integracja **Oblamatik** dla Home Assistant umożliwia:
 - sterowanie temperaturą i przepływem,
@@ -41,6 +47,19 @@ Sprawdź przykłady w: **[Automations](Automations)** (sekcja „Najlepsze prakt
 1. **[Installation](Installation)**: How to install via HACS or manually.
 2. **[Configuration](Configuration)**: Setting up the integration with your device.
 3. **[Supported Devices](Supported-Devices)**: Check if your device is compatible.
+
+## Getting Started (PL / EN)
+- Installation: [PL](Installation#pl) | [EN](Installation#en)
+- Configuration: [PL](Configuration#pl) | [EN](Configuration#en)
+- FAQ: [PL](FAQ#pl) | [EN](FAQ#en)
+
+## Related (Homebridge)
+- Homebridge plugin for Viega Multiplex Trio E (Axel Terizaki): https://github.com/AxelTerizaki/homebridge-trio-e
+  - Dla użytkowników Apple HomeKit — alternatywa do eksponowania urządzeń Viega w HomeKit przez Homebridge.
+
+## Further Reading (Hardware / Carambola)
+- Reverse engineering 8devices Carambola 2 (Roel Broersma): https://github.com/roelbroersma/viega_multiplex_trio_e
+  - Szczegóły o pinoucie, RS232 vs TTL, MAX3232 oraz zrzutach firmware (MTD/U‑Boot).
 
 ## FAQ Highlights
 - Higiena i „keep-alive”: dlaczego intensywne odpytywanie co 1s — zobacz **[FAQ](FAQ)**.

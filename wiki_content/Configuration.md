@@ -2,9 +2,15 @@
 
 Setting up the Oblamatik integration is done through the Home Assistant UI using the **Config Flow**.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Konfiguracja odbywa się w UI Home Assistant:
 1. Przejdź do **Ustawienia → Urządzenia i Usługi**.

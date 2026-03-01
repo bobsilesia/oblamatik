@@ -2,9 +2,15 @@
 
 This integration supports devices manufactured by **Oblamatik AG**, which are often sold under different brand names depending on the region.
 
+Language: [PL](#pl) | [EN](#en)
+
+<a id="en"></a>
+
 ---
 
 ## Wersja PL (skrót)
+
+<a id="pl"></a>
 
 Integracja wspiera urządzenia **Oblamatik** sprzedawane także jako **Viega**, **Crosswater**, **Deca**, **Sigma**:
 - Multiplex Trio E (Viega), Digital Duo/Elite (Crosswater), Touch Digital (Deca), Sigma Touch (USA, TLC30).
@@ -66,3 +72,9 @@ If your device is not discovered automatically:
 1. Ensure it is connected to the same Wi-Fi network as Home Assistant.
 2. Check if you can access `http://<device_ip>/api/` in your browser.
 3. Try adding it manually using the IP address in the integration configuration.
+
+## Further Reading (Viega topics)
+- AxelTerizaki — Homebridge for Viega Multiplex Trio E (API endpoints, control logic):  
+  https://github.com/AxelTerizaki/homebridge-trio-e
+- Roel Broersma — Reverse engineering, wiring, module details for Viega/Oblamatik:  
+  https://github.com/roelbroersma/viega_multiplex_trio_e
