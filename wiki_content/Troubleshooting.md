@@ -2,6 +2,28 @@
 
 If you encounter issues with the Oblamatik integration, follow these steps to diagnose and resolve them.
 
+---
+
+## Wersja PL (skrót)
+
+Najczęstsze problemy:
+- Brak połączenia (timeout/refused): sprawdź zasilanie, Wi-Fi i dostęp do `http://IP/`.
+- Niestabilne IP: ustaw **statyczny adres IP** dla urządzenia.
+- Brak przycisków (Tests/Hygiene): sprawdź, czy nie są domyślnie wyłączone; wymagane HA 2025.2+.
+- Intensywne logi w trybie Higieny: to świadome „keep-alive” (polling co 1s) – nie wyłączaj.
+- Aktualizacje firmware: nie flashuj generic OpenWrt/Carambola – ryzyko „brick”.
+
+Debug:
+```yaml
+logger:
+  default: info
+  logs:
+    custom_components.oblamatik: debug
+```
+Po odtworzeniu problemu sprawdź logi (Settings → System → Logs).
+
+---
+
 ## Common Issues
 
 ### 1. Integration initialization fails ("Connection refused" / "Timeout")

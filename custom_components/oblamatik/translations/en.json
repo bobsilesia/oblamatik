@@ -36,5 +36,42 @@
       "cannot_connect": "Failed to connect",
       "no_device_info": "Could not retrieve device information"
     }
+  },
+  "entity": {
+    "sensor": {
+      "oblamatik_fill_state": {
+        "name": "Water Fill State"
+      }
+    },
+    "number": {
+      "oblamatik_fill_amount": {
+        "name": "Fill Amount"
+      },
+      "oblamatik_fill_temperature": {
+        "name": "Fill Temperature"
+      },
+      "oblamatik_measuring_cup_amount": {
+        "name": "Measuring Cup Amount"
+      },
+      "oblamatik_hygiene_interval": {
+        "name": "Hygiene Interval"
+      },
+      "oblamatik_hygiene_flush_duration": {
+        "name": "Hygiene Flush Duration"
+      }
+    },
+    "switch": {
+      "oblamatik_hygiene_active": {
+        "name": "Hygiene Active"
+      }
+    },
+    "button": {
+      "oblamatik_measuring_cup_start": {
+        "name": "Measuring Cup Start"
+      },
+      "oblamatik_start_fill": {
+        "name": "Start Fill"
+      }
+    }
   }
 }

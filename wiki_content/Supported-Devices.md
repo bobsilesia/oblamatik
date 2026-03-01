@@ -2,6 +2,19 @@
 
 This integration supports devices manufactured by **Oblamatik AG**, which are often sold under different brand names depending on the region.
 
+---
+
+## Wersja PL (skrót)
+
+Integracja wspiera urządzenia **Oblamatik** sprzedawane także jako **Viega**, **Crosswater**, **Deca**, **Sigma**:
+- Multiplex Trio E (Viega), Digital Duo/Elite (Crosswater), Touch Digital (Deca), Sigma Touch (USA, TLC30).
+- Moduły WLAN: **708870** (Viega) / **DGXWLAN-E** (Crosswater) – sprzętowo identyczne.
+- Identyfikacja: obudowa Carambola (OpenWrt), etykiety z Oblamatik/Viega lub odpowiednim FCC/CE.
+
+Jeżeli urządzenie odpowiada na `http://IP/api/tlc/1/` lub `http://IP/api/`, jest wysokie prawdopodobieństwo zgodności.
+
+---
+
 ## Confirmed Supported Models
 
 The following devices share the same underlying hardware and API, making them fully compatible with this integration:

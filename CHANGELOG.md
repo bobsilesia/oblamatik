@@ -1,4 +1,11 @@
-## 4.0.5
+## v4.0.6
+- **Docs**: Dwujęzyczna wiki (PL + EN) rozszerzona o:
+  - FAQ oraz FAQ Highlights na stronie głównej (skrótowe automatyzacje: Guarded Fill, Emergency Stop, powiadomienia).
+  - Sekcje PL w Installation, Configuration, Troubleshooting, Supported Devices, Entities & Controls, Hardware Replication.
+  - Linki do FAQ w README i Home wiki.
+- **No Breaking Changes**: Zmiany wyłącznie w dokumentacji; integracja bez zmian API.
+
+## v4.0.5
 - **Fix**: Improved implementation of `OblamatikIoTSerialSensor` to reliably fetch serial number from `/inc/info.txt` or fallback API endpoints.
 
 ## 4.0.4
