@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'wiki_content/**'
+      - '.github/workflows/wiki-sync.yml'
   workflow_dispatch:
 
 permissions:
@@ -16,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Sync Wiki
-        uses: spenserblack/actions-wiki@v2
+      - name: Publish wiki
+        uses: Andrew-Chen-Wang/github-wiki-action@v4
         with:
           path: wiki_content
