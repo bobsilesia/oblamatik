@@ -1,3 +1,7 @@
+## v4.1.2
+- Fix: Resolved `awk` syntax error in release workflow (`in` variable collision) to ensure automated releases.
+- No changes to integration code or functionality.
+
 ## v4.1.1
 - Feature: Added Integration Options UI for Polling Mode (`minimal` / `normal`) and Polling Interval (minutes).
 - Improvement: Options are now clearly separated from connection settings (Host/Port stay in initial Config Flow).

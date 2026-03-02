@@ -26,12 +26,12 @@ jobs:
         run: |
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           awk -v ver="$TAG" '
-            BEGIN { in=0 }
+            BEGIN { inside=0 }
             /^## / {
-              if (in) exit
-              if ($0 ~ "^## " ver) { in=1; print; next }
+              if (inside) exit
+              if ($0 ~ "^## " ver) { inside=1; print; next }
             }
-            { if (in) print }
+            { if (inside) print }
           ' CHANGELOG.md > RELEASE_NOTES.md
 
       - name: Build ZIP (content in root)
