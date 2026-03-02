@@ -32,7 +32,15 @@ jobs:
           if [ -z "${TAG}" ]; then
             TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
           fi
+          echo "TAG=${TAG}"
+          echo "HEAD of CHANGELOG.md:"
+          head -n 10 CHANGELOG.md || true
           START_LINE=$(awk -v ver="${TAG}" 'BEGIN{n=0} {n++; if($0=="## " ver){print n; exit}}' CHANGELOG.md)
+          if [ -z "${START_LINE}" ]; then
+            ALT_VER=$(echo "${TAG}" | sed 's/^v//')
+            echo "Primary match failed, trying without 'v' prefix: ${ALT_VER}"
+            START_LINE=$(awk -v ver="${ALT_VER}" 'BEGIN{n=0} {n++; if($0=="## " ver){print n; exit}}' CHANGELOG.md)
+          fi
           if [ -z "${START_LINE}" ]; then
             echo "Nie znaleziono nagłówka dla ${TAG} w CHANGELOG.md"
             exit 1
