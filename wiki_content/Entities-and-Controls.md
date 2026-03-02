@@ -8,6 +8,23 @@ Language: [PL](#pl) | [EN](#en)
 
 ---
 
+## Polling Modes — Quick Guide
+
+- EN:
+  - Minimal: No periodic polling; updates only when you use entities in Home Assistant.
+  - Normal: Periodic polling at a configurable interval (default 5 minutes).
+  - Mode switching is available in Integration Options.
+- PL:
+  - Minimalny: brak cyklicznego odpytywania; aktualizacje tylko przy użyciu encji w Home Assistant.
+  - Normalny: cykliczne odpytywanie z konfigurowalnym interwałem (domyślnie 5 minut).
+  - Przełączanie trybu dostępne w Opcjach Integracji.
+
+## Polling Modes
+
+- Minimal: No periodic polling; updates only when you use entities in Home Assistant.
+- Normal: Periodic polling at a configurable interval (default 5 minutes).
+- Switching modes is available in Integration Options.
+
 ## Wersja PL (skrót)
 
 <a id="pl"></a>
@@ -34,6 +51,11 @@ Integracja udostępnia encje pozwalające na:
 - `button.oblamatik_*_hygiene_start` / `_cancel` – natychmiastowe rozpoczęcie/zatrzymanie.
 
 ---
+### Tryby odpytywania
+
+- Minimalny: brak cyklicznego odpytywania; aktualizacje tylko przy użyciu encji w Home Assistant.
+- Normalny: cykliczne odpytywanie z konfigurowalnym interwałem (domyślnie 5 minut).
+- Przełączanie trybu dostępne w Opcjach Integracji.
 ## Sensors
 
 These entities provide real-time information about the device's state.
