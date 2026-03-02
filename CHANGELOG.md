@@ -1,8 +1,8 @@
 ## v4.1.0
-- **Improvement**: Ustabilizowano automatyzację Release Notes — krok aktualizacji body wydania korzysta z odpornej ekstrakcji sekcji CHANGELOG (na podstawie numerów linii) oraz wspiera ręczne uruchomienie przez `workflow_dispatch` z parametrem `tag`.
-- **Fix**: Usunięto problemy z cytowaniem wielolinijkowych programów `awk/sed` na runnerach GitHub Actions, co powodowało błędy i puste body wydań.
-- **CI**: Zweryfikowano lokalnie `ruff format`, `ruff check` oraz `mypy`; w CI wersje narzędzi są przypięte zgodnie z regułami.
-- **No Breaking Changes**: brak zmian w API/encjach; wyłącznie usprawnienia procesu wydawniczego.
+- Improvement: Stabilized Release Notes automation — the release body update uses robust CHANGELOG section extraction (line-number based) and supports manual `workflow_dispatch` with a `tag` input.
+- Fix: Resolved quoting issues for multi-line `awk/sed` programs on GitHub Actions runners that caused errors and empty release bodies.
+- CI: Verified locally with `ruff format`, `ruff check`, and `mypy`; CI tool versions are pinned per repository rules.
+- No Breaking Changes: no changes to API/entities; only release process improvements.
 
 ## v4.0.9
 - **Fix**: Ograniczono odpytywanie modułów WLAN (tryb „Minimalny” bez cyklicznych zapytań).
