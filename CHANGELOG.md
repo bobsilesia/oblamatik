@@ -1,3 +1,9 @@
+## v4.0.9
+- **Fix**: Ograniczono odpytywanie modułów WLAN (tryb „Minimalny” bez cyklicznych zapytań).
+- **Improvement**: Dodano tryb „Normalny” z konfigurowalnym interwałem oraz centralny DataUpdateCoordinator; po akcjach użyto kontrolowanego `request_refresh` zamiast wielokrotnego `update_entity`.
+- **Impact**: Zmniejszone obciążenie HTTP/RS232 i poprawiona responsywność fizycznych przycisków.
+- **Docs**: Wiki uzupełniona o sekcję „Polling Modes” (PL/EN) w Entities & Controls.
+
 ## v4.0.8
 - **Fix**: Rozdzielenie źródeł numerów seryjnych:
   - IoT Serial pobierany wyłącznie z `serial_number_iot` (moduł WLAN).
