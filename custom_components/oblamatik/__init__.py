@@ -236,7 +236,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     _LOGGER.info("Unloading Oblamatik entry")
-    return await hass.config_entries.async_unload_platforms(
+    unload_ok = await hass.config_entries.async_unload_platforms(
         entry,
         [
             Platform.SWITCH,
@@ -247,3 +247,18 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             Platform.BINARY_SENSOR,
         ],
     )
+
+    if unload_ok:
+        if DOMAIN in hass.data:
+            # Clean up devices list for this entry
+            devices = hass.data[DOMAIN].pop(entry.entry_id, [])
+
+            # Clean up coordinators and options for these devices
+            for device in devices:
+                key = f"{device['host']}:{device.get('port', 80)}"
+                if "coordinators" in hass.data[DOMAIN]:
+                    hass.data[DOMAIN]["coordinators"].pop(key, None)
+                if "options" in hass.data[DOMAIN]:
+                    hass.data[DOMAIN]["options"].pop(key, None)
+
+    return unload_ok

@@ -1,3 +1,7 @@
+## v4.1.3
+- **Improvement**: Ulepszono obsługę przeładowania integracji (`async_unload_entry`) — czyszczenie `hass.data` (devices, coordinators, options) przy kliknięciu "Reload" w UI.
+- **Note**: Aktualizacja kodu integracji (np. przez HACS) nadal wymaga restartu HA ze względu na architekturę platformy.
+
 ## v4.1.2
 - Fix: Resolved `awk` syntax error in release workflow (`in` variable collision) to ensure automated releases.
 - No changes to integration code or functionality.
