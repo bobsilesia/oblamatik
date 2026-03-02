@@ -1,0 +1,55 @@
+name: Release Body Update
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  update-release-body:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Extract notes from CHANGELOG for v4.0.9
+        run: |
+          awk -v ver="v4.0.9" '
+            BEGIN { in=0 }
+            /^## / {
+              if (in) exit
+              if ($0 == "## " ver) { in=1; next }
+            }
+            { if (in) print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          echo "Extracted notes:"
+          cat RELEASE_NOTES.md
+
+      - name: Update GitHub Release body
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          OWNER_REPO="${{ github.repository }}"
+          TAG="v4.0.9"
+          REL_JSON=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/tags/${TAG}")
+          REL_ID=$(echo "${REL_JSON}" | jq -r '.id')
+          if [ -z "${REL_ID}" ] || [ "${REL_ID}" = "null" ]; then
+            echo "Release not found for tag ${TAG}"
+            exit 1
+          fi
+          BODY=$(jq -Rs . < RELEASE_NOTES.md)
+          PATCH_PAYLOAD="{\"body\": ${BODY}}"
+          curl -sS -X PATCH \
+            -H "Authorization: Bearer ${GITHUB_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${OWNER_REPO}/releases/${REL_ID}" \
+            -d "${PATCH_PAYLOAD}"
