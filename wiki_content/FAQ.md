@@ -1,44 +1,5 @@
 # FAQ
 
-Language: [PL](#pl) | [EN](#en)
-
-<a id="en"></a>
-
----
-
-## Wersja PL
-
-<a id="pl"></a>
-
-- **Dlaczego w trybie Higieny widzę intensywne odpytywanie (keep-alive)?**  
-  Aby urządzenie nie usypiało połączenia i nie przerwało długiej operacji, integracja co 1s odświeża status z losowym parametrem `?q=`. To świadome zachowanie, inspirowane oficjalną aplikacją.
-
-- **Jakie bezpieczne limity ustawić dla „Fill”?**  
-  Rekomendowane: `Fill Amount` 10–300 L, `Fill Temperature` 20–50°C. Dodaj warunek (guard) w automatyce, np. `amount <= 200 L`.
-
-- **Czy „Fill” działa tylko na wannie?**  
-  Nie. Encje są uniwersalne (faucet/shower/bath). Uruchamiają API `tlc-bathtub-fill`, ale nazwy i ikony są neutralne.
-
-- **Miarka: dlaczego `quantity` vs `amount`?**  
-  `tlc-measuring-cup/1/` oczekuje `quantity` (nalewanie), `tlc-measuring-cup/1/save/` zapisuje domyślną `amount`. Integracja obsługuje oba: liczba zapisuje `amount`, przycisk wysyła `quantity`.
-
-- **Jak szybko zatrzymać wszystko?**  
-  Użyj przycisku `Emergency Stop` (stop przepływu i anulowanie higieny). W dashboardzie warto mieć go zawsze widocznego.
-
-- **Co oznacza „Water Fill State”: ready / running / idle?**  
-  `ready` – system gotowy, `running` – fill w trakcie, `idle` – brak operacji lub powrót do stanu spoczynkowego.
-
-- **„IoT Serial Number” nie zawsze się pojawia – dlaczego?**  
-  W starszych firmware numer bywa tylko w `/inc/info.txt` lub `/api/index.php?url=info`. Integracja próbuje kilku źródeł i pokazuje wartość, gdy ją znajdzie.
-
-- **Jakie tryby sieci pokazuje „Network Mode”?**  
-  `Access Point (wlan_ap)`, `Client (WiFi) (wlan_cl)`, `Client (Ethernet) (ethernet)`, `Client (Bridged) (br-lan)`. Ikony i opis dopasowane do trybu.
-
-- **Czy mogę wywoływać „Fill” z automatyki czasu?**  
-  Tak, ale dodaj warunki (presence, drain closed, limit objętości) oraz powiadomienie po zakończeniu/ błędzie.
-
----
-
 ## English
 
 - **Why aggressive polling (keep-alive) during Hygiene?**  

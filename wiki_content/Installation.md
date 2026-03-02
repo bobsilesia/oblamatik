@@ -2,36 +2,7 @@
 
 There are two ways to install the Oblamatik integration: using **HACS (Home Assistant Community Store)** or manually.
 
-Language: [PL](#pl) | [EN](#en)
-
-<a id="en"></a>
-
----
-
-## Wersja PL (skrót)
-
-<a id="pl"></a>
-
-Są dwa sposoby instalacji integracji **Oblamatik**: przez **HACS** (zalecane) lub **manualnie**.
-
-### Metoda 1: HACS (zalecane)
-1. Otwórz **HACS** w Home Assistant.
-2. Przejdź do **Integrations**.
-3. W menu (trzy kropki) wybierz **Custom repositories**.
-4. Podaj URL repozytorium: `https://github.com/bobsilesia/oblamatik`
-5. Kategoria: **Integration** → **Add**.
-6. Wyszukaj **Oblamatik** i **Download**.
-7. **Restart Home Assistant**.
-
-### Metoda 2: Manualna
-1. Pobierz najnowsze wydanie (zip) z sekcji **Releases**.
-2. Rozpakuj.
-3. Skopiuj folder `custom_components/oblamatik` do `config/custom_components/`.
-4. **Restart Home Assistant**.
-
-Po restarcie przejdź do **Configuration** i dodaj integrację.
-
----
+ 
 
 ## Method 1: HACS (Recommended)
 

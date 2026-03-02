@@ -2,21 +2,15 @@
 
 Here are some examples of how you can use the Oblamatik integration in your Home Assistant automations.
 
-Language: [PL](#pl) | [EN](#en)
-
-<a id="en"></a>
-
-## Najlepsze praktyki (PL)
-
-<a id="pl"></a>
-
-- Używaj rozsądnych limitów:
-  - Fill Amount: 10–300 L (zalecane limity guard w automatyce, np. < 200 L).
-  - Fill Temperature: 20–50°C (bezpieczny komfort).
-- Nie uruchamiaj „Start Fill” bezpośrednio z triggera czasowego – dodaj warunki (presence, drain closed, max amount).
-- Dodaj powiadomienia po zakończeniu lub błędzie (czujnik „Water Fill State”).
-- Zawsze miej „Emergency Stop” pod ręką (przycisk integracji).
-- Higiena: modyfikuj interwał/duration razem z przeglądem instalacji (np. po serwisie), nie ustawiaj bardzo krótkich interwałów w ruchu ciągłym.
+## Good Practices
+ 
+- Use reasonable limits:
+  - Fill Amount: 10–300 L (recommended guard limits in automations, e.g. < 200 L).
+  - Fill Temperature: 20–50°C (safe comfort range).
+- Don't trigger "Start Fill" directly from a time trigger — add conditions (presence, drain closed, max amount).
+- Add notifications on completion or error (sensor "Water Fill State").
+- Always have an "Emergency Stop" available (integration button).
+- Hygiene: adjust interval/duration together with installation maintenance (e.g. after service), don't set very short intervals in continuous operation.
 
 ### Guard dla objętości (PL)
 

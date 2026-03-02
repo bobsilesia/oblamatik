@@ -2,60 +2,11 @@
 
 The Oblamatik integration exposes various entities to Home Assistant, allowing you to monitor and control your device comprehensively.
 
-Language: [PL](#pl) | [EN](#en)
-
-<a id="en"></a>
-
----
-
-## Polling Modes — Quick Guide
-
-- EN:
-  - Minimal: No periodic polling; updates only when you use entities in Home Assistant.
-  - Normal: Periodic polling at a configurable interval (default 5 minutes).
-  - Mode switching is available in Integration Options.
-- PL:
-  - Minimalny: brak cyklicznego odpytywania; aktualizacje tylko przy użyciu encji w Home Assistant.
-  - Normalny: cykliczne odpytywanie z konfigurowalnym interwałem (domyślnie 5 minut).
-  - Przełączanie trybu dostępne w Opcjach Integracji.
-
 ## Polling Modes
 
 - Minimal: No periodic polling; updates only when you use entities in Home Assistant.
 - Normal: Periodic polling at a configurable interval (default 5 minutes).
 - Switching modes is available in Integration Options.
-
-## Wersja PL (skrót)
-
-<a id="pl"></a>
-
-Integracja udostępnia encje pozwalające na:
-- odczyt temperatury, przepływu, stanu i parametrów sieciowych,
-- sterowanie odpływem (popup), trybem higieny, szybkim testem,
-- precyzyjne ustawianie temperatury/przepływu oraz nowych funkcji „Fill” i „Measuring Cup”.
-
-### Nowe uniwersalne encje (Faucet/Shower/Bath)
-- `number.oblamatik_*_fill_amount` – docelowa objętość (L), lokalna wartość w HA.
-- `number.oblamatik_*_fill_temperature` – docelowa temperatura (°C), lokalna wartość w HA.
-- `button.oblamatik_*_start_fill` – wysyła `amount` + `temperature` do `/api/index.php?url=tlc-bathtub-fill/1/`.
-- `sensor.oblamatik_*_fill_state` – stan operacji `ready|running|idle|unknown`.
-
-### Miarka (Measuring Cup)
-- `number.oblamatik_*_measuring_cup_amount` – odczyt/zapis domyślnej ilości (`GET/POST` `tlc-measuring-cup/1/get|save`).
-- `button.oblamatik_*_measuring_cup_start` – dozowanie (`POST tlc-measuring-cup/1/` z `quantity`).
-
-### Higiena
-- `number.oblamatik_*_hygiene_interval` – `repetition_period` (dni).
-- `number.oblamatik_*_hygiene_flush_duration` – `flush_duration` (sekundy).
-- `switch.oblamatik_*_hygiene_active` – harmonogram aktywny/nieaktywny.
-- `button.oblamatik_*_hygiene_start` / `_cancel` – natychmiastowe rozpoczęcie/zatrzymanie.
-
----
-### Tryby odpytywania
-
-- Minimalny: brak cyklicznego odpytywania; aktualizacje tylko przy użyciu encji w Home Assistant.
-- Normalny: cykliczne odpytywanie z konfigurowalnym interwałem (domyślnie 5 minut).
-- Przełączanie trybu dostępne w Opcjach Integracji.
 ## Sensors
 
 These entities provide real-time information about the device's state.

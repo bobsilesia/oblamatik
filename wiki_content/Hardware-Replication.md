@@ -2,33 +2,6 @@
 
 To guide explains how to replicate or clone the Oblamatik/Viega WLAN module based on the findings from the [bobsilesia/viega_multiplex_trio_e](https://github.com/bobsilesia/viega_multiplex_trio_e) repository.
 
-Language: [PL](#pl) | [EN](#en)
-
-<a id="en"></a>
-
----
-
-## Wersja PL (skrót)
-
-<a id="pl"></a>
-
-Architektura:
-- Rdzeń: **8devices Carambola 2** (OpenWrt, MIPS AR9331).
-- Interfejs: **RS232** do jednostki kąpielowej (konwersja poziomów wymagana: **MAX3232**).
-- Zasilanie: sprawdź **VCC** (brązowy przewód), użyj przetwornicy do 3.3V/5V.
-
-Klonowanie:
-- Opcja A (1:1): Carambola 2 + OpenWrt + lighttpd + PHP, wyłącz konsolę na UART, skopiuj `/www`.
-- Opcja B (emulacja): ESP32/RPi + MAX3232, logika „HTTP → Serial → HTTP”.
-
-Bezpieczeństwo:
-- Nigdy nie łącz bezpośrednio RS232 z TTL – używaj **MAX3232**.
-- Nie flashuj przypadkowego OpenWrt na oryginalnym module – ryzyko brick.
-
-Zrzut firmware:
-- Konsola UART → U-Boot/Failsafe → odczyt MTD/TFTP.
-
----
 ## 1. Hardware Architecture
 
 The original module consists of:
@@ -96,8 +69,8 @@ If you possess a working unit and want the exact `1.0-4.03` image:
 2.  **Bootloader:** Interrupt boot (press 'f' or any key) to enter U-Boot/Failsafe.
 3.  **Read Flash:** Use `cat /dev/mtd0 > /tmp/dump.bin` (if Linux boots) or U-Boot commands to read memory and transfer via TFTP/Serial (kermit).
 
-## Author Findings (Carambola) / Odkrycia autora (Carambola)
-- Roel Broersma — szczegółowe reverse engineering modułu **8devices Carambola 2** używanego w Viega/Oblamatik:
-  - Identyfikacja sprzętu i pinoutu, rozróżnienie **RS232** vs **TTL** oraz potrzeba konwertera **MAX3232**.
-  - Uwagi dot. wyłączenia konsoli UART, zrzutu pamięci (MTD/U-Boot) i zachowania firmware.
-  - Repozytorium: https://github.com/roelbroersma/viega_multiplex_trio_e
+## Author Findings (Carambola)
+- Roel Broersma — detailed reverse engineering of the **8devices Carambola 2** module used in Viega/Oblamatik:
+  - Hardware identification and pinout, RS232 vs TTL differences, and need for a **MAX3232** converter.
+  - Notes on disabling the UART console, dumping memory (MTD/U-Boot), and firmware behavior.
+  - Repository: https://github.com/roelbroersma/viega_multiplex_trio_e
