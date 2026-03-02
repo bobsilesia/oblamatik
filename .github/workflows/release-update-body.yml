@@ -41,9 +41,10 @@ jobs:
             TAG=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/latest" | jq -r '.tag_name')
           fi
           if [ -z "${TAG}" ] || [ "${TAG}" = "null" ]; then
-            echo "Brak tagu z API, fallback do najwyższego nagłówka w CHANGELOG"
+            echo "No tag from API, falling back to topmost header in CHANGELOG"
             TAG=$(grep -m1 '^## ' CHANGELOG.md | sed 's/^## //')
           fi
+          echo "TAG=${TAG}" >> $GITHUB_ENV
           echo "TAG=${TAG}"
           echo "HEAD of CHANGELOG.md:"
           head -n 15 CHANGELOG.md || true
@@ -54,14 +55,14 @@ jobs:
             START_LINE=$(awk -v ver="${ALT_VER}" 'BEGIN{n=0} {n++; if($0=="## " ver){print n; exit}}' CHANGELOG.md)
           fi
           if [ -z "${START_LINE}" ]; then
-            echo "Nie znaleziono nagłówka dla ${TAG} w CHANGELOG.md"
+            echo "Header for ${TAG} not found in CHANGELOG.md"
             exit 1
           fi
           END_LINE=$(awk -v s="${START_LINE}" 'BEGIN{n=0; found=0} {n++; if(n>s && $0 ~ /^## /){print n-1; found=1; exit}} END{if(found==0) print n}' CHANGELOG.md)
           START=$((START_LINE + 1))
           sed -n "${START},${END_LINE}p" CHANGELOG.md > RELEASE_NOTES.md
           if [ ! -s RELEASE_NOTES.md ]; then
-            echo "Brak wyodrębnionych notatek dla ${TAG} w CHANGELOG.md"
+            echo "No extracted notes for ${TAG} in CHANGELOG.md"
             exit 1
           fi
           echo "Tag: ${TAG}"
@@ -75,9 +76,13 @@ jobs:
         run: |
           set -e
           OWNER_REPO="${{ github.repository }}"
-          TAG="${{ inputs.tag }}"
+          TAG_INPUT="${{ inputs.tag }}"
+          TAG="${TAG_INPUT}"
           if [ -z "${TAG}" ]; then
-            TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+            TAG="${TAG}"
+          fi
+          if [ -z "${TAG}" ]; then
+            TAG=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/latest" | jq -r '.tag_name')
           fi
           REL_JSON=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/tags/${TAG}")
           REL_ID=$(echo "${REL_JSON}" | jq -r '.id')
