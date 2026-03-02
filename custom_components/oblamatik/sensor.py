@@ -150,6 +150,19 @@ class OblamatikBaseSensor(SensorEntity):
         self._attr_available = True
 
     async def _get_device_state(self, params: dict[str, Any] | None = None) -> dict[str, Any]:
+        key = f"{self._host}:{self._port}"
+        domain_data = self._hass.data.get(DOMAIN, {})
+        coordinators = domain_data.get("coordinators", {})
+        options_map = domain_data.get("options", {})
+        coordinator = coordinators.get(key)
+        options = options_map.get(key, {})
+        if coordinator is not None:
+            mode = options.get("polling_mode", "minimal")
+            if mode == "minimal":
+                data = coordinator.data or {}
+                return data
+            data = coordinator.data or {}
+            return data
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
@@ -166,11 +179,8 @@ class OblamatikBaseSensor(SensorEntity):
                         ) as response2:
                             if response2.status == 200:
                                 return await response2.json(content_type=None)
-                            else:
-                                _LOGGER.warning(f"Failed to get device state: {response.status}")
-                                return {}
-            except Exception as e:
-                # Try fallback only if first attempt raised exception (not just bad status)
+                            return {}
+            except Exception:
                 try:
                     async with session.get(
                         f"{base_url}/api/tlc/1/state/", params=params, timeout=timeout
@@ -178,11 +188,9 @@ class OblamatikBaseSensor(SensorEntity):
                         if response2.status == 200:
                             return await response2.json(content_type=None)
                 except Exception:
-                    pass  # Ignore nested failure
-                raise e  # Re-raise original error if fallback also failed
-
-        except Exception as e:
-            _LOGGER.error(f"Error getting device state for {self._host}: {e}")
+                    pass
+            return {}
+        except Exception:
             return {}
 
 

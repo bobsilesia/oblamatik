@@ -8,7 +8,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature, UnitOfVolumeFlowRate
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -98,18 +97,13 @@ class OblamatikBaseNumber(NumberEntity):
         tasks[key] = self._hass.async_create_task(self._async_fast_status_refresh())
 
     async def _async_fast_status_refresh(self) -> None:
-        registry = er.async_get(self._hass)
-        status_unique_id = f"{DOMAIN}_{self._host}_status"
-        entity_id = er.async_get_entity_id(registry, "sensor", DOMAIN, status_unique_id)
-        if not entity_id:
+        key = f"{self._host}:{self._port}"
+        domain_data = self._hass.data.get(DOMAIN, {})
+        coordinator = domain_data.get("coordinators", {}).get(key)
+        if coordinator is None:
             return
         for _ in range(10):
-            await self._hass.services.async_call(
-                "homeassistant",
-                "update_entity",
-                {"entity_id": entity_id},
-                blocking=False,
-            )
+            await coordinator.async_request_refresh()
             await asyncio.sleep(1)
 
 
@@ -126,6 +120,17 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
         self._attr_native_value = 38.0
 
     async def _get_current_flow(self) -> float | None:
+        domain_data = self._hass.data.get(DOMAIN, {})
+        coordinator = domain_data.get("coordinators", {}).get(f"{self._host}:{self._port}")
+        if coordinator and coordinator.data:
+            data = coordinator.data
+            if "required_flow" in data:
+                return float(data["required_flow"])
+            if "flow" in data:
+                return float(data["flow"])
+            if "flow_rate" in data:
+                return float(data["flow_rate"])
+            return None
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
@@ -135,18 +140,13 @@ class OblamatikTemperatureNumber(OblamatikBaseNumber):
                     data = await response.json()
                     if "required_flow" in data:
                         return float(data["required_flow"])
-                    elif "flow" in data:
+                    if "flow" in data:
                         return float(data["flow"])
-                    elif "flow_rate" in data:
+                    if "flow_rate" in data:
                         return float(data["flow_rate"])
-                    else:
-                        _LOGGER.warning(f"Flow not found in response: {data}")
-                        return None
-                else:
-                    _LOGGER.warning(f"Failed to get state: {response.status}")
                     return None
-        except Exception as e:
-            _LOGGER.error("Error getting current flow: %s", e)
+                return None
+        except Exception:
             return None
 
     async def async_set_native_value(self, value: float) -> None:
@@ -178,6 +178,17 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
         self._attr_native_value = 0.0
 
     async def _get_current_temperature(self) -> float | None:
+        domain_data = self._hass.data.get(DOMAIN, {})
+        coordinator = domain_data.get("coordinators", {}).get(f"{self._host}:{self._port}")
+        if coordinator and coordinator.data:
+            data = coordinator.data
+            if "required_temp" in data:
+                return float(data["required_temp"])
+            if "temperature" in data:
+                return float(data["temperature"])
+            if "temp" in data:
+                return float(data["temp"])
+            return None
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
@@ -187,18 +198,13 @@ class OblamatikFlowNumber(OblamatikBaseNumber):
                     data = await response.json()
                     if "required_temp" in data:
                         return float(data["required_temp"])
-                    elif "temperature" in data:
+                    if "temperature" in data:
                         return float(data["temperature"])
-                    elif "temp" in data:
+                    if "temp" in data:
                         return float(data["temp"])
-                    else:
-                        _LOGGER.warning(f"Temperature not found in response: {data}")
-                        return None
-                else:
-                    _LOGGER.warning(f"Failed to get state: {response.status}")
                     return None
-        except Exception as e:
-            _LOGGER.error("Error getting current temperature: %s", e)
+                return None
+        except Exception:
             return None
 
     async def async_set_native_value(self, value: float) -> None:

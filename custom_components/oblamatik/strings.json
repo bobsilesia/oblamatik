@@ -14,5 +14,17 @@
     "error": {
       "cannot_connect": "Failed to connect to Oblamatik device"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Oblamatik Options",
+        "description": "Polling mode and interval.",
+        "data": {
+          "polling_mode": "Polling Mode",
+          "polling_interval": "Polling Interval (minutes)"
+        }
+      }
+    }
   }
 }

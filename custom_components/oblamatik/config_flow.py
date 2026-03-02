@@ -248,16 +248,12 @@ class OblamatikOptionsFlow(config_entries.OptionsFlow):
             data_schema=vol.Schema(
                 {
                     vol.Optional(
-                        CONF_HOST,
-                        default=self._entry.options.get(
-                            CONF_HOST, self._entry.data.get(CONF_HOST, "")
-                        ),
-                    ): str,
+                        "polling_mode",
+                        default=self._entry.options.get("polling_mode", "minimal"),
+                    ): vol.In(["minimal", "normal"]),
                     vol.Optional(
-                        CONF_PORT,
-                        default=self._entry.options.get(
-                            CONF_PORT, self._entry.data.get(CONF_PORT, 80)
-                        ),
+                        "polling_interval",
+                        default=int(self._entry.options.get("polling_interval", 5)),
                     ): int,
                 }
             ),

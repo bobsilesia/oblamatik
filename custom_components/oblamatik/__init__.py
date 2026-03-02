@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 from typing import Any
 
 import aiohttp
@@ -8,6 +9,7 @@ from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -173,6 +175,49 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = updated_devices
+    hass.data[DOMAIN].setdefault("coordinators", {})
+    hass.data[DOMAIN].setdefault("options", {})
+    polling_mode = entry.options.get("polling_mode", "minimal")
+    polling_interval = int(entry.options.get("polling_interval", 5))
+
+    async def _async_update_data_for(host: str, port: int) -> dict[str, Any]:
+        session = aiohttp_client.async_get_clientsession(hass)
+        timeout = aiohttp.ClientTimeout(total=5)
+        try:
+            url = f"http://{host}:{port}/api/tlc/1/"
+            async with session.get(url, timeout=timeout) as response:
+                if response.status == 200:
+                    return await response.json(content_type=None)
+        except Exception:
+            pass
+        try:
+            url_state = f"http://{host}:{port}/api/tlc/1/state/"
+            async with session.get(url_state, timeout=timeout) as response2:
+                if response2.status == 200:
+                    return await response2.json(content_type=None)
+        except Exception as e:
+            raise UpdateFailed(str(e)) from e
+        return {}
+
+    for device in updated_devices:
+        key = f"{device['host']}:{device.get('port', 80)}"
+        update_interval = None
+        if polling_mode == "normal":
+            update_interval = timedelta(minutes=polling_interval)
+        coordinator = DataUpdateCoordinator(
+            hass,
+            _LOGGER,
+            name=f"{DOMAIN}_{key}",
+            update_method=lambda d=device: _async_update_data_for(d["host"], d.get("port", 80)),
+            update_interval=update_interval,
+        )
+        hass.data[DOMAIN]["coordinators"][key] = coordinator
+        hass.data[DOMAIN]["options"][key] = {
+            "polling_mode": polling_mode,
+            "polling_interval": polling_interval,
+        }
+        if update_interval is not None:
+            await coordinator.async_config_entry_first_refresh()
 
     await hass.config_entries.async_forward_entry_setups(
         entry,

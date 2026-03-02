@@ -1,3 +1,9 @@
+## v4.1.1
+- Feature: Added Integration Options UI for Polling Mode (`minimal` / `normal`) and Polling Interval (minutes).
+- Improvement: Options are now clearly separated from connection settings (Host/Port stay in initial Config Flow).
+- Docs: GitHub Wiki cleaned up to English-only with an expanded "Polling Modes" explanation.
+- No Breaking Changes: entities and API remain compatible with 4.1.0 and 4.0.9.
+
 ## v4.1.0
 - Improvement: Stabilized Release Notes automation — the release body update uses robust CHANGELOG section extraction (line-number based) and supports manual `workflow_dispatch` with a `tag` input.
 - Fix: Resolved quoting issues for multi-line `awk/sed` programs on GitHub Actions runners that caused errors and empty release bodies.

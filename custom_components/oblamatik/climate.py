@@ -9,7 +9,6 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import UnitOfTemperature
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import aiohttp_client
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
@@ -129,16 +128,11 @@ class OblamatikClimate(ClimateEntity):
         tasks[key] = self._hass.async_create_task(self._async_fast_status_refresh())
 
     async def _async_fast_status_refresh(self) -> None:
-        registry = er.async_get(self._hass)
-        status_unique_id = f"{DOMAIN}_{self._host}_status"
-        entity_id = er.async_get_entity_id(registry, "sensor", DOMAIN, status_unique_id)
-        if not entity_id:
+        key = f"{self._host}:{self._port}"
+        domain_data = self._hass.data.get(DOMAIN, {})
+        coordinator = domain_data.get("coordinators", {}).get(key)
+        if coordinator is None:
             return
         for _ in range(10):
-            await self._hass.services.async_call(
-                "homeassistant",
-                "update_entity",
-                {"entity_id": entity_id},
-                blocking=False,
-            )
+            await coordinator.async_request_refresh()
             await asyncio.sleep(1)

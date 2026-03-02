@@ -22,6 +22,18 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Extract Release Notes
+        run: |
+          TAG="${{ github.event.inputs.tag || github.ref_name }}"
+          awk -v ver="$TAG" '
+            BEGIN { in=0 }
+            /^## / {
+              if (in) exit
+              if ($0 ~ "^## " ver) { in=1; print; next }
+            }
+            { if (in) print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+
       - name: Build ZIP (content in root)
         run: |
           cd custom_components/oblamatik
@@ -33,6 +45,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
+          body_path: RELEASE_NOTES.md
           files: |
             oblamatik.zip
           fail_on_unmatched_files: true
