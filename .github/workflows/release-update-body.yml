@@ -20,6 +20,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Install jq
         run: |
@@ -27,14 +30,23 @@ jobs:
           sudo apt-get install -y jq
 
       - name: Extract notes from CHANGELOG for tag
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="${{ inputs.tag }}"
-          if [ -z "${TAG}" ]; then
-            TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          OWNER_REPO="${{ github.repository }}"
+          TAG_INPUT="${{ inputs.tag }}"
+          if [ -n "${TAG_INPUT}" ]; then
+            TAG="${TAG_INPUT}"
+          else
+            TAG=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/latest" | jq -r '.tag_name')
+          fi
+          if [ -z "${TAG}" ] || [ "${TAG}" = "null" ]; then
+            echo "Brak tagu z API, fallback do najwyższego nagłówka w CHANGELOG"
+            TAG=$(grep -m1 '^## ' CHANGELOG.md | sed 's/^## //')
           fi
           echo "TAG=${TAG}"
           echo "HEAD of CHANGELOG.md:"
-          head -n 10 CHANGELOG.md || true
+          head -n 15 CHANGELOG.md || true
           START_LINE=$(awk -v ver="${TAG}" 'BEGIN{n=0} {n++; if($0=="## " ver){print n; exit}}' CHANGELOG.md)
           if [ -z "${START_LINE}" ]; then
             ALT_VER=$(echo "${TAG}" | sed 's/^v//')
