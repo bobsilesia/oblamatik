@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag to update (e.g., v4.0.9)'
+        required: false
+        default: 'v4.0.9'
 
 permissions:
   contents: write
@@ -20,16 +26,26 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq
 
-      - name: Extract notes from CHANGELOG for v4.0.9
+      - name: Extract notes from CHANGELOG for tag
         run: |
-          awk -v ver="v4.0.9" '
-            BEGIN { in=0 }
-            /^## / {
-              if (in) exit
-              if ($0 == "## " ver) { in=1; next }
-            }
-            { if (in) print }
-          ' CHANGELOG.md > RELEASE_NOTES.md
+          TAG="${{ inputs.tag }}"
+          if [ -z "${TAG}" ]; then
+            TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          fi
+          START_LINE=$(awk -v ver="${TAG}" 'BEGIN{n=0} {n++; if($0=="## " ver){print n; exit}}' CHANGELOG.md)
+          if [ -z "${START_LINE}" ]; then
+            echo "Nie znaleziono nagłówka dla ${TAG} w CHANGELOG.md"
+            exit 1
+          fi
+          END_LINE=$(awk -v s="${START_LINE}" 'BEGIN{n=0; found=0} {n++; if(n>s && $0 ~ /^## /){print n-1; found=1; exit}} END{if(found==0) print n}' CHANGELOG.md)
+          START=$((START_LINE + 1))
+          sed -n "${START},${END_LINE}p" CHANGELOG.md > RELEASE_NOTES.md
+          if [ ! -s RELEASE_NOTES.md ]; then
+            echo "Brak wyodrębnionych notatek dla ${TAG} w CHANGELOG.md"
+            exit 1
+          fi
+          echo "Tag: ${TAG}"
+          echo "Start: ${START_LINE}, End: ${END_LINE}"
           echo "Extracted notes:"
           cat RELEASE_NOTES.md
 
@@ -39,7 +55,10 @@ jobs:
         run: |
           set -e
           OWNER_REPO="${{ github.repository }}"
-          TAG="v4.0.9"
+          TAG="${{ inputs.tag }}"
+          if [ -z "${TAG}" ]; then
+            TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)")
+          fi
           REL_JSON=$(curl -sS -H "Authorization: Bearer ${GITHUB_TOKEN}" -H "Accept: application/vnd.github+json" "https://api.github.com/repos/${OWNER_REPO}/releases/tags/${TAG}")
           REL_ID=$(echo "${REL_JSON}" | jq -r '.id')
           if [ -z "${REL_ID}" ] || [ "${REL_ID}" = "null" ]; then
