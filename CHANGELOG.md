@@ -1,3 +1,7 @@
+## v4.1.7
+- Fix: Force stable entity_id for Water Usage Reset in single-device setups (button.oblamatik_water_usage_reset).
+- No Breaking Changes.
+
 ## v4.1.6
 - Fix: Ensure Water Usage Reset button appears by adding base entity mapping in strings.json.
 - Docs: Minor README clarification about Water Usage Reset availability.

@@ -35,7 +35,11 @@ async def async_setup_entry(
         ]
 
     buttons = []
+    single_device = len(devices) == 1
     for device in devices:
+        water_usage_reset_button = OblamatikWaterUsageResetButton(hass, device)
+        if single_device:
+            water_usage_reset_button.entity_id = "button.oblamatik_water_usage_reset"
         buttons.extend(
             [
                 OblamatikEmergencyStopButton(hass, device),
@@ -46,6 +50,7 @@ async def async_setup_entry(
                 OblamatikQuickAction3Button(hass, device),
                 OblamatikOpenDrainButton(hass, device),
                 OblamatikCloseDrainButton(hass, device),
+                water_usage_reset_button,
                 OblamatikWlanRestartButton(hass, device),
                 OblamatikFunctionTestStep1Button(hass, device),
                 OblamatikFunctionTestStep2Button(hass, device),
@@ -238,6 +243,18 @@ class OblamatikQuickAction3Button(OblamatikBaseButton):
 
     async def async_press(self) -> None:
         await self._post_command("/api/tlc/1/quick/3/", "data=1")
+
+
+class OblamatikWaterUsageResetButton(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Water Usage Reset"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_water_usage_reset"
+        self._attr_icon = "mdi:water-off"
+        self._attr_entity_category = EntityCategory.CONFIG
+
+    async def async_press(self) -> None:
+        await self._post_command("/api/tlc/1/", "flow=0&changed=2")
 
 
 class OblamatikWlanRestartButton(OblamatikBaseButton):
