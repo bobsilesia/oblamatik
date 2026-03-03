@@ -59,14 +59,14 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 - Ensure the device returns valid responses at `http://IP:PORT/api/tlc/1/` and `http://IP:PORT/api/tlc/1/state/`.
 - [Detailed Troubleshooting Guide](wiki_content/Troubleshooting.md)
 - [Supported Devices & Features](wiki_content/Supported-Devices.md)
-- [FAQ (PL + EN)](wiki_content/FAQ.md)
+- [FAQ](wiki_content/FAQ.md)
 
-## Quick Links (PL / EN)
-- Home: [PL](wiki_content/Home.md#pl) | [EN](wiki_content/Home.md#en)
-- Installation: [PL](wiki_content/Installation.md#pl) | [EN](wiki_content/Installation.md#en)
-- Configuration: [PL](wiki_content/Configuration.md#pl) | [EN](wiki_content/Configuration.md#en)
-- Automations: [PL](wiki_content/Automations.md#pl) | [EN](wiki_content/Automations.md#en)
-- FAQ: [PL](wiki_content/FAQ.md#pl) | [EN](wiki_content/FAQ.md#en)
+## Documentation
+- [Home](wiki_content/Home.md)
+- [Installation](wiki_content/Installation.md)
+- [Configuration](wiki_content/Configuration.md)
+- [Automations](wiki_content/Automations.md)
+- [FAQ](wiki_content/FAQ.md)
 
 ## Contributing
 

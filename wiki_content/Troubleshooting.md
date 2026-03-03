@@ -49,7 +49,25 @@ If you encounter issues with the Oblamatik integration, follow these steps to di
 - The integration implements an aggressive **Keep-Alive mechanism** (polling every 1 second with `?q=random`) when the device is in a running state (Hygiene/Flow active).
 - This is **required behavior** to prevent the device from timing out or sleeping during operation, mimicking the official app's behavior. Do not disable this.
 
-### 5. Firmware Updates
+### 5. Communication hangs / System freezes (RS232 overload)
+
+**Symptoms:**
+- The integration stops updating or responding to commands.
+- The physical control panel (buttons/knobs) becomes unresponsive or lags significantly.
+- The device web interface might still work, but API calls fail or timeout.
+
+**Cause:**
+- The internal RS232 communication bus between the WLAN module and the main controller is overloaded.
+- This often happens if **Polling Mode** is set to "Normal" with a very short interval (e.g. < 1 minute) while simultaneously running frequent automations or having multiple clients (e.g. Home Assistant + Homebridge) polling the device.
+- The device's internal buffer fills up, causing it to drop commands or freeze the interface.
+
+**Solution:**
+- **Increase Polling Interval:** Set it to 5 minutes or more in Integration Options.
+- **Use Minimal Mode:** If you rely heavily on automations, consider switching to "Minimal" mode (no background polling) and only refresh data when needed.
+- **Limit Clients:** Avoid having multiple systems polling the device at the same time.
+- **Restart Device:** Power cycle the unit (unplug/plug) to clear the RS232 buffer state.
+
+### 6. Firmware Updates
 
 **Status:**
 - Official firmware updates for these modules (Viega/Oblamatik/Crosswater) are **not publicly available**.

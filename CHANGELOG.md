@@ -1,3 +1,8 @@
+## v4.1.4
+- **Change**: Changed default polling mode to **Normal** (5 minutes). "Minimal" mode is now optional.
+- **Docs**: Added detailed warnings in Wiki about RS232 communication hanging due to excessive polling.
+- **Improvement**: Simplified sensor logic in code (`sensor.py`) - always returns available data from coordinator.
+
 ## v4.1.3
 - **Improvement**: Ulepszono obsługę przeładowania integracji (`async_unload_entry`) — czyszczenie `hass.data` (devices, coordinators, options) przy kliknięciu "Reload" w UI.
 - **Note**: Aktualizacja kodu integracji (np. przez HACS) nadal wymaga restartu HA ze względu na architekturę platformy.

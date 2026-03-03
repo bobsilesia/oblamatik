@@ -153,16 +153,10 @@ class OblamatikBaseSensor(SensorEntity):
         key = f"{self._host}:{self._port}"
         domain_data = self._hass.data.get(DOMAIN, {})
         coordinators = domain_data.get("coordinators", {})
-        options_map = domain_data.get("options", {})
         coordinator = coordinators.get(key)
-        options = options_map.get(key, {})
         if coordinator is not None:
-            mode = options.get("polling_mode", "minimal")
-            if mode == "minimal":
-                data = coordinator.data or {}
-                return data
-            data = coordinator.data or {}
-            return data
+            # Return coordinator data regardless of polling mode
+            return coordinator.data or {}
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)

@@ -177,7 +177,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = updated_devices
     hass.data[DOMAIN].setdefault("coordinators", {})
     hass.data[DOMAIN].setdefault("options", {})
-    polling_mode = entry.options.get("polling_mode", "minimal")
+    polling_mode = entry.options.get("polling_mode", "normal")
     polling_interval = int(entry.options.get("polling_interval", 5))
 
     async def _async_update_data_for(host: str, port: int) -> dict[str, Any]:

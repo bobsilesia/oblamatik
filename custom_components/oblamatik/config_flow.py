@@ -249,7 +249,7 @@ class OblamatikOptionsFlow(config_entries.OptionsFlow):
                 {
                     vol.Optional(
                         "polling_mode",
-                        default=self._entry.options.get("polling_mode", "minimal"),
+                        default=self._entry.options.get("polling_mode", "normal"),
                     ): vol.In(["minimal", "normal"]),
                     vol.Optional(
                         "polling_interval",

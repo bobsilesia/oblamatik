@@ -4,9 +4,10 @@ The Oblamatik integration exposes various entities to Home Assistant, allowing y
 
 ## Polling Modes
 
-- Minimal: No periodic polling; updates only when you use entities in Home Assistant.
-- Normal: Periodic polling at a configurable interval (default 5 minutes).
-- Switching modes is available in Integration Options.
+- **Normal (Default)**: The integration polls the device periodically (default interval: 5 minutes). This ensures sensors are updated even if you don't interact with them, but adds load to the device.
+- **Minimal**: No periodic polling. Sensors only update when you interact with the device via Home Assistant (e.g., turn on a switch) or when a manual refresh is triggered. This is recommended if you experience RS232 stability issues or have a very busy network.
+
+> **Warning:** Setting a very short polling interval (e.g., < 1 minute) in "Normal" mode can overload the device's internal RS232 communication, causing it to freeze or become unresponsive. We recommend keeping the default 5-minute interval.
 ## Sensors
 
 These entities provide real-time information about the device's state.
