@@ -1,3 +1,8 @@
+## v4.1.5
+- New: Added button.oblamatik_water_usage_reset to immediately set flow to 0 and refresh sensors.
+- Docs: Wiki updated (Entities & Controls) with Water Usage Reset description and usage scenarios.
+- No Breaking Changes: Existing entities and APIs unchanged; optional control addition.
+
 ## v4.1.4
 - **Change**: Changed default polling mode to **Normal** (5 minutes). "Minimal" mode is now optional.
 - **Docs**: Added detailed warnings in Wiki about RS232 communication hanging due to excessive polling.
