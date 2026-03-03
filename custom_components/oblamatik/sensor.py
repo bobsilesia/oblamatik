@@ -602,6 +602,38 @@ class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
             except Exception:
                 pass
 
+        if not serial:
+            # Try /getserial.php (raw output from fw_printenv) - common on stock firmware
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                async with session.get(f"{base_url}/getserial.php", timeout=timeout) as response:
+                    if response.status == 200:
+                        text = await response.text()
+                        # Output format: "serialnum=123456\n" or similar in <pre> tags
+                        # We look for "serialnum=" and take the value
+                        if "serialnum=" in text:
+                            parts = text.split("serialnum=")
+                            if len(parts) > 1:
+                                # Take the part after =, split by whitespace/newlines, and clean up
+                                candidate = parts[1].split()[0].strip()
+                                # Clean up HTML tags if present (e.g. </pre>)
+                                candidate = candidate.split("<")[0].strip()
+                                if candidate:
+                                    serial = candidate
+            except Exception:
+                pass
+
+        if not serial:
+            # Fallback to MAC address as IoT Serial (unique identifier for WLAN module)
+            state = await self._get_device_state()
+            if state:
+                mac = state.get("mac_address") or state.get("wlan", {}).get("mac_address")
+                if mac and mac != "Unknown":
+                    # Format MAC as serial: 00:11:22... -> 001122...
+                    serial = mac.replace(":", "").upper()
+
         if serial:
             self._serial = str(serial)
         else:

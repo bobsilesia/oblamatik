@@ -1,3 +1,9 @@
+## v4.1.8
+- **Fix**: Improved `IoT Serial Number` detection for stock firmware (e.g. 1.0-4.03).
+- **Feature**: Added fallback to `/getserial.php` (fw_printenv) for reading serial number.
+- **Feature**: Added fallback to MAC Address (formatted as serial) if no other serial number is found, ensuring a unique identifier is always available.
+- **No Breaking Changes**: Existing entities unchanged.
+
 ## v4.1.7
 - Fix: Force stable entity_id for Water Usage Reset in single-device setups (button.oblamatik_water_usage_reset).
 - No Breaking Changes.
