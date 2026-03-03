@@ -1,9 +1,25 @@
-oblamatik.zip
 __pycache__/
 *.pyc
 .DS_Store
 .venv
-local_firmware_work/
 .trae/
+
+# Build artifacts
+oblamatik.zip
+
+# Firmware dumps and work dirs
+local_firmware_work/
+oblamatik_dump/
+oblamatik_dump_403/
+oblamatik_www.tar.gz
+www/
+tools/
+
+# Exploits and tools
 exploit_*.py
+crack_password.py
+scan_device.py
+deploy_fix.py
+upload_fix.py
+fix_ip_address.patch
 payload/
