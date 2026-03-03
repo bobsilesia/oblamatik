@@ -15,6 +15,13 @@
       "cannot_connect": "Failed to connect to Oblamatik device"
     }
   },
+  "entity": {
+    "button": {
+      "oblamatik_water_usage_reset": {
+        "name": "Water Usage Reset"
+      }
+    }
+  },
   "options": {
     "step": {
       "init": {

@@ -1,3 +1,8 @@
+## v4.1.6
+- Fix: Ensure Water Usage Reset button appears by adding base entity mapping in strings.json.
+- Docs: Minor README clarification about Water Usage Reset availability.
+- No Breaking Changes.
+
 ## v4.1.5
 - New: Added button.oblamatik_water_usage_reset to immediately set flow to 0 and refresh sensors.
 - Docs: Wiki updated (Entities & Controls) with Water Usage Reset description and usage scenarios.

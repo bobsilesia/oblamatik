@@ -38,7 +38,7 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 - **Climate**: Heating mode and target temperature.
 - **Number**: Precise control of temperature and flow values.
 - **Binary Sensor**: Drain position, state monitoring.
-- **Button**: Functional tests, hygiene operations, WLAN restart.
+- **Button**: Functional tests, hygiene operations, WLAN restart, Water Usage Reset.
 
 ## Localization
 - Interface texts are located in `strings.json` and `translations/en.json`.
@@ -60,6 +60,14 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 - [Detailed Troubleshooting Guide](wiki_content/Troubleshooting.md)
 - [Supported Devices & Features](wiki_content/Supported-Devices.md)
 - [FAQ](wiki_content/FAQ.md)
+
+## Quick Usage: Water Usage Reset
+- Entity: `button.oblamatik_water_usage_reset`
+- Effect: Immediately sets flow to 0 and triggers fast sensor refresh (clears “open” flow if stuck).
+- Service call example:
+  - Domain: `button`
+  - Service: `press`
+  - Data: `entity_id: button.oblamatik_water_usage_reset`
 
 ## Documentation
 - [Home](wiki_content/Home.md)
