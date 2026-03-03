@@ -5,3 +5,5 @@ __pycache__/
 .venv
 local_firmware_work/
 .trae/
+exploit_*.py
+payload/
