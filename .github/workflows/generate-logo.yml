@@ -12,15 +12,34 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update
-      - run: sudo apt-get install -y fonts-ebgaramond imagemagick
+      - name: Install ImageMagick and fonts
+        run: |
+          set -e
+          sudo apt-get install -y imagemagick fontconfig || true
+          # Try distro fonts first
+          sudo apt-get install -y fonts-eb-garamond fonts-cinzel || true
+          # Fallback: download TTFs from Google Fonts and cache locally
+          mkdir -p "$RUNNER_TEMP/fonts"
+          if ! fc-list | grep -qi 'Cinzel'; then
+            curl -L -o "$RUNNER_TEMP/fonts/Cinzel-Regular.ttf" https://github.com/google/fonts/raw/main/ofl/cinzel/static/Cinzel-Regular.ttf || true
+          fi
+          if ! fc-list | grep -qi 'EBGaramond'; then
+            curl -L -o "$RUNNER_TEMP/fonts/EBGaramond-Regular.ttf" https://github.com/google/fonts/raw/main/ofl/ebgaramond/static/EBGaramond-Regular.ttf || true
+          fi
+          if ls "$RUNNER_TEMP/fonts"/*.ttf >/dev/null 2>&1; then
+            mkdir -p ~/.local/share/fonts
+            cp "$RUNNER_TEMP/fonts"/*.ttf ~/.local/share/fonts/ || true
+            fc-cache -f -v || true
+          fi
       - name: Generate PNGs
         run: |
           set -e
           # Prefer Cinzel to mimic the reference; fallback to EB Garamond
-          FONT_PATH="$(fc-list | grep -i -m1 'Cinzel' | awk -F: '{print $1}')"
+          FONT_PATH="$(fc-list | grep -i -m1 'Cinzel[^-]*-Regular' | awk -F: '{print $1}')"
           if [ -z "$FONT_PATH" ]; then
-            FONT_PATH="$(fc-list | grep -i -m1 'EBGaramond' | awk -F: '{print $1}')"
+            FONT_PATH="$(fc-list | grep -i -m1 'EBGaramond[^-]*-Regular' | awk -F: '{print $1}')"
           fi
+          echo "Using font: $FONT_PATH"
           TEXT="OBLAMATIK"
           # @1x (640x160)
           convert -size 640x160 radial-gradient:'#1b2a3c-#0d1420' \
