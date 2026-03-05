@@ -43,6 +43,7 @@ async def async_setup_entry(
         buttons.extend(
             [
                 OblamatikEmergencyStopButton(hass, device),
+                OblamatikForceRefreshButton(hass, device),
                 OblamatikMeasuringCupStartButton(hass, device),
                 OblamatikStartFillButton(hass, device),
                 OblamatikQuickAction1Button(hass, device),
@@ -154,6 +155,20 @@ class OblamatikEmergencyStopButton(OblamatikBaseButton):
         await self._post_command("/api/tlc/1/", f"temperature={target_temp}&flow=0&changed=1")
         # Ensure hygiene mode is cancelled if active
         await self._post_command("/api/tlc/1/hygiene/thermal-desinfection/cancel/", "data=1")
+
+
+class OblamatikForceRefreshButton(OblamatikBaseButton):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Force Refresh"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_force_refresh"
+        self._attr_icon = "mdi:refresh"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+
+    async def async_press(self) -> None:
+        await self._hass.services.async_call(
+            DOMAIN, "force_refresh", {"host": self._host}, blocking=False
+        )
 
 
 class OblamatikMeasuringCupStartButton(OblamatikBaseButton):

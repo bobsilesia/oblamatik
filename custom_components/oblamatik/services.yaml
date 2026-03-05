@@ -1,0 +1,11 @@
+force_refresh:
+  name: Force Refresh
+  description: Request immediate refresh for Oblamatik devices.
+  fields:
+    host:
+      name: Host (optional)
+      description: Refresh only the device at this host/IP. Leave empty to refresh all.
+      example: 192.168.1.50
+      required: false
+      selector:
+        text: {}

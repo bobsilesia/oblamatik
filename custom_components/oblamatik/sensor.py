@@ -154,25 +154,49 @@ class OblamatikBaseSensor(SensorEntity):
         domain_data = self._hass.data.get(DOMAIN, {})
         coordinators = domain_data.get("coordinators", {})
         coordinator = coordinators.get(key)
-        if coordinator is not None:
-            # Return coordinator data regardless of polling mode
+        verbose_debug = bool(
+            domain_data.get("options", {}).get(key, {}).get("verbose_debug", False)
+        )
+        if coordinator is not None and coordinator.data:
+            if verbose_debug:
+                _LOGGER.debug("Using coordinator cache for %s", key)
             return coordinator.data or {}
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
             timeout = aiohttp.ClientTimeout(total=5)
+            result: dict[str, Any] = {}
             try:
                 async with session.get(
                     f"{base_url}/api/tlc/1/", params=params, timeout=timeout
                 ) as response:
                     if response.status == 200:
-                        return await response.json(content_type=None)
+                        result = await response.json(content_type=None)
+                        if verbose_debug:
+                            _LOGGER.debug(
+                                "Fetched /api/tlc/1 for %s; seeding cache=%s",
+                                key,
+                                coordinator is not None,
+                            )
+                        # Seed coordinator cache in minimal mode for quicker subsequent reads
+                        if coordinator is not None and result:
+                            coordinator.async_set_updated_data(result)
+                        return result
                     else:
                         async with session.get(
                             f"{base_url}/api/tlc/1/state/", params=params, timeout=timeout
                         ) as response2:
                             if response2.status == 200:
-                                return await response2.json(content_type=None)
+                                result = await response2.json(content_type=None)
+                                if verbose_debug:
+                                    _LOGGER.debug(
+                                        "Fetched /api/tlc/1/state for %s; seeding cache=%s",
+                                        key,
+                                        coordinator is not None,
+                                    )
+                                if coordinator is not None and result:
+                                    coordinator.async_set_updated_data(result)
+                                return result
                             return {}
             except Exception:
                 try:
@@ -180,7 +204,17 @@ class OblamatikBaseSensor(SensorEntity):
                         f"{base_url}/api/tlc/1/state/", params=params, timeout=timeout
                     ) as response2:
                         if response2.status == 200:
-                            return await response2.json(content_type=None)
+                            result = await response2.json(content_type=None)
+                            if verbose_debug:
+                                _LOGGER.debug(
+                                    "Fetched /api/tlc/1/state (except-path) for %s; "
+                                    "seeding cache=%s",
+                                    key,
+                                    coordinator is not None,
+                                )
+                            if coordinator is not None and result:
+                                coordinator.async_set_updated_data(result)
+                            return result
                 except Exception:
                     pass
             return {}

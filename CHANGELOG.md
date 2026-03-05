@@ -1,3 +1,11 @@
+## v4.2.0
+- Feature: Added service `oblamatik.force_refresh` to refresh all or a single device (host parameter).
+- Feature: Added Force Refresh button entity per device (Diagnostics) to trigger refresh from UI.
+- Improvement: Always perform initial coordinator refresh also in "minimal" polling mode.
+- Improvement: Sensors now seed coordinator cache on direct HTTP fallback and include guarded verbose debug logs.
+- Options: Added `verbose_debug` toggle in integration Options to enable extra debug logs.
+- Docs: README already centers logo; branding unchanged.
+
 ## v4.1.9
 - Docs: Align README badges between GitHub and HACS (remove Release Date, Issues, PRs, Last Commit).
 - Rules: Add README badges + HACS icon policy to project rules.

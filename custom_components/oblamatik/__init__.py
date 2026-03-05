@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import timedelta
 from typing import Any
@@ -6,7 +7,7 @@ import aiohttp
 import homeassistant.helpers.config_validation as cv
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import aiohttp_client
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -177,8 +178,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     hass.data[DOMAIN][entry.entry_id] = updated_devices
     hass.data[DOMAIN].setdefault("coordinators", {})
     hass.data[DOMAIN].setdefault("options", {})
+    hass.data[DOMAIN].setdefault("service_registered", False)
     polling_mode = entry.options.get("polling_mode", "normal")
     polling_interval = int(entry.options.get("polling_interval", 5))
+    verbose_debug_opt = bool(entry.options.get("verbose_debug", False))
 
     async def _async_update_data_for(host: str, port: int) -> dict[str, Any]:
         session = aiohttp_client.async_get_clientsession(hass)
@@ -215,9 +218,36 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN]["options"][key] = {
             "polling_mode": polling_mode,
             "polling_interval": polling_interval,
+            "verbose_debug": verbose_debug_opt,
         }
-        if update_interval is not None:
-            await coordinator.async_config_entry_first_refresh()
+        # Perform initial refresh to seed data irrespective of polling mode
+        await coordinator.async_config_entry_first_refresh()
+
+    # Register force_refresh service once
+    async def _handle_force_refresh_call(call: ServiceCall) -> None:
+        try:
+            host = str(call.data.get("host", "")).strip() if call and call.data else ""
+            all_coords = hass.data.get(DOMAIN, {}).get("coordinators", {})
+            if host:
+                coords = [v for k, v in all_coords.items() if k.startswith(f"{host}:")]
+            else:
+                coords = list(all_coords.values())
+            if not coords:
+                _LOGGER.info("force_refresh: no coordinators to refresh (host=%s)", host or "*")
+                return
+            _LOGGER.info(
+                "force_refresh: requesting refresh for %d coordinators (host=%s)",
+                len(coords),
+                host or "*",
+            )
+            await asyncio.gather(*(c.async_request_refresh() for c in coords))
+            _LOGGER.debug("force_refresh: refresh requests dispatched")
+        except Exception as e:
+            _LOGGER.error("force_refresh: error during refresh: %s", e)
+
+    if not hass.data[DOMAIN]["service_registered"]:
+        hass.services.async_register(DOMAIN, "force_refresh", _handle_force_refresh_call)
+        hass.data[DOMAIN]["service_registered"] = True
 
     await hass.config_entries.async_forward_entry_setups(
         entry,

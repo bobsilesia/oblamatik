@@ -255,6 +255,10 @@ class OblamatikOptionsFlow(config_entries.OptionsFlow):
                         "polling_interval",
                         default=int(self._entry.options.get("polling_interval", 5)),
                     ): int,
+                    vol.Optional(
+                        "verbose_debug",
+                        default=bool(self._entry.options.get("verbose_debug", False)),
+                    ): bool,
                 }
             ),
         )
