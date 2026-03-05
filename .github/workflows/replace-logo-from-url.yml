@@ -37,25 +37,31 @@ jobs:
           with Image.open(src) as im:
               im = im.convert("RGBA")
               for w,h,outname in targets:
-                  # Wyrównaj do docelowych proporcji 4:1 (centrowany crop z zachowaniem tła)
-                  target_ratio = w/h
                   iw, ih = im.size
-                  ratio = iw/ih
-                  img = im.copy()
-                  if ratio > target_ratio:
-                      # Zbyt szerokie -> przytnij boki
-                      new_w = int(ih*target_ratio)
-                      left = (iw - new_w)//2
-                      img = img.crop((left, 0, left+new_w, ih))
-                  elif ratio < target_ratio:
-                      # Zbyt wysokie -> przytnij góra/dół
-                      new_h = int(iw/target_ratio)
-                      top = (ih - new_h)//2
-                      img = img.crop((0, top, iw, top+new_h))
-                  img = img.resize((w,h), Image.LANCZOS)
-                  # Delikatne wyostrzenie po skalowaniu
-                  img = img.filter(ImageFilter.UnsharpMask(radius=0.5, percent=120, threshold=2))
-                  img.save(outname)
+                  # 1) FIT: skaluj tak, by cala grafika zmiescila sie w docelowym rozmiarze (bez kadrowania)
+                  scale_fit = min(w/iw, h/ih)
+                  fit_w, fit_h = max(1, int(iw*scale_fit)), max(1, int(ih*scale_fit))
+                  img_fit = im.resize((fit_w, fit_h), Image.LANCZOS)
+                  # 2) TLO: stworz rozmyte tlo z obrazu skalowanego metodą COVER (zachowujemy styl i kolory)
+                  scale_cover = max(w/iw, h/ih)
+                  cov_w, cov_h = max(1, int(iw*scale_cover)), max(1, int(ih*scale_cover))
+                  bg = im.resize((cov_w, cov_h), Image.LANCZOS)
+                  # wytnij centralnie do wymiaru docelowego
+                  left = max(0, (cov_w - w)//2)
+                  top = max(0, (cov_h - h)//2)
+                  bg = bg.crop((left, top, left+w, top+h)).convert("RGBA")
+                  # rozmycie i lekkie przyciemnienie na krawedziach
+                  bg = bg.filter(ImageFilter.GaussianBlur(12))
+                  overlay = Image.new("RGBA", (w,h), (0,0,0,80))
+                  bg = Image.alpha_composite(bg, overlay)
+                  # 3) Zloz: wklej dopasowany obraz centralnie na tle
+                  canvas = bg.copy()
+                  x = (w - fit_w)//2
+                  y = (h - fit_h)//2
+                  canvas.paste(img_fit, (x, y), img_fit)
+                  # 4) Delikatne wyostrzenie
+                  canvas = canvas.filter(ImageFilter.UnsharpMask(radius=0.5, percent=120, threshold=2))
+                  canvas.save(outname)
           PY
       - name: Commit
         run: |
