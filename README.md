@@ -1,7 +1,7 @@
 # Oblamatik — Home Assistant Integration
 
 <p align="center">
-  <img src="logo.png" alt="Oblamatik Logo" />
+  <img src="https://private-user-images.githubusercontent.com/25335470/558668899-d96b5367-cf81-424c-8d15-b9afa3df7b23.jpg?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NzI3NTUxODQsIm5iZiI6MTc3Mjc1NDg4NCwicGF0aCI6Ii8yNTMzNTQ3MC81NTg2Njg4OTktZDk2YjUzNjctY2Y4MS00MjRjLThkMTUtYjlhZmEzZGY3YjIzLmpwZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjAzMDUlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYwMzA1VDIzNTQ0NFomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTE0OWU2MzFkMmU2NzQxOGNmZDg5MGE0NTlmNDk3NWI3OWJhNTdjNDdmZjQwOTgxNGQ2MzZmYmM0MzQzZWZiZTcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.4dVkVt9dBEGGns-T9bSqtTi8FV7DhDPQJNcsSWk9cj0" alt="Oblamatik Logo" />
 </p>
 
 [![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver)](https://github.com/bobsilesia/oblamatik/releases) ![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg) [![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml) [![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml)
