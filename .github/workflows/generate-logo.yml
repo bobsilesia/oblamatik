@@ -15,8 +15,12 @@ jobs:
       - run: sudo apt-get install -y fonts-ebgaramond imagemagick
       - name: Generate PNGs
         run: |
-          magick -size 640x160 canvas:#f2ede6 \( -size 640x160 granite: -alpha set -channel A -evaluate Set 15% +channel \) -compose overlay -composite -gravity center -font EBGaramond-Regular -pointsize 128 -fill "#333333" -annotate +0+0 "Oblamatik" logo.png
-          magick -size 1280x320 canvas:#f2ede6 \( -size 1280x320 granite: -alpha set -channel A -evaluate Set 15% +channel \) -compose overlay -composite -gravity center -font EBGaramond-Regular -pointsize 256 -fill "#333333" -annotate +0+0 "Oblamatik" logo@2x.png
+          FONT_PATH="/usr/share/fonts/truetype/ebgaramond/EBGaramond-Regular.ttf"
+          if [ ! -f "$FONT_PATH" ]; then
+            FONT_PATH=$(fc-list | grep -i 'EBGaramond' | head -n1 | awk -F: '{print $1}')
+          fi
+          convert -size 640x160 canvas:#f2ede6 \( -size 640x160 granite: -alpha set -channel A -evaluate Set 15% +channel \) -compose overlay -composite -gravity center -font "$FONT_PATH" -pointsize 128 -fill "#333333" -annotate +0+0 "Oblamatik" logo.png
+          convert -size 1280x320 canvas:#f2ede6 \( -size 1280x320 granite: -alpha set -channel A -evaluate Set 15% +channel \) -compose overlay -composite -gravity center -font "$FONT_PATH" -pointsize 256 -fill "#333333" -annotate +0+0 "Oblamatik" logo@2x.png
       - name: Commit
         run: |
           if ! git diff --quiet; then
