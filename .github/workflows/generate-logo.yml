@@ -12,90 +12,75 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update
-      - name: Install ImageMagick and fonts
+      - name: Install Python and font (Cinzel)
         run: |
           set -euo pipefail
-          sudo apt-get install -y imagemagick fontconfig fonts-dejavu-core || true
-          # Try distro fonts first (names vary between distros)
-          sudo apt-get install -y fonts-ebgaramond fonts-eb-garamond fonts-cinzel || true
-          # Fallback: download TTFs from Google Fonts and cache locally
-          mkdir -p "$RUNNER_TEMP/fonts"
-          if ! fc-list | grep -qi 'Cinzel'; then
-            curl -L -o "$RUNNER_TEMP/fonts/Cinzel-Regular.ttf" https://github.com/google/fonts/raw/main/ofl/cinzel/static/Cinzel-Regular.ttf || true
-          fi
-          if ! fc-list | grep -qi 'EBGaramond'; then
-            curl -L -o "$RUNNER_TEMP/fonts/EBGaramond-Regular.ttf" https://github.com/google/fonts/raw/main/ofl/ebgaramond/static/EBGaramond-Regular.ttf || true
-          fi
-          if ls "$RUNNER_TEMP/fonts"/*.ttf >/dev/null 2>&1; then
-            mkdir -p ~/.local/share/fonts
-            cp "$RUNNER_TEMP/fonts"/*.ttf ~/.local/share/fonts/ || true
-            fc-cache -f -v || true
-          fi
-      - name: Generate PNGs
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pillow
+          curl -L -o Cinzel-Regular.ttf https://github.com/google/fonts/raw/main/ofl/cinzel/static/Cinzel-Regular.ttf
+      - name: Generate PNGs (Pillow)
         run: |
-          set -euo pipefail
-          set -x
-          # Prefer Cinzel/EB Garamond by family name (safer than direct TTF path with IM6)
-          FONT_NAME="$(fc-list : family | grep -i -m1 '^Cinzel' || true)"
-          if [ -z "$FONT_NAME" ]; then
-            FONT_NAME="$(fc-list : family | grep -i -m1 '^EB Garamond' || true)"
-          fi
-          if [ -z "$FONT_NAME" ]; then
-            FONT_NAME="$(fc-list : family | grep -i -m1 '^DejaVu Serif' || true)"
-          fi
-          if [ -z "$FONT_NAME" ]; then
-            FONT_NAME="DejaVu Serif"
-          fi
-          echo "Using font family: $FONT_NAME"
-          TEXT="OBLAMATIK"
-          # @1x (640x160) — create background step by step for reliability
-          convert -size 640x160 xc:'#1b2a3c' bg_1x.png
-          convert -size 640x160 radial-gradient:'#334962-#0d1420' grad_1x.png
-          composite -compose overlay grad_1x.png bg_1x.png bg_1x.png
-          convert -size 640x160 granite: granite_1x.png
-          convert granite_1x.png -alpha set -channel A -evaluate set 18% +channel granite_1x.png
-          composite -compose overlay granite_1x.png bg_1x.png bg_1x.png
-          mogrify -blur 0x0.6 -vignette 0x28 bg_1x.png
-          # Shadow
-          if ! convert -size 640x160 xc:none -font "$FONT_NAME" -pointsize 130 -gravity center \
-               -fill black -annotate +1+2 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
-               -blur 0x1 shadow_1x.png ; then
-            convert -size 640x160 xc:none -font "DejaVu Serif" -pointsize 130 -gravity center \
-               -fill black -annotate +1+2 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
-               -blur 0x1 shadow_1x.png
-          fi
-          # Main text (light grey for metallic look)
-          if ! convert bg_1x.png shadow_1x.png \
-               \( -size 640x160 xc:none -font "$FONT_NAME" -pointsize 130 -gravity center -fill '#cfd3d8' -annotate +0+0 "$TEXT" \) \
-               -compose over -composite -compose over -composite logo.png ; then
-            convert bg_1x.png shadow_1x.png \
-               \( -size 640x160 xc:none -font "DejaVu Serif" -pointsize 130 -gravity center -fill '#cfd3d8' -annotate +0+0 "$TEXT" \) \
-               -compose over -composite -compose over -composite logo.png
-          fi
-          rm -f bg_1x.png shadow_1x.png
-          # @2x (1280x320)
-          convert -size 1280x320 xc:'#1b2a3c' bg_2x.png
-          convert -size 1280x320 radial-gradient:'#334962-#0d1420' grad_2x.png
-          composite -compose overlay grad_2x.png bg_2x.png bg_2x.png
-          convert -size 1280x320 granite: granite_2x.png
-          convert granite_2x.png -alpha set -channel A -evaluate set 18% +channel granite_2x.png
-          composite -compose overlay granite_2x.png bg_2x.png bg_2x.png
-          mogrify -blur 0x0.8 -vignette 0x40 bg_2x.png
-          if ! convert -size 1280x320 xc:none -font "$FONT_NAME" -pointsize 260 -gravity center \
-               -fill black -annotate +2+4 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
-               -blur 0x2 shadow_2x.png ; then
-            convert -size 1280x320 xc:none -font "DejaVu Serif" -pointsize 260 -gravity center \
-               -fill black -annotate +2+4 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
-               -blur 0x2 shadow_2x.png
-          fi
-          if ! convert bg_2x.png shadow_2x.png \
-               \( -size 1280x320 xc:none -font "$FONT_NAME" -pointsize 260 -gravity center -fill '#cfd3d8' -annotate +0+0 "$TEXT" \) \
-               -compose over -composite -compose over -composite logo@2x.png ; then
-            convert bg_2x.png shadow_2x.png \
-               \( -size 1280x320 xc:none -font "DejaVu Serif" -pointsize 260 -gravity center -fill '#cfd3d8' -annotate +0+0 "$TEXT" \) \
-               -compose over -composite -compose over -composite logo@2x.png
-          fi
-          rm -f bg_2x.png shadow_2x.png grad_1x.png grad_2x.png granite_1x.png granite_2x.png
+          python3 - << 'PY'
+          from PIL import Image, ImageDraw, ImageFont, ImageFilter
+          import math, random
+          def radial_bg(w, h):
+              base = Image.new("RGB", (w, h), (0x1b,0x2a,0x3c))
+              grad = Image.new("RGB", (w, h))
+              cx, cy = w/2, h/2
+              maxr = math.hypot(cx, cy)
+              px = grad.load()
+              for y in range(h):
+                  for x in range(w):
+                      r = math.hypot(x-cx, y-cy)/maxr
+                      a = min(1.0, r)
+                      c1 = (0x33,0x49,0x62); c2 = (0x0d,0x14,0x20)
+                      px[x,y] = tuple(int(c1[i]*(1-a) + c2[i]*a) for i in range(3))
+              out = Image.blend(base, grad, 0.6)
+              noise = Image.new("L", (w, h))
+              npx = noise.load()
+              for y in range(h):
+                  for x in range(w):
+                      npx[x,y] = random.randint(0, 40)
+              noise = noise.filter(ImageFilter.GaussianBlur(0.6))
+              out = Image.composite(out, Image.merge("RGB",(noise,noise,noise)), Image.new("L",(w,h),45))
+              vign = Image.new("L",(w,h),0)
+              vpx = vign.load(); cx, cy = w/2, h/2; maxr = math.hypot(cx, cy)
+              for y in range(h):
+                  for x in range(w):
+                      r = math.hypot(x-cx, y-cy)/maxr
+                      v = int(255*min(max((r-0.5)*1.6,0),1))
+                      vpx[x,y]=v
+              out = Image.composite(out, Image.new("RGB",(w,h),(0,0,0)), vign)
+              return out.convert("RGBA")
+          def render(w,h,outname,fontpath):
+              img = radial_bg(w,h)
+              draw = ImageDraw.Draw(img)
+              text = "OBLAMATIK"
+              lo, hi = 10, 400; best=10
+              while lo<=hi:
+                  mid=(lo+hi)//2
+                  f=ImageFont.truetype(fontpath, mid)
+                  tw, th = draw.textbbox((0,0), text, font=f)[2:]
+                  if tw<=int(w*0.86) and th<=int(h*0.72):
+                      best=mid; lo=mid+1
+                  else:
+                      hi=mid-1
+              f=ImageFont.truetype(fontpath, best)
+              tw, th = draw.textbbox((0,0), text, font=f)[2:]
+              x=(w-tw)//2; y=(h-th)//2
+              shadow = Image.new("RGBA",(w,h),(0,0,0,0))
+              sd = ImageDraw.Draw(shadow)
+              sd.text((x+2,y+4), text, font=f, fill=(0,0,0,140))
+              shadow = shadow.filter(ImageFilter.GaussianBlur(2))
+              img = Image.alpha_composite(img, shadow)
+              draw = ImageDraw.Draw(img)
+              draw.text((x,y), text, font=f, fill=(0xCF,0xD3,0xD8,255))
+              img.save(outname)
+          render(640,160,"logo.png","Cinzel-Regular.ttf")
+          render(1280,320,"logo@2x.png","Cinzel-Regular.ttf")
+          PY
       - name: Commit
         run: |
           if ! git diff --quiet; then
