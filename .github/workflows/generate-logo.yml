@@ -14,10 +14,10 @@ jobs:
       - run: sudo apt-get update
       - name: Install ImageMagick and fonts
         run: |
-          set -e
-          sudo apt-get install -y imagemagick fontconfig || true
-          # Try distro fonts first
-          sudo apt-get install -y fonts-eb-garamond fonts-cinzel || true
+          set -euo pipefail
+          sudo apt-get install -y imagemagick fontconfig fonts-dejavu-core || true
+          # Try distro fonts first (names vary between distros)
+          sudo apt-get install -y fonts-ebgaramond fonts-eb-garamond fonts-cinzel || true
           # Fallback: download TTFs from Google Fonts and cache locally
           mkdir -p "$RUNNER_TEMP/fonts"
           if ! fc-list | grep -qi 'Cinzel'; then
@@ -33,19 +33,32 @@ jobs:
           fi
       - name: Generate PNGs
         run: |
-          set -e
+          set -euo pipefail
+          set -x
           # Prefer Cinzel to mimic the reference; fallback to EB Garamond
-          FONT_PATH="$(fc-list | grep -i -m1 'Cinzel[^-]*-Regular' | awk -F: '{print $1}')"
+          FONT_PATH="$(fc-list | grep -i -m1 'Cinzel[^-]*-Regular' | awk -F: '{print $1}' || true)"
           if [ -z "$FONT_PATH" ]; then
-            FONT_PATH="$(fc-list | grep -i -m1 'EBGaramond[^-]*-Regular' | awk -F: '{print $1}')"
+            FONT_PATH="$(fc-list | grep -i -m1 'EBGaramond[^-]*-Regular' | awk -F: '{print $1}' || true)"
+          fi
+          if [ -z "$FONT_PATH" ] && [ -f "$HOME/.local/share/fonts/Cinzel-Regular.ttf" ]; then
+            FONT_PATH="$HOME/.local/share/fonts/Cinzel-Regular.ttf"
+          fi
+          if [ -z "$FONT_PATH" ] && [ -f "$HOME/.local/share/fonts/EBGaramond-Regular.ttf" ]; then
+            FONT_PATH="$HOME/.local/share/fonts/EBGaramond-Regular.ttf"
+          fi
+          if [ -z "$FONT_PATH" ] && [ -f "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf" ]; then
+            FONT_PATH="/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"
           fi
           echo "Using font: $FONT_PATH"
           TEXT="OBLAMATIK"
-          # @1x (640x160)
-          convert -size 640x160 radial-gradient:'#1b2a3c-#0d1420' \
-            \( -size 640x160 granite: -alpha set -channel A -evaluate set 18% +channel \) \
-            -compose overlay -composite \
-            -blur 0x0.4 -vignette 0x28 bg_1x.png
+          # @1x (640x160) — create background step by step for reliability
+          convert -size 640x160 xc:'#1b2a3c' bg_1x.png
+          convert -size 640x160 radial-gradient:'#334962-#0d1420' grad_1x.png
+          composite -compose overlay grad_1x.png bg_1x.png bg_1x.png
+          convert -size 640x160 granite: granite_1x.png
+          convert granite_1x.png -alpha set -channel A -evaluate set 18% +channel granite_1x.png
+          composite -compose overlay granite_1x.png bg_1x.png bg_1x.png
+          mogrify -blur 0x0.6 -vignette 0x28 bg_1x.png
           # Shadow
           convert -size 640x160 xc:none -font "$FONT_PATH" -pointsize 130 -gravity center \
             -fill black -annotate +1+2 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
@@ -56,17 +69,20 @@ jobs:
             -compose over -composite -compose over -composite logo.png
           rm -f bg_1x.png shadow_1x.png
           # @2x (1280x320)
-          convert -size 1280x320 radial-gradient:'#1b2a3c-#0d1420' \
-            \( -size 1280x320 granite: -alpha set -channel A -evaluate set 18% +channel \) \
-            -compose overlay -composite \
-            -blur 0x0.6 -vignette 0x40 bg_2x.png
+          convert -size 1280x320 xc:'#1b2a3c' bg_2x.png
+          convert -size 1280x320 radial-gradient:'#334962-#0d1420' grad_2x.png
+          composite -compose overlay grad_2x.png bg_2x.png bg_2x.png
+          convert -size 1280x320 granite: granite_2x.png
+          convert granite_2x.png -alpha set -channel A -evaluate set 18% +channel granite_2x.png
+          composite -compose overlay granite_2x.png bg_2x.png bg_2x.png
+          mogrify -blur 0x0.8 -vignette 0x40 bg_2x.png
           convert -size 1280x320 xc:none -font "$FONT_PATH" -pointsize 260 -gravity center \
             -fill black -annotate +2+4 "$TEXT" -alpha set -channel A -evaluate set 35% +channel \
             -blur 0x2 shadow_2x.png
           convert bg_2x.png shadow_2x.png \
             \( -size 1280x320 xc:none -font "$FONT_PATH" -pointsize 260 -gravity center -fill '#cfd3d8' -annotate +0+0 "$TEXT" \) \
             -compose over -composite -compose over -composite logo@2x.png
-          rm -f bg_2x.png shadow_2x.png
+          rm -f bg_2x.png shadow_2x.png grad_1x.png grad_2x.png granite_1x.png granite_2x.png
       - name: Commit
         run: |
           if ! git diff --quiet; then
