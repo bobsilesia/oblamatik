@@ -12,29 +12,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: sudo apt-get update
-      - name: Install Python and font (Cinzel)
+      - name: Install Python and Pillow
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y python3-pip
+          sudo apt-get install -y python3-pip fonts-dejavu-core fonts-texgyre fonts-cardo || true
           python3 -m pip install --upgrade pip
           python3 -m pip install pillow
-          # Pobierz font bezpośrednio z raw.githubusercontent.com (unikamy HTML redirect)
-          curl -fL -o Cinzel-Regular.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/cinzel/static/Cinzel-Regular.ttf
-          # Weryfikacja pliku TTF na runnerze (Pillow/Freetype load)
-          python3 - << 'PY'
-          from PIL import ImageFont
-          try:
-              ImageFont.truetype("Cinzel-Regular.ttf", 32)
-              print("Font OK")
-          except Exception as e:
-              raise SystemExit(f"Font load failed: {e}")
-          PY
       - name: Generate PNGs (Pillow)
         run: |
           python3 - << 'PY'
           from PIL import Image, ImageDraw, ImageFont, ImageFilter
-          import math, random
+          import math, random, os
+          # Ustal stabilny krój z systemu (bez pobierania z sieci)
+          FONT_CANDIDATES = [
+              "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
+              "/usr/share/fonts/truetype/tex-gyre/texgyretermes-regular.otf",
+              "/usr/share/fonts/truetype/cardo/Cardo-Regular.ttf",
+          ]
+          FONT_PATH = None
+          for p in FONT_CANDIDATES:
+              if os.path.exists(p):
+                  try:
+                      ImageFont.truetype(p, 32)
+                      FONT_PATH = p
+                      break
+                  except Exception:
+                      continue
+          if not FONT_PATH:
+              raise SystemExit("Brak dostępnego kroju serif na runnerze (DejaVu/TeX Gyre/Cardo).")
           def radial_bg(w, h):
               base = Image.new("RGB", (w, h), (0x1b,0x2a,0x3c))
               grad = Image.new("RGB", (w, h))
@@ -88,8 +94,8 @@ jobs:
               draw = ImageDraw.Draw(img)
               draw.text((x,y), text, font=f, fill=(0xCF,0xD3,0xD8,255))
               img.save(outname)
-          render(640,160,"logo.png","Cinzel-Regular.ttf")
-          render(1280,320,"logo@2x.png","Cinzel-Regular.ttf")
+          render(640,160,"logo.png",FONT_PATH)
+          render(1280,320,"logo@2x.png",FONT_PATH)
           PY
       - name: Commit
         run: |
