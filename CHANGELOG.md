@@ -1,3 +1,8 @@
+## v4.1.9
+- Docs: Align README badges between GitHub and HACS (remove Release Date, Issues, PRs, Last Commit).
+- Rules: Add README badges + HACS icon policy to project rules.
+- No Breaking Changes.
+
 ## v4.1.8
 - **Fix**: Improved `IoT Serial Number` detection for stock firmware (e.g. 1.0-4.03).
 - **Feature**: Added fallback to `/getserial.php` (fw_printenv) for reading serial number.
