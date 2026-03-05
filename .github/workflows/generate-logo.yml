@@ -1,0 +1,28 @@
+name: Generate Logo
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - logo.svg
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get update
+      - run: sudo apt-get install -y fonts-ebgaramond imagemagick
+      - name: Generate PNGs
+        run: |
+          magick -background none -fill black -font EBGaramond-Regular -pointsize 128 -gravity center -size 640x160 label:"Oblamatik" logo.png
+          magick -background none -fill black -font EBGaramond-Regular -pointsize 256 -gravity center -size 1280x320 label:"Oblamatik" logo@2x.png
+      - name: Commit
+        run: |
+          if ! git diff --quiet; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git add logo.png logo@2x.png
+            git commit -m "chore: regenerate logo assets (Garamond style)"
+            git push
+          fi
