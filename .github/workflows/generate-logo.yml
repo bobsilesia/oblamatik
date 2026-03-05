@@ -19,7 +19,17 @@ jobs:
           sudo apt-get install -y python3-pip
           python3 -m pip install --upgrade pip
           python3 -m pip install pillow
-          curl -L -o Cinzel-Regular.ttf https://github.com/google/fonts/raw/main/ofl/cinzel/static/Cinzel-Regular.ttf
+          # Pobierz font bezpośrednio z raw.githubusercontent.com (unikamy HTML redirect)
+          curl -fL -o Cinzel-Regular.ttf https://raw.githubusercontent.com/google/fonts/main/ofl/cinzel/static/Cinzel-Regular.ttf
+          # Weryfikacja pliku TTF na runnerze (Pillow/Freetype load)
+          python3 - << 'PY'
+          from PIL import ImageFont
+          try:
+              ImageFont.truetype("Cinzel-Regular.ttf", 32)
+              print("Font OK")
+          except Exception as e:
+              raise SystemExit(f"Font load failed: {e}")
+          PY
       - name: Generate PNGs (Pillow)
         run: |
           python3 - << 'PY'
