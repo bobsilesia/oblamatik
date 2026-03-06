@@ -1,3 +1,7 @@
+## v4.2.6
+- Fix: Move Wi‑Fi Signal sensors out of Diagnostic category, so Home Assistant can render signal chips in the device header.
+- Maintenance: No functional changes to polling. dBm/quality fallbacks remain as in 4.2.5.
+
 ## v4.2.5
 - Fix: Ensure Wi‑Fi Signal sensors render in device header by setting device class also for percentage sensor and adding fallback to `/api/info`.
 - Improvement: More robust dBm/quality derivation when `/api/wlan` scan is unavailable (AP/Ethernet).
