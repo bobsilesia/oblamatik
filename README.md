@@ -1,7 +1,7 @@
 # Oblamatik — Home Assistant Integration
 
 <p align="center">
-  <img src="logo.png" alt="Oblamatik Logo" />
+  <img src="assets/readme_logo.jpg" alt="Oblamatik Logo" />
 </p>
 
 [![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver)](https://github.com/bobsilesia/oblamatik/releases) ![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg) [![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml) [![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml)
