@@ -1031,7 +1031,7 @@ class OblamatikIoTVendorSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             wlan = state.get("wlan") or {}
-            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(":", "")
+            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(":", "").replace("-", "")
             
             if not mac:
                 self._vendor = "Unknown"

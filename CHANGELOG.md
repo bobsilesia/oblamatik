@@ -1,3 +1,6 @@
+## v4.3.9
+- Fix: Improved MAC address parsing in `IoT Hardware Vendor` sensor to handle formats with hyphens (e.g., `C4-93-00...`) instead of colons, ensuring 8devices/Carambola2 modules are correctly identified.
+
 ## v4.3.8
 - Maintenance: Changed log level from WARNING to INFO when a device reports >99°C (missing temperature sensor), to reduce log noise.
 
