@@ -1,3 +1,7 @@
+## v4.2.5
+- Fix: Ensure Wi‑Fi Signal sensors render in device header by setting device class also for percentage sensor and adding fallback to `/api/info`.
+- Improvement: More robust dBm/quality derivation when `/api/wlan` scan is unavailable (AP/Ethernet).
+
 ## v4.2.4
 - Feature: Auto-populate manufacturer (vendor) in Device Registry during setup.
 - Feature: Wi‑Fi Signal (dBm) sensor with SIGNAL_STRENGTH device class (enabled by default) to show in device header.

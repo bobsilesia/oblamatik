@@ -798,6 +798,7 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
         self._attr_icon = "mdi:wifi-strength-2"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = "measurement"
+        self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
         # Enable by default as requested by user
         self._attr_entity_registry_enabled_default = True
         self._signal_strength = 0
@@ -835,6 +836,39 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
                             break
         except Exception as e:
             _LOGGER.debug(f"Error scanning wifi for {self._host}: {e}")
+        # Fallback: try /api/info to derive quality if scan not available
+        if self._signal_strength == 0:
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                for url in (f"{base_url}/api/info", f"{base_url}/api/index.php?url=info"):
+                    try:
+                        async with session.get(url, timeout=timeout) as resp:
+                            if resp.status != 200:
+                                continue
+                            data = await resp.json(content_type=None)
+                            wlan = (data or {}).get("wlan") or {}
+                            q = wlan.get("quality")
+                            if q is not None:
+                                try:
+                                    self._signal_strength = int(min(100, max(0, float(q))))
+                                    return
+                                except Exception:
+                                    pass
+                            rs = wlan.get("rawsignal")
+                            if rs is not None:
+                                try:
+                                    self._signal_strength = int(
+                                        min(100, max(0, (float(rs) / 70) * 100))
+                                    )
+                                    return
+                                except Exception:
+                                    pass
+                    except Exception:
+                        continue
+            except Exception:
+                pass
 
 
 class OblamatikSignalDbmSensor(OblamatikBaseSensor):
@@ -886,3 +920,43 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
                             return
         except Exception as e:
             _LOGGER.debug(f"Error scanning wifi dBm for {self._host}: {e}")
+        # Fallback: query /api/info for wlan metrics when scan not available
+        if self._signal_dbm == -100:
+            try:
+                base_url = f"http://{self._host}:{self._port}"
+                session = aiohttp_client.async_get_clientsession(self._hass)
+                timeout = aiohttp.ClientTimeout(total=5)
+                for url in (f"{base_url}/api/info", f"{base_url}/api/index.php?url=info"):
+                    try:
+                        async with session.get(url, timeout=timeout) as resp:
+                            if resp.status != 200:
+                                continue
+                            data = await resp.json(content_type=None)
+                            wlan = (data or {}).get("wlan") or {}
+                            sig_val = wlan.get("signal")
+                            if sig_val is not None:
+                                try:
+                                    self._signal_dbm = int(float(sig_val))
+                                    return
+                                except Exception:
+                                    self._signal_dbm = -100
+                            q = wlan.get("quality")
+                            if q is not None:
+                                try:
+                                    percent = int(min(100, max(0, float(q))))
+                                    self._signal_dbm = int((percent / 2) - 100)
+                                    return
+                                except Exception:
+                                    pass
+                            rs = wlan.get("rawsignal")
+                            if rs is not None:
+                                try:
+                                    percent = int(min(100, max(0, (float(rs) / 70) * 100)))
+                                    self._signal_dbm = int((percent / 2) - 100)
+                                    return
+                                except Exception:
+                                    pass
+                    except Exception:
+                        continue
+            except Exception:
+                pass
