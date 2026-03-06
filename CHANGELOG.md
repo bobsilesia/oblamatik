@@ -1,3 +1,7 @@
+## v4.3.5
+- Feature: Added `Connection Reliability` sensor (diagnostic) to track API success rate %.
+- Docs: Added `Diagnostics.md` to Wiki covering all diagnostic sensors (Ping, Reliability, Signal, Vendor).
+
 ## v4.3.4
 - Feature: Added `IoT Hardware Vendor` sensor (diagnostic) which detects the Wi-Fi module manufacturer (e.g. 8devices, Espressif, RPi) based on MAC address OUI.
 

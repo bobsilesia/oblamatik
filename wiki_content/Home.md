@@ -25,6 +25,10 @@ This integration allows you to monitor and control water temperature, flow rate,
 
 ## Getting Started
 
+- [Automations](Automations.md)
+- [Diagnostics](Diagnostics.md)
+- [FAQ](FAQ.md)
+
 ## Related (Homebridge)
 - Homebridge plugin for Viega Multiplex Trio E (Axel Terizaki): https://github.com/AxelTerizaki/homebridge-trio-e
   - For Apple HomeKit users — alternative to expose Viega devices in HomeKit via Homebridge.

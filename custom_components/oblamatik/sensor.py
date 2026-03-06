@@ -114,6 +114,7 @@ async def async_setup_entry(
             OblamatikSignalDbmSensor(hass, device),
             OblamatikPingSensor(hass, device),
             OblamatikIoTVendorSensor(hass, device),
+            OblamatikReliabilitySensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -977,6 +978,41 @@ class OblamatikPingSensor(OblamatikBaseSensor):
                     self._ping = None
         except Exception:
             self._ping = None
+
+
+class OblamatikReliabilitySensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Connection Reliability"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_reliability"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:shield-check"
+        self._attr_native_unit_of_measurement = "%"
+        self._attr_state_class = "measurement"
+        self._success_count = 0
+        self._total_count = 0
+        self._reliability = 100.0
+
+    @property
+    def native_value(self) -> float | None:
+        return self._reliability
+
+    async def async_update(self) -> None:
+        # We check connectivity via lightweight ping
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}/api/", timeout=timeout) as response:
+                if response.status == 200:
+                    self._success_count += 1
+        except Exception:
+            pass  # Failure counts as no increment to success
+        
+        self._total_count += 1
+        
+        if self._total_count > 0:
+            self._reliability = round((self._success_count / self._total_count) * 100, 1)
 
 
 class OblamatikIoTVendorSensor(OblamatikBaseSensor):
