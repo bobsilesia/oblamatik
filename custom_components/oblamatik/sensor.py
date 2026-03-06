@@ -3,7 +3,7 @@ import random
 from typing import Any
 
 import aiohttp
-from homeassistant.components.sensor import SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     EntityCategory,
@@ -102,12 +102,14 @@ async def async_setup_entry(
             OblamatikRequiredTemperatureSensor(hass, device),
             OblamatikDeviceSerialSensor(hass, device),
             OblamatikDeviceVersionSensor(hass, device),
+            OblamatikVendorSensor(hass, device),
             OblamatikWifiSsidSensor(hass, device),
             OblamatikMacAddressSensor(hass, device),
             OblamatikNetworkModeSensor(hass, device),
             OblamatikIPAddressSensor(hass, device),
             OblamatikIoTSerialSensor(hass, device),
             OblamatikSignalStrengthSensor(hass, device),
+            OblamatikSignalDbmSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -572,6 +574,26 @@ class OblamatikDeviceVersionSensor(OblamatikBaseSensor):
             self._version = str(state.get("version", "Unknown"))
 
 
+class OblamatikVendorSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Vendor"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_vendor"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:factory"
+        self._vendor = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._vendor
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            v = state.get("vendor") or state.get("manufacturer")
+            self._vendor = str(v or "Unknown")
+
+
 class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
@@ -785,7 +807,6 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
         return self._signal_strength
 
     async def async_update(self) -> None:
-        # First get current SSID from device state
         state = await self._get_device_state()
         if not state:
             return
@@ -796,11 +817,10 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
         if not current_ssid or current_ssid == "Unknown":
             return
 
-        # Now scan for networks to get signal strength
         try:
             base_url = f"http://{self._host}:{self._port}"
             session = aiohttp_client.async_get_clientsession(self._hass)
-            timeout = aiohttp.ClientTimeout(total=10)  # Scan takes time
+            timeout = aiohttp.ClientTimeout(total=10)
             async with session.get(f"{base_url}/api/wlan/", timeout=timeout) as response:
                 if response.status == 200:
                     networks = await response.json(content_type=None)
@@ -811,9 +831,58 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
                     for network in networks:
                         if isinstance(network, dict) and network.get("name") == current_ssid:
                             raw_signal = float(network.get("rawsignal", 0))
-                            # Convert raw signal (0-70 or similar) to percentage
-                            # Assuming 70 is max quality
                             self._signal_strength = int(min(100, max(0, (raw_signal / 70) * 100)))
                             break
         except Exception as e:
             _LOGGER.debug(f"Error scanning wifi for {self._host}: {e}")
+
+
+class OblamatikSignalDbmSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Wi-Fi Signal (dBm)"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_signal_dbm"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:wifi-strength"
+        self._attr_native_unit_of_measurement = "dBm"
+        self._attr_state_class = "measurement"
+        self._attr_entity_registry_enabled_default = True
+        self._attr_device_class = SensorDeviceClass.SIGNAL_STRENGTH
+        self._signal_dbm = -100
+
+    @property
+    def native_value(self) -> int | None:
+        return self._signal_dbm
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if not state:
+            return
+        wlan = state.get("wlan") or {}
+        current_ssid = str(wlan.get("name", ""))
+        if not current_ssid or current_ssid == "Unknown":
+            return
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=10)
+            async with session.get(f"{base_url}/api/wlan/", timeout=timeout) as response:
+                if response.status == 200:
+                    networks = await response.json(content_type=None)
+                    if isinstance(networks, dict):
+                        networks = list(networks.values())
+                    for network in networks:
+                        if isinstance(network, dict) and network.get("name") == current_ssid:
+                            sig_val = network.get("signal")
+                            if sig_val is not None:
+                                try:
+                                    self._signal_dbm = int(float(sig_val))
+                                    return
+                                except Exception:
+                                    self._signal_dbm = -100
+                            raw_signal = float(network.get("rawsignal", 0))
+                            percent = int(min(100, max(0, (raw_signal / 70) * 100)))
+                            self._signal_dbm = int((percent / 2) - 100)
+                            return
+        except Exception as e:
+            _LOGGER.debug(f"Error scanning wifi dBm for {self._host}: {e}")

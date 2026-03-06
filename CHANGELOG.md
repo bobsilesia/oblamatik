@@ -1,3 +1,8 @@
+## v4.2.4
+- Feature: Auto-populate manufacturer (vendor) in Device Registry during setup.
+- Feature: Wi‑Fi Signal (dBm) sensor with SIGNAL_STRENGTH device class (enabled by default) to show in device header.
+- Note: dBm uses `/api/wlan` and falls back from `rawsignal` if needed.
+
 ## v4.2.3
 - **Docs**: Changed README logo path to absolute URL (raw.githubusercontent.com) to fix visibility issues in HACS.
 

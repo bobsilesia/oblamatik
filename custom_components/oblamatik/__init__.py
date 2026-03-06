@@ -9,6 +9,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.helpers import aiohttp_client
+from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
@@ -182,6 +183,34 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     polling_mode = entry.options.get("polling_mode", "normal")
     polling_interval = int(entry.options.get("polling_interval", 5))
     verbose_debug_opt = bool(entry.options.get("verbose_debug", False))
+
+    try:
+        dev_reg = dr.async_get(hass)
+        for device in updated_devices:
+            host = device["host"]
+            port = device.get("port", 80)
+            session = aiohttp_client.async_get_clientsession(hass)
+            try:
+                async with session.get(
+                    f"http://{host}:{port}/api/info", timeout=aiohttp.ClientTimeout(total=5)
+                ) as r:
+                    if r.status == 200:
+                        data = await r.json(content_type=None)
+                        vendor = str(data.get("vendor") or data.get("manufacturer") or "KWC")
+                        model = str(device.get("model", data.get("model", "Unknown")))
+                        name = device.get("name", f"Oblamatik {host}")
+                        dev_reg.async_get_or_create(
+                            config_entry=entry,
+                            identifiers={(DOMAIN, host)},
+                            manufacturer=vendor,
+                            model=model,
+                            name=name,
+                            configuration_url=f"http://{host}:{port}/",
+                        )
+            except Exception:
+                pass
+    except Exception:
+        pass
 
     async def _async_update_data_for(host: str, port: int) -> dict[str, Any]:
         session = aiohttp_client.async_get_clientsession(hass)
