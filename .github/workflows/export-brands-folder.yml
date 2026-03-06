@@ -1,0 +1,62 @@
+name: Export Brands Folder
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Ensure 2x assets exist
+        run: |
+          python - << 'PY'
+          from PIL import Image
+          import os
+          # Ensure brand/logo@2x.png
+          src = "custom_components/oblamatik/brand/logo.png"
+          dst = "custom_components/oblamatik/brand/logo@2x.png"
+          if os.path.exists(src) and not os.path.exists(dst):
+              with Image.open(src) as im:
+                  im = im.convert("RGBA")
+                  im = im.resize((im.width*2, im.height*2), Image.LANCZOS)
+                  os.makedirs(os.path.dirname(dst), exist_ok=True)
+                  im.save(dst)
+          # Ensure icon@2x.png (use root icon.png as source)
+          src_icon = "icon.png"
+          dst_icon = "icon@2x.png"
+          if os.path.exists(src_icon) and not os.path.exists(dst_icon):
+              with Image.open(src_icon) as im:
+                  im = im.convert("RGBA")
+                  im = im.resize((im.width*2, im.height*2), Image.LANCZOS)
+                  im.save(dst_icon)
+          PY
+      - name: Build brands folder
+        run: |
+          set -euo pipefail
+          mkdir -p brands_oblamatik/custom_integrations/oblamatik
+          cp -f custom_components/oblamatik/brand/logo.png brands_oblamatik/custom_integrations/oblamatik/logo.png
+          if [ -f custom_components/oblamatik/brand/logo@2x.png ]; then
+            cp -f custom_components/oblamatik/brand/logo@2x.png brands_oblamatik/custom_integrations/oblamatik/logo@2x.png
+          fi
+          cp -f icon.png brands_oblamatik/custom_integrations/oblamatik/icon.png
+          if [ -f icon@2x.png ]; then
+            cp -f icon@2x.png brands_oblamatik/custom_integrations/oblamatik/icon@2x.png
+          fi
+          printf "%s\n" "# Oblamatik brands assets" > brands_oblamatik/README.md
+          printf "%s\n" "" "Copy the 'custom_integrations/oblamatik' folder into a fork of home-assistant/brands under the same path and open a PR." >> brands_oblamatik/README.md
+      - name: Commit brands folder
+        run: |
+          set -euo pipefail
+          BRANCH="${GITHUB_REF_NAME:-main}"
+          if ! git diff --quiet; then
+            git config user.name "github-actions"
+            git config user.email "github-actions@users.noreply.github.com"
+            git add brands_oblamatik
+            git commit -m "chore: export brands folder for PR (logo+logo@2x, icon+icon@2x)"
+            git push origin HEAD:"${BRANCH}"
+          fi
