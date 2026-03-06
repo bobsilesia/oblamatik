@@ -1,3 +1,7 @@
+## v4.2.8
+- Fix: Quick Action 1/2/3 now reads presets from `/api/tlc/1/quick/{n}/` and keeps flow alive during the computed runtime.
+- Improvement: Runtime is derived from device preset `amount` and `flow` (amount/flow*60), then auto-stops the flow.
+
 ## v4.2.7
 - Revert: Wi‑Fi sensors restored to Diagnostic category (no header chips) per user decision.
 - Feature: Enforce Quick Action 1/2/3 duration — read presets when available and explicitly set temperature/flow, then auto‑stop after configured seconds (fallback 30s).

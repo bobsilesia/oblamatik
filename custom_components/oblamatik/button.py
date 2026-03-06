@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import time
 from typing import Any
 
 import aiohttp
@@ -81,7 +82,7 @@ class OblamatikBaseButton(ButtonEntity):
         )
         self._attr_has_entity_name = True
         self._attr_available = True
-        self._quick_stop_tasks: dict[str, asyncio.Task] = {}
+        self._quick_run_tasks: dict[str, asyncio.Task[None]] = {}
 
     async def _post_command(self, endpoint: str, data: str) -> bool:
         try:
@@ -139,6 +140,7 @@ class OblamatikBaseButton(ButtonEntity):
 
     async def _get_quick_preset(self, slot: int) -> dict[str, Any] | None:
         candidates = [
+            f"/api/tlc/1/quick/{slot}/",
             f"/api/index.php?url=tlc-quick/{slot}/get/",
             f"/api/index.php?url=tlc-quick/{slot}/",
             f"/api/tlc/1/quick/{slot}/get/",
@@ -149,55 +151,75 @@ class OblamatikBaseButton(ButtonEntity):
                 return data
         return None
 
-    def _cancel_existing_quick_timer(self) -> None:
+    def _cancel_existing_quick_run(self) -> None:
         key = f"{self._host}:{self._port}"
-        task = self._quick_stop_tasks.get(key)
+        task = self._quick_run_tasks.get(key)
         if task and not task.done():
             task.cancel()
-        self._quick_stop_tasks.pop(key, None)
+        self._quick_run_tasks.pop(key, None)
 
     async def _stop_flow(self) -> None:
         await self._post_command("/api/tlc/1/", "flow=0&changed=2")
 
-    def _schedule_stop_after(self, seconds: int) -> None:
-        self._cancel_existing_quick_timer()
+    async def _run_quick_action(self, slot: int) -> None:
+        self._cancel_existing_quick_run()
         key = f"{self._host}:{self._port}"
 
-        async def _timer() -> None:
-            try:
-                await asyncio.sleep(max(0, int(seconds)))
-                await self._stop_flow()
-            except asyncio.CancelledError:
+        async def _runner() -> None:
+            preset = await self._get_quick_preset(slot)
+            if not isinstance(preset, dict) or not preset:
+                await self._post_command(f"/api/tlc/1/quick/{slot}/", "data=1")
                 return
 
-        self._quick_stop_tasks[key] = self._hass.async_create_task(_timer())
-
-    async def _run_quick_action(self, slot: int) -> None:
-        preset = await self._get_quick_preset(slot)
-        duration = None
-        temp = None
-        flow = None
-        if isinstance(preset, dict):
-            temp = preset.get("temperature") or preset.get("temp")
-            flow = preset.get("flow")
-            for k in ("duration", "seconds", "time", "length"):
-                if k in preset:
-                    try:
-                        duration = int(float(preset[k]))
-                        break
-                    except Exception:
-                        continue
-        if temp is not None and flow is not None:
             try:
+                preset_temp = float(preset.get("temperature") or preset.get("temp") or 0)
+            except Exception:
+                preset_temp = 0.0
+
+            try:
+                preset_flow = float(preset.get("flow") or 0)
+            except Exception:
+                preset_flow = 0.0
+
+            duration_s: int | None = None
+            amount = preset.get("amount")
+            if amount is not None:
+                try:
+                    amount_f = float(amount)
+                    if amount_f > 0 and preset_flow > 0:
+                        duration_s = int(round((amount_f / preset_flow) * 60))
+                except Exception:
+                    duration_s = None
+
+            if duration_s is None:
+                duration_s = 30
+
+            await self._post_command(f"/api/tlc/1/quick/{slot}/", "data=1")
+
+            if preset_temp > 0:
                 await self._post_command(
                     "/api/tlc/1/",
-                    f"temperature={float(temp)}&flow={float(flow)}&changed=3",
+                    f"temperature={preset_temp}&flow={preset_flow}&changed=1",
                 )
-            finally:
-                self._schedule_stop_after(duration if duration is not None else 30)
-        else:
-            await self._post_command(f"/api/tlc/1/quick/{slot}/", "data=1")
-            self._schedule_stop_after(duration if duration is not None else 30)
+            await self._post_command(
+                "/api/tlc/1/",
+                f"temperature={preset_temp}&flow={preset_flow}&changed=2",
+            )
+
+            deadline = time.monotonic() + max(0, duration_s)
+            while True:
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
+                    break
+                await asyncio.sleep(min(5.0, remaining))
+                await self._post_command(
+                    "/api/tlc/1/",
+                    f"temperature={preset_temp}&flow={preset_flow}&changed=2",
+                )
+
+            await self._stop_flow()
+
+        self._quick_run_tasks[key] = self._hass.async_create_task(_runner())
 
 
 class OblamatikEmergencyStopButton(OblamatikBaseButton):
