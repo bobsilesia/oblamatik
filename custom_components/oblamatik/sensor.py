@@ -139,7 +139,6 @@ async def async_setup_entry(
 
 
 class OblamatikBaseSensor(SensorEntity):
-class OblamatikSignalDbmSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__()
         self._hass = hass

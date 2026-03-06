@@ -1,4 +1,9 @@
-## v4.3.6
+## v4.3.7
+- Hotfix: Resolved `IndentationError` in `sensor.py` that caused integration setup failure (and subsequent `import_module` blocking call error).
+- **Note**: Please skip v4.3.6 and upgrade directly to v4.3.7.
+
+## v4.3.6 [BROKEN]
+- ⚠️ **DO NOT USE** - This release contains a syntax error.
 - Docs: Added prominent `DISCLAIMER & SAFETY WARNING` to README, HACS info, and Wiki. This integration controls physical hardware; improper use may lead to unintended water flow or scalding. Use at your own risk.
 
 ## v4.3.5
