@@ -1,3 +1,6 @@
+## v4.3.8
+- Maintenance: Changed log level from WARNING to INFO when a device reports >99°C (missing temperature sensor), to reduce log noise.
+
 ## v4.3.7
 - Hotfix: Resolved `IndentationError` in `sensor.py` that caused integration setup failure (and subsequent `import_module` blocking call error).
 - **Note**: Please skip v4.3.6 and upgrade directly to v4.3.7.

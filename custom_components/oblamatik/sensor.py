@@ -54,9 +54,9 @@ async def async_setup_entry(
                         data = await response.json(content_type=None)
                         temp = float(data.get("temperature", 0.0))
                         if temp > 99.0:
-                            _LOGGER.warning(
+                            _LOGGER.info(
                                 "Device at %s reports invalid temperature (%.1f°C). "
-                                "Temperature sensor will be disabled.",
+                                "Assuming no temperature sensor is present. Sensor skipped.",
                                 host,
                                 temp,
                             )
@@ -72,9 +72,9 @@ async def async_setup_entry(
                         data = await response.json(content_type=None)
                         temp = float(data.get("temperature", 0.0))
                         if temp > 99.0:
-                            _LOGGER.warning(
+                            _LOGGER.info(
                                 "Device at %s reports invalid temperature (%.1f°C). "
-                                "Temperature sensor will be disabled.",
+                                "Assuming no temperature sensor is present. Sensor skipped.",
                                 host,
                                 temp,
                             )
