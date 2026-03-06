@@ -1,3 +1,6 @@
+## v4.3.6
+- Docs: Added prominent `DISCLAIMER & SAFETY WARNING` to README, HACS info, and Wiki. This integration controls physical hardware; improper use may lead to unintended water flow or scalding. Use at your own risk.
+
 ## v4.3.5
 - Feature: Added `Connection Reliability` sensor (diagnostic) to track API success rate %.
 - Docs: Added `Diagnostics.md` to Wiki covering all diagnostic sensors (Ping, Reliability, Signal, Vendor).

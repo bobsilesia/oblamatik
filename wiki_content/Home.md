@@ -1,6 +1,14 @@
-# Welcome to the Oblamatik Integration Wiki
+# Oblamatik Home Assistant Integration
 
-**oblamatik** is a custom integration for Home Assistant that provides full control over **Oblamatik** based systems, including **Viega Multiplex Trio E**, **KWC** electronic faucets, and **Crosswater** digital showers.
+> [!WARNING]  
+> **DISCLAIMER & SAFETY WARNING**  
+> This integration allows control of physical hardware (water flow, temperature, valves) via software. Improper use, bugs, or network issues could potentially lead to **unintended water flow, flooding, or scalding temperatures**.  
+>  
+> - **Use at your own risk.** The authors are not responsible for any damage to property, hardware, or personal injury caused by the use of this software.  
+> - **Not for critical systems.** Do not rely on this integration for safety-critical applications.  
+> - If you are not comfortable with these risks, **do not use this integration**.
+
+This integration brings KWC, Viega, Crosswater, and other Oblamatik TLC-based water controllers into Home Assistant.
 
 This integration allows you to monitor and control water temperature, flow rate, drain position, and perform maintenance tasks directly from your smart home dashboard.
 
