@@ -2,6 +2,8 @@ name: Generate Brand Assets
 on:
   workflow_dispatch:
   push:
+    branches:
+      - main
     paths:
       - assets/fonts/EBGaramond.ttf
       - .github/workflows/generate-logo.yml
