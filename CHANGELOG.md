@@ -1,3 +1,6 @@
+## v4.3.4
+- Feature: Added `IoT Hardware Vendor` sensor (diagnostic) which detects the Wi-Fi module manufacturer (e.g. 8devices, Espressif, RPi) based on MAC address OUI.
+
 ## v4.3.3
 - Feature: Added `Ping` sensor (diagnostic) to monitor API latency.
 - Fix: Improved `Wi-Fi Signal (dBm)` logic to handle both RSSI (negative dBm) and Bars/Quality (0-5 or 0-100 scale) correctly.

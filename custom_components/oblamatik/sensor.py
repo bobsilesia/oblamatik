@@ -113,6 +113,7 @@ async def async_setup_entry(
             OblamatikSignalStrengthSensor(hass, device),
             OblamatikSignalDbmSensor(hass, device),
             OblamatikPingSensor(hass, device),
+            OblamatikIoTVendorSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -976,6 +977,40 @@ class OblamatikPingSensor(OblamatikBaseSensor):
                     self._ping = None
         except Exception:
             self._ping = None
+
+
+class OblamatikIoTVendorSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "IoT Hardware Vendor"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_iot_vendor"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:chip"
+        self._vendor = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._vendor
+
+    async def async_update(self) -> None:
+        state = await self._get_device_state()
+        if state:
+            wlan = state.get("wlan") or {}
+            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(":", "")
+            
+            if not mac:
+                self._vendor = "Unknown"
+                return
+
+            # Check OUI (first 6 chars)
+            if mac.startswith(("C49300", "001F16", "801F12")):
+                self._vendor = "8devices (Carambola2)"
+            elif mac.startswith(("B827EB", "DCA632", "E45F01")):
+                self._vendor = "Raspberry Pi"
+            elif mac.startswith(("18FE34", "240AC4", "246F28", "24A160", "2C3AE8", "30AEA4", "3C71BF", "483FDA", "485519", "5443B2", "5C6B4F", "600194", "68C63A", "807D3A", "84CCA8", "84F3EB", "9097D5", "A020A6", "A47B9D", "AC67B2", "B4E62D", "BCDD7E", "C44F33", "CC50E3", "D8A01D", "DC4F22", "ECFABC")):
+                self._vendor = "Espressif (ESP32/8266)"
+            else:
+                self._vendor = "Unknown (Generic)"
 
 
 class OblamatikSignalDbmSensor(OblamatikBaseSensor):
