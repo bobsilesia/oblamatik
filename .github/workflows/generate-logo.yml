@@ -16,7 +16,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo apt-get update
-          sudo apt-get install -y python3-pip fonts-dejavu-core fonts-texgyre fonts-cardo || true
+          sudo apt-get install -y python3-pip fonts-dejavu-core fonts-tex-gyre fonts-cardo fonts-eb-garamond fonts-ebgaramond || true
           python3 -m pip install --upgrade pip
           python3 -m pip install pillow
       - name: Generate PNGs (Pillow)
@@ -26,6 +26,7 @@ jobs:
           import math, random, os
           # Ustal stabilny krój z systemu (bez pobierania z sieci)
           FONT_CANDIDATES = [
+              "/usr/share/fonts/truetype/ebgaramond/EBGaramond-Regular.ttf",
               "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
               "/usr/share/fonts/truetype/tex-gyre/texgyretermes-regular.otf",
               "/usr/share/fonts/truetype/cardo/Cardo-Regular.ttf",
@@ -101,6 +102,35 @@ jobs:
               img.save(outname)
           render(640,160,"logo.png",FONT_PATH)
           render(1280,320,"logo@2x.png",FONT_PATH)
+          # Brand logo for HA/HACS (transparent, Garamond, light gray)
+          for w,h,outname in [(640,160,"custom_components/oblamatik/brand/logo.png")]:
+              canvas = Image.new("RGBA",(w,h),(0,0,0,0))
+              draw = ImageDraw.Draw(canvas)
+              text = "Oblamatik"
+              # Prefer EB Garamond if available, fallback to same FONT_PATH
+              brand_font = None
+              for p in ["/usr/share/fonts/truetype/ebgaramond/EBGaramond-Regular.ttf", FONT_PATH]:
+                  try:
+                      brand_font = ImageFont.truetype(p, 10); FONT_PATH_USED = p; break
+                  except Exception:
+                      continue
+              lo, hi = 10, 240; best=10
+              while lo<=hi:
+                  mid=(lo+hi)//2
+                  f=ImageFont.truetype(FONT_PATH_USED, mid)
+                  tw, th = draw.textbbox((0,0), text, font=f)[2:]
+                  if tw<=int(w*0.9) and th<=int(h*0.7):
+                      best=mid; lo=mid+1
+                  else:
+                      hi=mid-1
+              f=ImageFont.truetype(FONT_PATH_USED, best)
+              tw, th = draw.textbbox((0,0), text, font=f)[2:]
+              x=(w-tw)//2; y=(h-th)//2
+              # subtle shadow
+              draw.text((x+1,y+2), text, font=f, fill=(0,0,0,100))
+              # light gray text (slightly darker for visibility on light bg)
+              draw.text((x,y), text, font=f, fill=(175,180,186,255))
+              canvas.save(outname)
           PY
       - name: Commit
         run: |
