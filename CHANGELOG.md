@@ -1,3 +1,11 @@
+## v4.3.1
+- Fix: Restore original Oblamatik logo and icon (from `assets/readme_logo.jpg`) for HACS branding, replacing the temporary KWC logo.
+
+## v4.3.0
+- Feature: HACS Compliance - added `hacs.json`, `images/` folder with logo/icon, and GitHub Actions workflows for HACS validation.
+- Docs: Updated `README.md` with installation instructions for HACS and manual methods.
+- Chore: Prepare repository for submission to HACS Default repository list.
+
 ## v4.2.10
 - Fix: Use valid `mdi:wifi` icon for Wi-Fi Signal (dBm) sensor (previously invalid `mdi:wifi-strength`).
 
