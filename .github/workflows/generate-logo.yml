@@ -1,148 +1,125 @@
-name: Generate Logo
+name: Generate Brand Assets
 on:
   workflow_dispatch:
   push:
     paths:
-      - logo.svg
+      - assets/fonts/EBGaramond.ttf
+      - .github/workflows/generate-logo.yml
+
 permissions:
   contents: write
+
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: sudo apt-get update
-      - name: Install Python and Pillow
-        run: |
-          set -euo pipefail
-          sudo apt-get update
-          sudo apt-get install -y python3-pip fonts-dejavu-core fonts-tex-gyre fonts-cardo fonts-eb-garamond fonts-ebgaramond || true
-          python3 -m pip install --upgrade pip
-          python3 -m pip install pillow
-      - name: Generate PNGs (Pillow)
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          
+      - name: Install Dependencies
+        run: pip install pillow
+
+      - name: Generate Logos
         run: |
           python3 - << 'PY'
-          from PIL import Image, ImageDraw, ImageFont, ImageFilter
-          import math, random, os
-          # Ustal stabilny krój z systemu (bez pobierania z sieci)
-          FONT_CANDIDATES = [
-              "/usr/share/fonts/truetype/ebgaramond/EBGaramond-Regular.ttf",
-              "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-              "/usr/share/fonts/truetype/tex-gyre/texgyretermes-regular.otf",
-              "/usr/share/fonts/truetype/cardo/Cardo-Regular.ttf",
-          ]
-          FONT_PATH = None
-          for p in FONT_CANDIDATES:
-              if os.path.exists(p):
-                  try:
-                      ImageFont.truetype(p, 32)
-                      FONT_PATH = p
-                      break
-                  except Exception:
-                      continue
-          if not FONT_PATH:
-              raise SystemExit("Brak dostępnego kroju serif na runnerze (DejaVu/TeX Gyre/Cardo).")
-          def radial_bg(w, h):
-              base = Image.new("RGB", (w, h), (0x1b,0x2a,0x3c))
-              grad = Image.new("RGB", (w, h))
-              cx, cy = w/2, h/2
-              maxr = math.hypot(cx, cy)
-              px = grad.load()
-              for y in range(h):
-                  for x in range(w):
-                      r = math.hypot(x-cx, y-cy)/maxr
-                      a = min(1.0, r)
-                      c1 = (0x33,0x49,0x62); c2 = (0x0d,0x14,0x20)
-                      px[x,y] = tuple(int(c1[i]*(1-a) + c2[i]*a) for i in range(3))
-              out = Image.blend(base, grad, 0.6)
-              noise = Image.new("L", (w, h))
-              npx = noise.load()
-              for y in range(h):
-                  for x in range(w):
-                      npx[x,y] = random.randint(0, 40)
-              noise = noise.filter(ImageFilter.GaussianBlur(0.6))
-              out = Image.composite(out, Image.merge("RGB",(noise,noise,noise)), Image.new("L",(w,h),45))
-              vign = Image.new("L",(w,h),0)
-              vpx = vign.load(); cx, cy = w/2, h/2; maxr = math.hypot(cx, cy)
-              for y in range(h):
-                  for x in range(w):
-                      r = math.hypot(x-cx, y-cy)/maxr
-                      v = int(255*min(max((r-0.5)*1.6,0),1))
-                      vpx[x,y]=v
-              out = Image.composite(out, Image.new("RGB",(w,h),(0,0,0)), vign)
-              return out.convert("RGBA")
-          def render(w,h,outname,fontpath):
-              img = radial_bg(w,h)
+          from PIL import Image, ImageDraw, ImageFont
+          import os
+
+          def create_text_image(text, font_path, font_size, color):
+              try:
+                  font = ImageFont.truetype(font_path, font_size)
+              except IOError as e:
+                  print(f"Could not load font from {font_path}: {e}")
+                  return None
+
+              # Calculate text size using a dummy image
+              dummy_img = Image.new('RGBA', (1, 1), (0, 0, 0, 0))
+              draw = ImageDraw.Draw(dummy_img)
+              bbox = draw.textbbox((0, 0), text, font=font)
+              text_width = bbox[2] - bbox[0]
+              text_height = bbox[3] - bbox[1]
+
+              # Create image with padding
+              padding = 20
+              img_width = text_width + (padding * 2)
+              img_height = text_height + (padding * 2)
+              
+              img = Image.new('RGBA', (img_width, img_height), (0, 0, 0, 0))
               draw = ImageDraw.Draw(img)
-              text = "OBLAMATIK"
-              lo, hi = 10, 400; best=10
-              while lo<=hi:
-                  mid=(lo+hi)//2
-                  f=ImageFont.truetype(fontpath, mid)
-                  tw, th = draw.textbbox((0,0), text, font=f)[2:]
-                  if tw<=int(w*0.86) and th<=int(h*0.72):
-                      best=mid; lo=mid+1
-                  else:
-                      hi=mid-1
-              f=ImageFont.truetype(fontpath, best)
-              tw, th = draw.textbbox((0,0), text, font=f)[2:]
-              x=(w-tw)//2; y=(h-th)//2
-              shadow = Image.new("RGBA",(w,h),(0,0,0,0))
-              sd = ImageDraw.Draw(shadow)
-              sd.text((x+2,y+4), text, font=f, fill=(0,0,0,140))
-              shadow = shadow.filter(ImageFilter.GaussianBlur(2))
-              img = Image.alpha_composite(img, shadow)
-              highlight = Image.new("RGBA",(w,h),(0,0,0,0))
-              hd = ImageDraw.Draw(highlight)
-              hd.text((x-1,y-2), text, font=f, fill=(255,255,255,90))
-              highlight = highlight.filter(ImageFilter.GaussianBlur(0.6))
-              img = Image.alpha_composite(img, highlight)
-              draw = ImageDraw.Draw(img)
-              draw.text((x,y), text, font=f, fill=(207,211,216,255))
-              img.save(outname)
-          render(640,160,"logo.png",FONT_PATH)
-          render(1280,320,"logo@2x.png",FONT_PATH)
-          # Brand logo for HA/HACS (transparent, Garamond, light gray)
-          for w,h,outname in [
-              (640,160,"custom_components/oblamatik/brand/logo.png"),
-              (1280,320,"custom_components/oblamatik/brand/logo@2x.png"),
-          ]:
-              canvas = Image.new("RGBA",(w,h),(0,0,0,0))
-              draw = ImageDraw.Draw(canvas)
-              text = "Oblamatik"
-              # Prefer EB Garamond if available, fallback to same FONT_PATH
-              brand_font = None
-              for p in ["/usr/share/fonts/truetype/ebgaramond/EBGaramond-Regular.ttf", FONT_PATH]:
-                  try:
-                      brand_font = ImageFont.truetype(p, 10); FONT_PATH_USED = p; break
-                  except Exception:
-                      continue
-              lo, hi = 10, 240; best=10
-              while lo<=hi:
-                  mid=(lo+hi)//2
-                  f=ImageFont.truetype(FONT_PATH_USED, mid)
-                  tw, th = draw.textbbox((0,0), text, font=f)[2:]
-                  if tw<=int(w*0.9) and th<=int(h*0.7):
-                      best=mid; lo=mid+1
-                  else:
-                      hi=mid-1
-              f=ImageFont.truetype(FONT_PATH_USED, best)
-              tw, th = draw.textbbox((0,0), text, font=f)[2:]
-              x=(w-tw)//2; y=(h-th)//2
-              # subtle shadow
-              draw.text((x+1,y+2), text, font=f, fill=(0,0,0,100))
-              # light gray text (slightly darker for visibility on light bg)
-              draw.text((x,y), text, font=f, fill=(175,180,186,255))
-              canvas.save(outname)
+              
+              # Draw text centered
+              text_x = padding - bbox[0]
+              text_y = padding - bbox[1]
+              draw.text((text_x, text_y), text, font=font, fill=color)
+              
+              return img
+
+          def main():
+              base_dir = os.getcwd()
+              font_path = os.path.join(base_dir, "assets", "fonts", "EBGaramond.ttf")
+              
+              if not os.path.exists(font_path):
+                  print(f"Font file not found: {font_path}")
+                  exit(1)
+
+              # Output directories
+              brand_dir = os.path.join(base_dir, "custom_components", "oblamatik", "brand")
+              root_dir = base_dir
+              
+              os.makedirs(brand_dir, exist_ok=True)
+              
+              # Light gray color
+              text_color = (200, 200, 200, 255) # Light Gray
+              
+              # Generate @2x logo (High Res)
+              print(f"Generating logo@2x.png using font: {font_path}")
+              logo_2x = create_text_image("Oblamatik", font_path, 200, text_color)
+              
+              if logo_2x:
+                  # Save to brand/
+                  logo_2x_path = os.path.join(brand_dir, "logo@2x.png")
+                  logo_2x.save(logo_2x_path)
+                  print(f"Saved {logo_2x_path}")
+                  
+                  # Save to root/
+                  root_logo_2x_path = os.path.join(root_dir, "logo@2x.png")
+                  logo_2x.save(root_logo_2x_path)
+                  print(f"Saved {root_logo_2x_path}")
+                  
+                  # Generate standard logo (Resized)
+                  print("Generating logo.png...")
+                  target_width = logo_2x.width // 2
+                  target_height = logo_2x.height // 2
+                  logo = logo_2x.resize((target_width, target_height), Image.Resampling.LANCZOS)
+                  
+                  # Save to brand/
+                  logo_path = os.path.join(brand_dir, "logo.png")
+                  logo.save(logo_path)
+                  print(f"Saved {logo_path}")
+
+                  # Save to root/
+                  root_logo_path = os.path.join(root_dir, "logo.png")
+                  logo.save(root_logo_path)
+                  print(f"Saved {root_logo_path}")
+
+          if __name__ == "__main__":
+              main()
           PY
-      - name: Commit
+
+      - name: Commit and Push
         run: |
-          set -euo pipefail
-          BRANCH="${GITHUB_REF_NAME:-main}"
-          if ! git diff --quiet; then
-            git config user.name "github-actions"
-            git config user.email "github-actions@users.noreply.github.com"
-            git add logo.png logo@2x.png
-            git commit -m "chore: regenerate logo assets (Garamond style)"
-            git push origin HEAD:"${BRANCH}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Check for changes
+          if [[ -n $(git status -s) ]]; then
+            git add custom_components/oblamatik/brand/logo*.png logo*.png
+            git commit -m "chore: update brand logos (Garamond Light Gray)"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          else
+            echo "No changes to commit"
           fi
