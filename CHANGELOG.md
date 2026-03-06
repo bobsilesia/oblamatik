@@ -1,3 +1,7 @@
+## v4.3.3
+- Feature: Added `Ping` sensor (diagnostic) to monitor API latency.
+- Fix: Improved `Wi-Fi Signal (dBm)` logic to handle both RSSI (negative dBm) and Bars/Quality (0-5 or 0-100 scale) correctly.
+
 ## v4.3.2
 - Chore: Remove `device_backup/` folder from repository to ensure compliance with HACS repository rules (clean repo without vendor binaries).
 - Docs: Add `info.md` for better HACS integration presentation.

@@ -9,6 +9,7 @@ from homeassistant.const import (
     EntityCategory,
     UnitOfTemperature,
     UnitOfVolumeFlowRate,
+    UnitOfTime,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import aiohttp_client
@@ -111,6 +112,7 @@ async def async_setup_entry(
             OblamatikIoTSerialSensor(hass, device),
             OblamatikSignalStrengthSensor(hass, device),
             OblamatikSignalDbmSensor(hass, device),
+            OblamatikPingSensor(hass, device),
         ]
 
         if has_temp_sensor:
@@ -135,6 +137,7 @@ async def async_setup_entry(
 
 
 class OblamatikBaseSensor(SensorEntity):
+class OblamatikSignalDbmSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__()
         self._hass = hass
@@ -942,6 +945,39 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
                 pass
 
 
+class OblamatikPingSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Ping"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_ping"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:speedometer"
+        self._attr_native_unit_of_measurement = UnitOfTime.MILLISECONDS
+        self._attr_state_class = "measurement"
+        self._ping = None
+
+    @property
+    def native_value(self) -> float | None:
+        return self._ping
+
+    async def async_update(self) -> None:
+        import time
+        start = time.monotonic()
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            # Use /api/ endpoint as it's lightweight
+            async with session.get(f"{base_url}/api/", timeout=timeout) as response:
+                if response.status == 200:
+                    end = time.monotonic()
+                    self._ping = round((end - start) * 1000, 2)
+                else:
+                    self._ping = None
+        except Exception:
+            self._ping = None
+
+
 class OblamatikSignalDbmSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
@@ -981,7 +1017,18 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
                             sig_val = network.get("signal")
                             if sig_val is not None:
                                 try:
-                                    self._signal_dbm = int(float(sig_val))
+                                    val = float(sig_val)
+                                    if val < 0:
+                                        # Already dBm (negative)
+                                        self._signal_dbm = int(val)
+                                    elif val <= 5:
+                                        # Bars (0-5) -> dBm mapping
+                                        # 5 -> -50, 4 -> -60, 3 -> -70, 2 -> -80, 1 -> -90, 0 -> -100
+                                        self._signal_dbm = -100 + (int(val) * 10)
+                                    else:
+                                        # Quality % (>5) -> dBm mapping
+                                        # 100 -> -50, 0 -> -100
+                                        self._signal_dbm = int((val / 2) - 100)
                                     return
                                 except Exception:
                                     self._signal_dbm = -100
@@ -1007,7 +1054,13 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
                             sig_val = wlan.get("signal")
                             if sig_val is not None:
                                 try:
-                                    self._signal_dbm = int(float(sig_val))
+                                    val = float(sig_val)
+                                    if val < 0:
+                                        self._signal_dbm = int(val)
+                                    elif val <= 5:
+                                        self._signal_dbm = -100 + (int(val) * 10)
+                                    else:
+                                        self._signal_dbm = int((val / 2) - 100)
                                     return
                                 except Exception:
                                     self._signal_dbm = -100
