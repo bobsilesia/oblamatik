@@ -794,6 +794,7 @@ class OblamatikSignalStrengthSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = "Wi-Fi Signal Strength"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_signal_strength"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:wifi-strength-2"
         self._attr_native_unit_of_measurement = "%"
         self._attr_state_class = "measurement"
@@ -875,6 +876,7 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
         super().__init__(hass, device)
         self._attr_name = "Wi-Fi Signal (dBm)"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_signal_dbm"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
         self._attr_icon = "mdi:wifi-strength"
         self._attr_native_unit_of_measurement = "dBm"
         self._attr_state_class = "measurement"

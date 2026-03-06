@@ -1,3 +1,7 @@
+## v4.2.7
+- Revert: Wi‑Fi sensors restored to Diagnostic category (no header chips) per user decision.
+- Feature: Enforce Quick Action 1/2/3 duration — read presets when available and explicitly set temperature/flow, then auto‑stop after configured seconds (fallback 30s).
+
 ## v4.2.6
 - Fix: Move Wi‑Fi Signal sensors out of Diagnostic category, so Home Assistant can render signal chips in the device header.
 - Maintenance: No functional changes to polling. dBm/quality fallbacks remain as in 4.2.5.

@@ -81,6 +81,7 @@ class OblamatikBaseButton(ButtonEntity):
         )
         self._attr_has_entity_name = True
         self._attr_available = True
+        self._quick_stop_tasks: dict[str, asyncio.Task] = {}
 
     async def _post_command(self, endpoint: str, data: str) -> bool:
         try:
@@ -99,6 +100,18 @@ class OblamatikBaseButton(ButtonEntity):
         except Exception as e:
             _LOGGER.error(f"Error sending command: {e}")
             return False
+
+    async def _get_json(self, path: str) -> Any | None:
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            async with session.get(f"{base_url}{path}", timeout=timeout) as response:
+                if response.status != 200:
+                    return None
+                return await response.json(content_type=None)
+        except Exception:
+            return None
 
     def _start_fast_status_refresh(self) -> None:
         runtime = self._hass.data.setdefault(DOMAIN, {}).setdefault("runtime", {})
@@ -123,6 +136,68 @@ class OblamatikBaseButton(ButtonEntity):
                 blocking=False,
             )
             await asyncio.sleep(1)
+
+    async def _get_quick_preset(self, slot: int) -> dict[str, Any] | None:
+        candidates = [
+            f"/api/index.php?url=tlc-quick/{slot}/get/",
+            f"/api/index.php?url=tlc-quick/{slot}/",
+            f"/api/tlc/1/quick/{slot}/get/",
+        ]
+        for path in candidates:
+            data = await self._get_json(path)
+            if isinstance(data, dict) and data:
+                return data
+        return None
+
+    def _cancel_existing_quick_timer(self) -> None:
+        key = f"{self._host}:{self._port}"
+        task = self._quick_stop_tasks.get(key)
+        if task and not task.done():
+            task.cancel()
+        self._quick_stop_tasks.pop(key, None)
+
+    async def _stop_flow(self) -> None:
+        await self._post_command("/api/tlc/1/", "flow=0&changed=2")
+
+    def _schedule_stop_after(self, seconds: int) -> None:
+        self._cancel_existing_quick_timer()
+        key = f"{self._host}:{self._port}"
+
+        async def _timer() -> None:
+            try:
+                await asyncio.sleep(max(0, int(seconds)))
+                await self._stop_flow()
+            except asyncio.CancelledError:
+                return
+
+        self._quick_stop_tasks[key] = self._hass.async_create_task(_timer())
+
+    async def _run_quick_action(self, slot: int) -> None:
+        preset = await self._get_quick_preset(slot)
+        duration = None
+        temp = None
+        flow = None
+        if isinstance(preset, dict):
+            temp = preset.get("temperature") or preset.get("temp")
+            flow = preset.get("flow")
+            for k in ("duration", "seconds", "time", "length"):
+                if k in preset:
+                    try:
+                        duration = int(float(preset[k]))
+                        break
+                    except Exception:
+                        continue
+        if temp is not None and flow is not None:
+            try:
+                await self._post_command(
+                    "/api/tlc/1/",
+                    f"temperature={float(temp)}&flow={float(flow)}&changed=3",
+                )
+            finally:
+                self._schedule_stop_after(duration if duration is not None else 30)
+        else:
+            await self._post_command(f"/api/tlc/1/quick/{slot}/", "data=1")
+            self._schedule_stop_after(duration if duration is not None else 30)
 
 
 class OblamatikEmergencyStopButton(OblamatikBaseButton):
@@ -235,7 +310,7 @@ class OblamatikQuickAction1Button(OblamatikBaseButton):
         self._attr_icon = "mdi:numeric-1-box"
 
     async def async_press(self) -> None:
-        await self._post_command("/api/tlc/1/quick/1/", "data=1")
+        await self._run_quick_action(1)
 
 
 class OblamatikQuickAction2Button(OblamatikBaseButton):
@@ -246,7 +321,7 @@ class OblamatikQuickAction2Button(OblamatikBaseButton):
         self._attr_icon = "mdi:numeric-2-box"
 
     async def async_press(self) -> None:
-        await self._post_command("/api/tlc/1/quick/2/", "data=1")
+        await self._run_quick_action(2)
 
 
 class OblamatikQuickAction3Button(OblamatikBaseButton):
@@ -257,7 +332,7 @@ class OblamatikQuickAction3Button(OblamatikBaseButton):
         self._attr_icon = "mdi:numeric-3-box"
 
     async def async_press(self) -> None:
-        await self._post_command("/api/tlc/1/quick/3/", "data=1")
+        await self._run_quick_action(3)
 
 
 class OblamatikWaterUsageResetButton(OblamatikBaseButton):
