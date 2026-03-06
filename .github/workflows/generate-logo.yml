@@ -103,7 +103,10 @@ jobs:
           render(640,160,"logo.png",FONT_PATH)
           render(1280,320,"logo@2x.png",FONT_PATH)
           # Brand logo for HA/HACS (transparent, Garamond, light gray)
-          for w,h,outname in [(640,160,"custom_components/oblamatik/brand/logo.png")]:
+          for w,h,outname in [
+              (640,160,"custom_components/oblamatik/brand/logo.png"),
+              (1280,320,"custom_components/oblamatik/brand/logo@2x.png"),
+          ]:
               canvas = Image.new("RGBA",(w,h),(0,0,0,0))
               draw = ImageDraw.Draw(canvas)
               text = "Oblamatik"
