@@ -1,3 +1,7 @@
+## v4.2.9
+- Fix: Brand/Model diagnostics now read directly from `/api/` (uses `vendor` and `model` fields) with fallbacks.
+- Fix: Device Registry manufacturer/model now prefer `/api/` so they match device-reported values (e.g. Crosswater/Digital, Oblamatik AG/Twinlevel, Viega/Trio-E).
+
 ## v4.2.8
 - Fix: Quick Action 1/2/3 now reads presets from `/api/tlc/1/quick/{n}/` and keeps flow alive during the computed runtime.
 - Improvement: Runtime is derived from device preset `amount` and `flow` (amount/flow*60), then auto-stops the flow.

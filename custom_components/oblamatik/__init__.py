@@ -190,23 +190,37 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
             host = device["host"]
             port = device.get("port", 80)
             session = aiohttp_client.async_get_clientsession(hass)
+            data = None
+            for url in (
+                f"http://{host}:{port}/api/",
+                f"http://{host}:{port}/api/info",
+                f"http://{host}:{port}/api/index.php?url=info",
+                f"http://{host}:{port}/api/tlc/1/",
+            ):
+                try:
+                    async with session.get(url, timeout=aiohttp.ClientTimeout(total=5)) as r:
+                        if r.status == 200:
+                            data = await r.json(content_type=None)
+                            break
+                except Exception:
+                    continue
+            vendor = "KWC"
+            model = device.get("model", "Unknown")
+            if isinstance(data, dict):
+                vendor = str(
+                    data.get("vendor") or data.get("manufacturer") or data.get("name") or vendor
+                )
+                model = str(data.get("model") or data.get("type") or data.get("name") or model)
+            name = device.get("name", f"Oblamatik {host}")
             try:
-                async with session.get(
-                    f"http://{host}:{port}/api/info", timeout=aiohttp.ClientTimeout(total=5)
-                ) as r:
-                    if r.status == 200:
-                        data = await r.json(content_type=None)
-                        vendor = str(data.get("vendor") or data.get("manufacturer") or "KWC")
-                        model = str(device.get("model", data.get("model", "Unknown")))
-                        name = device.get("name", f"Oblamatik {host}")
-                        dev_reg.async_get_or_create(
-                            config_entry=entry,
-                            identifiers={(DOMAIN, host)},
-                            manufacturer=vendor,
-                            model=model,
-                            name=name,
-                            configuration_url=f"http://{host}:{port}/",
-                        )
+                dev_reg.async_get_or_create(
+                    config_entry=entry,
+                    identifiers={(DOMAIN, host)},
+                    manufacturer=vendor,
+                    model=model,
+                    name=name,
+                    configuration_url=f"http://{host}:{port}/",
+                )
             except Exception:
                 pass
     except Exception:

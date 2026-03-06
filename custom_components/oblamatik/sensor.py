@@ -102,7 +102,8 @@ async def async_setup_entry(
             OblamatikRequiredTemperatureSensor(hass, device),
             OblamatikDeviceSerialSensor(hass, device),
             OblamatikDeviceVersionSensor(hass, device),
-            OblamatikVendorSensor(hass, device),
+            OblamatikBrandSensor(hass, device),
+            OblamatikModelSensor(hass, device),
             OblamatikWifiSsidSensor(hass, device),
             OblamatikMacAddressSensor(hass, device),
             OblamatikNetworkModeSensor(hass, device),
@@ -574,24 +575,94 @@ class OblamatikDeviceVersionSensor(OblamatikBaseSensor):
             self._version = str(state.get("version", "Unknown"))
 
 
-class OblamatikVendorSensor(OblamatikBaseSensor):
+class OblamatikBrandSensor(OblamatikBaseSensor):
     def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
         super().__init__(hass, device)
-        self._attr_name = "Vendor"
-        self._attr_unique_id = f"{DOMAIN}_{self._host}_vendor"
+        self._attr_name = "Brand"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_brand"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:factory"
-        self._vendor = "Unknown"
+        self._attr_icon = "mdi:label-variant"
+        self._brand = "Unknown"
 
     @property
     def native_value(self) -> str | None:
-        return self._vendor
+        return self._brand
 
     async def async_update(self) -> None:
-        state = await self._get_device_state()
-        if state:
-            v = state.get("vendor") or state.get("manufacturer")
-            self._vendor = str(v or "Unknown")
+        info = None
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            for url in (
+                f"{base_url}/api/",
+                f"{base_url}/api/info",
+                f"{base_url}/api/index.php?url=info",
+                f"{base_url}/api/tlc/1/",
+            ):
+                try:
+                    async with session.get(url, timeout=timeout) as response:
+                        if response.status != 200:
+                            continue
+                        data = await response.json(content_type=None)
+                        info = data
+                        break
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        if isinstance(info, dict):
+            v = info.get("vendor") or info.get("manufacturer")
+            if isinstance(v, str) and v.strip():
+                self._brand = v.strip()
+                return
+            n = info.get("name")
+            if isinstance(n, str) and n.strip():
+                self._brand = n.strip()
+                return
+        self._brand = "Unknown"
+
+
+class OblamatikModelSensor(OblamatikBaseSensor):
+    def __init__(self, hass: HomeAssistant, device: dict[str, Any]) -> None:
+        super().__init__(hass, device)
+        self._attr_name = "Model"
+        self._attr_unique_id = f"{DOMAIN}_{self._host}_model"
+        self._attr_entity_category = EntityCategory.DIAGNOSTIC
+        self._attr_icon = "mdi:shield-crown"
+        self._model = "Unknown"
+
+    @property
+    def native_value(self) -> str | None:
+        return self._model
+
+    async def async_update(self) -> None:
+        model = None
+        try:
+            base_url = f"http://{self._host}:{self._port}"
+            session = aiohttp_client.async_get_clientsession(self._hass)
+            timeout = aiohttp.ClientTimeout(total=5)
+            # Try multiple sources for model information
+            for url in (
+                f"{base_url}/api/",
+                f"{base_url}/api/info",
+                f"{base_url}/api/index.php?url=info",
+                f"{base_url}/api/tlc/1/",
+            ):
+                try:
+                    async with session.get(url, timeout=timeout) as response:
+                        if response.status != 200:
+                            continue
+                        data = await response.json(content_type=None)
+                        cand = data.get("model") or data.get("type") or data.get("name")
+                        if cand:
+                            model = str(cand)
+                            break
+                except Exception:
+                    continue
+        except Exception:
+            pass
+        self._model = model or "Unknown"
 
 
 class OblamatikIoTSerialSensor(OblamatikIoTSensorBase):
