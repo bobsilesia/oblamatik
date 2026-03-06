@@ -1,6 +1,11 @@
 name: Export Brands Folder
 on:
   workflow_dispatch:
+  push:
+    paths:
+      - "custom_components/oblamatik/brand/**"
+      - "icon.png"
+      - "icon@2x.png"
 permissions:
   contents: write
 jobs:
