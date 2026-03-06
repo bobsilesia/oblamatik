@@ -1,3 +1,6 @@
+## v4.2.3
+- **Docs**: Changed README logo path to absolute URL (raw.githubusercontent.com) to fix visibility issues in HACS.
+
 ## v4.2.2
 - **Branding Fix**: Adjusted logo and icon rendering (added shadow) to improve visibility in HACS on both light and dark themes.
 - **Assets**: Regenerated all branding assets with improved contrast.
