@@ -1,3 +1,9 @@
+## v4.2.1
+- **Branding**: Updated integration logo and icons to use Garamond font in light gray.
+- **Assets**: Added high-resolution (`@2x`) logo and icon variants for HACS and Home Assistant brands.
+- **Docs**: Updated README to use the specific logo requested by the user.
+- **CI**: Fixed branding workflow dependencies and asset generation logic.
+
 ## v4.2.0
 - Feature: Added service `oblamatik.force_refresh` to refresh all or a single device (host parameter).
 - Feature: Added Force Refresh button entity per device (Diagnostics) to trigger refresh from UI.
