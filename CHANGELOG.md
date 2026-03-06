@@ -1,3 +1,6 @@
+## v4.2.10
+- Fix: Use valid `mdi:wifi` icon for Wi-Fi Signal (dBm) sensor (previously invalid `mdi:wifi-strength`).
+
 ## v4.2.9
 - Fix: Brand/Model diagnostics now read directly from `/api/` (uses `vendor` and `model` fields) with fallbacks.
 - Fix: Device Registry manufacturer/model now prefer `/api/` so they match device-reported values (e.g. Crosswater/Digital, Oblamatik AG/Twinlevel, Viega/Trio-E).

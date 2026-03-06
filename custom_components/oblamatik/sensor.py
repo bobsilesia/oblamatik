@@ -948,7 +948,7 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
         self._attr_name = "Wi-Fi Signal (dBm)"
         self._attr_unique_id = f"{DOMAIN}_{self._host}_signal_dbm"
         self._attr_entity_category = EntityCategory.DIAGNOSTIC
-        self._attr_icon = "mdi:wifi-strength"
+        self._attr_icon = "mdi:wifi"
         self._attr_native_unit_of_measurement = "dBm"
         self._attr_state_class = "measurement"
         self._attr_entity_registry_enabled_default = True
