@@ -1,3 +1,7 @@
+## v4.3.2
+- Chore: Remove `device_backup/` folder from repository to ensure compliance with HACS repository rules (clean repo without vendor binaries).
+- Docs: Add `info.md` for better HACS integration presentation.
+
 ## v4.3.1
 - Fix: Restore original Oblamatik logo and icon (from `assets/readme_logo.jpg`) for HACS branding, replacing the temporary KWC logo.
 

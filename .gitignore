@@ -23,3 +23,4 @@ deploy_fix.py
 upload_fix.py
 fix_ip_address.patch
 payload/
+device_backup/
