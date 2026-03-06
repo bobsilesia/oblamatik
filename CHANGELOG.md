@@ -1,3 +1,7 @@
+## v4.2.2
+- **Branding Fix**: Adjusted logo and icon rendering (added shadow) to improve visibility in HACS on both light and dark themes.
+- **Assets**: Regenerated all branding assets with improved contrast.
+
 ## v4.2.1
 - **Branding**: Updated integration logo and icons to use Garamond font in light gray.
 - **Assets**: Added high-resolution (`@2x`) logo and icon variants for HACS and Home Assistant brands.
