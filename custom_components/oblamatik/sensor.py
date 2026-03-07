@@ -955,7 +955,7 @@ class OblamatikPingSensor(OblamatikBaseSensor):
         self._attr_icon = "mdi:speedometer"
         self._attr_native_unit_of_measurement = UnitOfTime.MILLISECONDS
         self._attr_state_class = "measurement"
-        self._ping = None
+        self._ping: float | None = None
 
     @property
     def native_value(self) -> float | None:

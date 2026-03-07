@@ -1,3 +1,6 @@
+## v4.4.2
+- **Fix**: Corrected MyPy typing issues (`Incompatible types in assignment`) in `sensor.py`.
+
 ## v4.4.1
 - **Fix**: Code formatting corrections to satisfy CI checks (Ruff Format).
 
