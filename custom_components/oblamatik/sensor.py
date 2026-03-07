@@ -1101,7 +1101,8 @@ class OblamatikSignalDbmSensor(OblamatikBaseSensor):
                                         self._signal_dbm = int(val)
                                     elif val <= 5:
                                         # Bars (0-5) -> dBm mapping
-                                        # 5 -> -50, 4 -> -60, 3 -> -70, 2 -> -80, 1 -> -90, 0 -> -100
+                                        # 5 -> -50, 4 -> -60, 3 -> -70, 2 -> -80
+                                        # 1 -> -90, 0 -> -100
                                         self._signal_dbm = -100 + (int(val) * 10)
                                     else:
                                         # Quality % (>5) -> dBm mapping

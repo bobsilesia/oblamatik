@@ -1,3 +1,8 @@
+## v4.4.0
+- **Feature**: Comprehensive CI/CD pipeline implementation (HACS, Hassfest, Ruff Linting).
+- **Maintenance**: Significant code quality improvements and linting fixes in `sensor.py`.
+- **Maintenance**: Refactored project documentation and rules for better maintainability.
+
 ## v4.3.10
 - Maintenance: Code quality improvements (linting, formatting, imports sorting) to meet HACS/Home Assistant standards.
 - Maintenance: Updated CI workflows (`hassfest`, `hacs`) for better automated validation.
