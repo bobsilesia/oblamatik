@@ -2,19 +2,21 @@
 
 ## Supported Versions
 
-We only support the latest released version of the integration. Please upgrade to the latest version before reporting any security issues.
+Only the latest major version is officially supported with security updates.
 
 | Version | Supported          |
 | ------- | ------------------ |
-| Latest  | :white_check_mark: |
-| < 2.0   | :x:                |
+| > 4.0   | :white_check_mark: |
+| < 4.0   | :x:                |
 
 ## Reporting a Vulnerability
 
-We take security seriously. If you discover a vulnerability, please report it responsibly.
+We take the security of this integration seriously.
 
-### How to Report
+If you discover a security vulnerability, please **DO NOT** open a public issue.
 
-Please do **not** create a public GitHub issue for security vulnerabilities. Instead, please use the **"Report a vulnerability"** button on the [Security Advisories](https://github.com/bobsilesia/oblamatik/security/advisories) page if available, or contact the maintainer directly via GitHub (e.g., mention in a generic issue asking for a private channel if unsure).
+Instead, please report it via [GitHub Security Advisories](https://github.com/bobsilesia/oblamatik/security/advisories/new).
 
-We will do our best to respond and address the issue promptly.
+If that feature is not enabled or accessible, please contact the maintainer directly or open a "Draft" Pull Request with the fix and mark it as sensitive.
+
+We will acknowledge your report within 48 hours and strive to provide a fix as soon as possible.
