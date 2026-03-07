@@ -8,8 +8,8 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import (
     EntityCategory,
     UnitOfTemperature,
-    UnitOfVolumeFlowRate,
     UnitOfTime,
+    UnitOfVolumeFlowRate,
 )
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import aiohttp_client
@@ -1007,9 +1007,9 @@ class OblamatikReliabilitySensor(OblamatikBaseSensor):
                     self._success_count += 1
         except Exception:
             pass  # Failure counts as no increment to success
-        
+
         self._total_count += 1
-        
+
         if self._total_count > 0:
             self._reliability = round((self._success_count / self._total_count) * 100, 1)
 
@@ -1031,18 +1031,26 @@ class OblamatikIoTVendorSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             wlan = state.get("wlan") or {}
-            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(":", "").replace("-", "")
-            
+            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(
+                ":", ""
+            ).replace("-", "")
+
             if not mac:
                 self._vendor = "Unknown"
                 return
 
             # Check OUI (first 6 chars)
-            if mac.startswith(("C49300", "001F16", "801F12")):
+            oui = mac[:6]
+            if oui in ["C49300", "001F16", "801F12"]:
                 self._vendor = "8devices (Carambola2)"
-            elif mac.startswith(("B827EB", "DCA632", "E45F01")):
+            elif oui in ["B827EB", "DCA632", "E45F01"]:
                 self._vendor = "Raspberry Pi"
-            elif mac.startswith(("18FE34", "240AC4", "246F28", "24A160", "2C3AE8", "30AEA4", "3C71BF", "483FDA", "485519", "5443B2", "5C6B4F", "600194", "68C63A", "807D3A", "84CCA8", "84F3EB", "9097D5", "A020A6", "A47B9D", "AC67B2", "B4E62D", "BCDD7E", "C44F33", "CC50E3", "D8A01D", "DC4F22", "ECFABC")):
+            elif oui in [
+                "18FE34", "240AC4", "246F28", "24A160", "2C3AE8", "30AEA4", "3C71BF",
+                "483FDA", "485519", "5443B2", "5C6B4F", "600194", "68C63A", "807D3A",
+                "84CCA8", "84F3EB", "9097D5", "A020A6", "A47B9D", "AC67B2", "B4E62D",
+                "BCDD7E", "C44F33", "CC50E3", "D8A01D", "DC4F22", "ECFABC"
+            ]:
                 self._vendor = "Espressif (ESP32/8266)"
             else:
                 self._vendor = "Unknown (Generic)"

@@ -1,3 +1,7 @@
+## v4.3.10
+- Maintenance: Code quality improvements (linting, formatting, imports sorting) to meet HACS/Home Assistant standards.
+- Maintenance: Updated CI workflows (`hassfest`, `hacs`) for better automated validation.
+
 ## v4.3.9
 - Fix: Improved MAC address parsing in `IoT Hardware Vendor` sensor to handle formats with hyphens (e.g., `C4-93-00...`) instead of colons, ensuring 8devices/Carambola2 modules are correctly identified.
 
