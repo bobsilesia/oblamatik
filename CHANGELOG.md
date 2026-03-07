@@ -1,3 +1,6 @@
+## v4.4.1
+- **Fix**: Code formatting corrections to satisfy CI checks (Ruff Format).
+
 ## v4.4.0
 - **Feature**: Comprehensive CI/CD pipeline implementation (HACS, Hassfest, Ruff Linting).
 - **Maintenance**: Significant code quality improvements and linting fixes in `sensor.py`.

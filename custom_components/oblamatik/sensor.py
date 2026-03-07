@@ -963,6 +963,7 @@ class OblamatikPingSensor(OblamatikBaseSensor):
 
     async def async_update(self) -> None:
         import time
+
         start = time.monotonic()
         try:
             base_url = f"http://{self._host}:{self._port}"
@@ -1031,9 +1032,12 @@ class OblamatikIoTVendorSensor(OblamatikBaseSensor):
         state = await self._get_device_state()
         if state:
             wlan = state.get("wlan") or {}
-            mac = str(state.get("mac_address") or wlan.get("mac_address") or "").upper().replace(
-                ":", ""
-            ).replace("-", "")
+            mac = (
+                str(state.get("mac_address") or wlan.get("mac_address") or "")
+                .upper()
+                .replace(":", "")
+                .replace("-", "")
+            )
 
             if not mac:
                 self._vendor = "Unknown"
@@ -1046,10 +1050,33 @@ class OblamatikIoTVendorSensor(OblamatikBaseSensor):
             elif oui in ["B827EB", "DCA632", "E45F01"]:
                 self._vendor = "Raspberry Pi"
             elif oui in [
-                "18FE34", "240AC4", "246F28", "24A160", "2C3AE8", "30AEA4", "3C71BF",
-                "483FDA", "485519", "5443B2", "5C6B4F", "600194", "68C63A", "807D3A",
-                "84CCA8", "84F3EB", "9097D5", "A020A6", "A47B9D", "AC67B2", "B4E62D",
-                "BCDD7E", "C44F33", "CC50E3", "D8A01D", "DC4F22", "ECFABC"
+                "18FE34",
+                "240AC4",
+                "246F28",
+                "24A160",
+                "2C3AE8",
+                "30AEA4",
+                "3C71BF",
+                "483FDA",
+                "485519",
+                "5443B2",
+                "5C6B4F",
+                "600194",
+                "68C63A",
+                "807D3A",
+                "84CCA8",
+                "84F3EB",
+                "9097D5",
+                "A020A6",
+                "A47B9D",
+                "AC67B2",
+                "B4E62D",
+                "BCDD7E",
+                "C44F33",
+                "CC50E3",
+                "D8A01D",
+                "DC4F22",
+                "ECFABC",
             ]:
                 self._vendor = "Espressif (ESP32/8266)"
             else:
