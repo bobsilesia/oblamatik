@@ -306,7 +306,7 @@ class OblamatikStartFillButton(OblamatikBaseButton):
 
     async def _get_number_value(self, unique_id: str, fallback: float) -> float:
         registry = er.async_get(self._hass)
-        entity_id = er.async_get_entity_id(registry, "number", DOMAIN, unique_id)
+        entity_id = registry.async_get_entity_id("number", DOMAIN, unique_id)
         if not entity_id:
             return fallback
         state = self._hass.states.get(entity_id)
