@@ -126,7 +126,7 @@ class OblamatikBaseButton(ButtonEntity):
     async def _async_fast_status_refresh(self) -> None:
         registry = er.async_get(self._hass)
         status_unique_id = f"{DOMAIN}_{self._host}_status"
-        entity_id = er.async_get_entity_id(registry, "sensor", DOMAIN, status_unique_id)
+        entity_id = registry.async_get_entity_id("sensor", DOMAIN, status_unique_id)
         if not entity_id:
             return
         for _ in range(10):
@@ -279,7 +279,7 @@ class OblamatikMeasuringCupStartButton(OblamatikBaseButton):
     async def _get_current_amount(self) -> float:
         registry = er.async_get(self._hass)
         unique_id = f"{DOMAIN}_{self._host}_measuring_cup_amount"
-        entity_id = er.async_get_entity_id(registry, "number", DOMAIN, unique_id)
+        entity_id = registry.async_get_entity_id("number", DOMAIN, unique_id)
         if not entity_id:
             return 0.5
         state = self._hass.states.get(entity_id)
