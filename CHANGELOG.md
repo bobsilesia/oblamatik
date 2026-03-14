@@ -1,5 +1,7 @@
-## v4.4.3
+## v4.4.4
 - **Fix**: Resolved `button/press` error due to deprecated `async_get_entity_id` usage. Now using `registry.async_get_entity_id(...)` correctly.
+
+## v4.4.3
 
 ## v4.4.3
 - **Fix**: Resolved `button/press` error due to deprecated `async_get_entity_id` usage. Now using `registry.async_get_entity_id(...)` correctly.
