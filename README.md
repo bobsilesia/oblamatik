@@ -4,7 +4,7 @@
   <img src="https://raw.githubusercontent.com/bobsilesia/oblamatik/main/assets/readme_logo.jpg" alt="Oblamatik Logo" width="70%" />
 </p>
 
-[![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver)](https://github.com/bobsilesia/oblamatik/releases) ![HACS Custom](https://img.shields.io/badge/HACS-Custom-orange.svg) [![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml) [![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml)
+[![Latest release](https://img.shields.io/github/v/release/bobsilesia/oblamatik?sort=semver)](https://github.com/bobsilesia/oblamatik/releases) ![HACS Default](https://img.shields.io/badge/HACS-Default-blue.svg) [![CI](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/ci.yml) [![Release](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml/badge.svg?branch=main)](https://github.com/bobsilesia/oblamatik/actions/workflows/release.yml)
 [![Stars](https://img.shields.io/github/stars/bobsilesia/oblamatik?style=social)](https://github.com/bobsilesia/oblamatik/stargazers)
 ![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg) ![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json) ![Mypy](https://img.shields.io/badge/mypy-checked-blue)
 
@@ -30,7 +30,7 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=bobsilesia&repository=oblamatik&category=integration)
 
 1. Ensure the repository contains the `custom_components/oblamatik` directory.
-2. In HACS, add the repository as a Custom Repository or use the available source if the repo is publicly supported by HACS.
+2. In HACS, search for **Oblamatik** and install it directly (available in HACS Default).
 3. Install the integration and restart Home Assistant.
 
 ## Installation (Manual)
