@@ -3,7 +3,6 @@ __pycache__/
 .DS_Store
 .venv
 .trae/
-.clinerules
 
 # Build artifacts
 oblamatik.zip
