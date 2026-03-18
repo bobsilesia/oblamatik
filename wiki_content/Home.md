@@ -36,6 +36,7 @@ This integration allows you to monitor and control water temperature, flow rate,
 - [Automations](Automations.md)
 - [Diagnostics](Diagnostics.md)
 - [FAQ](FAQ.md)
+- [UiMatic (Lovelace Card)](UiMatic.md)
 
 ## Related (Homebridge)
 - Homebridge plugin for Viega Multiplex Trio E (Axel Terizaki): https://github.com/AxelTerizaki/homebridge-trio-e

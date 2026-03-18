@@ -82,6 +82,55 @@ Oblamatik is a Home Assistant integration that allows control and parameter read
   - Service: `press`
   - Data: `entity_id: button.oblamatik_water_usage_reset`
 
+## Lovelace UI: UiMatic Card
+If you want a modern, minimalist Lovelace UI for controlling Oblamatik devices, check out **UiMatic**:
+https://github.com/bobsilesia/UiMatic
+
+### Features
+- Temperature control (10–45°C) — arc dial (classic) or iOS-style drum picker (modern)
+- Water ON/OFF button (with ripple animation)
+- Flow rate control (0–10 L/min) — arc dial or drum picker
+- Drain open/close toggle (flood-safety oriented default: open)
+- Toast notifications on action
+- Two layouts: `classic` and `modern`
+
+### Installation
+HACS (recommended):
+1. In HACS, click ⋮ → Custom repositories
+2. Add URL: `https://github.com/bobsilesia/UiMatic` → Category: `Dashboard`
+3. Download, then hard refresh the browser (Ctrl+Shift+R / Cmd+Shift+R)
+
+Manual:
+1. Download `oblamatik-card.js` from the latest UiMatic release
+2. Copy it to `/config/www/oblamatik-card.js`
+3. In Home Assistant: Settings → Dashboards → Resources → Add resource:
+   - URL: `/local/oblamatik-card.js`
+   - Type: JavaScript module
+4. Restart Home Assistant
+
+### Configuration
+1. Find your entity IDs:
+   - Home Assistant → Developer Tools → States, filter by `oblamatik`
+2. Add the card to your dashboard using a Manual card (replace entity IDs with yours):
+
+```yaml
+type: custom:oblamatik-card
+name: Bath Controller
+entity_switch: switch.water_flow_192.168.1.36
+entity_temperature: sensor.temperature_192.168.1.36
+entity_flow: sensor.flow_rate_192.168.1.36
+entity_drain: binary_sensor.bath_drain_192.168.1.36
+entity_number_temp: number.temperature_192.168.1.36
+entity_number_flow: number.flow_rate_192.168.1.36
+min_temp: 10
+max_temp: 45
+min_flow: 0
+max_flow: 10
+layout: classic
+```
+
+Note: The example entity IDs above are taken from UiMatic docs; your actual IDs depend on your Home Assistant naming and detected device model. Always copy the real entity IDs from Developer Tools.
+
 ## Documentation
 - [Home](wiki_content/Home.md)
 - [Installation](wiki_content/Installation.md)
@@ -113,3 +162,5 @@ Special thanks to the authors of the following repositories, whose work served a
 - Homebridge plugin for Viega Multiplex Trio E (by Axel Terizaki):  
   https://github.com/AxelTerizaki/homebridge-trio-e  
   If you use Apple HomeKit via Homebridge, this plugin exposes Viega devices to HomeKit. Our project targets Home Assistant; the Homebridge plugin is an alternative path for Apple-centric setups.
+- UiMatic — modern minimalist Lovelace card for Oblamatik / KWC / Viega / Crosswater bath controllers:  
+  https://github.com/bobsilesia/UiMatic

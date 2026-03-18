@@ -3,6 +3,7 @@
 - [Configuration](Configuration)
 - [Supported Devices](Supported-Devices)
 - [Entities and Controls](Entities-and-Controls)
+- [UiMatic (Lovelace Card)](UiMatic)
 - [Automations](Automations)
 - [Troubleshooting](Troubleshooting)
 - [Hardware Replication](Hardware-Replication)
